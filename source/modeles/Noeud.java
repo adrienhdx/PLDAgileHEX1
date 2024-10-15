@@ -1,10 +1,12 @@
 package source.modeles;
 
 public class Noeud {
+    private String id;
     private double latitude;
     private double longitude;
 
-    public Noeud(double latitude, double longitude) {
+    public Noeud(String id, double latitude, double longitude) {
+        this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -23,5 +25,10 @@ public class Noeud {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    @Override
+    public String toString() {
+        return "Noeud{id='" + id + "', latitude=" + latitude + ", longitude=" + longitude + "}";
     }
 }

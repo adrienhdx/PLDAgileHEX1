@@ -2,39 +2,44 @@ package source;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import source.modeles.Noeud;
 
 public class Test_xml {
     public static void main(String[] args) throws ParserConfigurationException, SAXException {
         try {
             File file = new File("petitPlan.xml");
+            // Chargement du fichier XML
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document document = db.parse(file);
             document.getDocumentElement().normalize();
-            System.out.println("Racine :" + document.getDocumentElement().getNodeName());
-            NodeList liste_noeud = document.getElementsByTagName("noeud");
-            System.out.println("noeuds :" + liste_noeud);
-//            System.out.println("----------------------------");
-//            for (int temp = 0; temp < nList.getLength(); temp++) {
-//                Node nNode = nList.item(temp);
-//                System.out.println("\nCurrent Element :" + nNode.getNodeName());
-//                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-//                    Element eElement = (Element) nNode;
-//                    System.out.println("Employee id : " + eElement.getAttribute("id"));
-//                    System.out.println("First Name : "
-//                            + eElement.getElementsByTagName("firstname").item(0).getTextContent());
-//                    System.out.println(
-//                            "Last Name : " + eElement.getElementsByTagName("lastname").item(0).getTextContent());
-//                    System.out.println(
-//                            "Salary : " + eElement.getElementsByTagName("salary").item(0).getTextContent());
-//                }
-//            }
+            // On récupère tous les noeuds "noeud" correspondant aux points de la carte
+            NodeList nodeList = document.getElementsByTagName("noeud");
+
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+                    // On recupere les attributs pour creer chaque objet noeud
+                    String id = element.getAttribute("id");
+                    double latitude = Double.parseDouble(element.getAttribute("latitude"));
+                    double longitude = Double.parseDouble(element.getAttribute("longitude"));
+
+                    Noeud noeud = new Noeud(id, latitude, longitude);
+                    System.out.println(noeud);
+                }
+            }
         } catch (IOException e) {
             System.out.println(e);
         }
