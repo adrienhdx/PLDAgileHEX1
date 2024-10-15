@@ -9,7 +9,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Test_xml {
-    public static void traiterXml(String[] args) throws ParserConfigurationException, SAXException {
+    public static void main(String[] args) throws ParserConfigurationException, SAXException {
         try {
             File file = new File("petitPlan.xml");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
