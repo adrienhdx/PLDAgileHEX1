@@ -2,9 +2,9 @@ package source.modeles;
 
 public class Graph {
     private int verticesNum;
-    private int[][] matrix;
+    private double[][] matrix;
 
-    public Graph(int verticesNum, int[][] matrix) {
+    public Graph(int verticesNum, double[][] matrix) {
         this.verticesNum = verticesNum;
         this.matrix = matrix;
     }
@@ -13,6 +13,6 @@ public class Graph {
     public int getVerticesNum() { return verticesNum; }
     public void setVerticesNum(int verticesNum) { this.verticesNum = verticesNum; }
 
-    public int[][] getMatrix() { return matrix; }
-    public void setMatrix(int[][] matrix) { this.matrix = matrix; }
+    public double[][] getMatrix() { return matrix; }
+    public void setMatrix(double[][] matrix) { this.matrix = matrix; }
 }
