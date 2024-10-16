@@ -1,18 +1,23 @@
 package source.modeles;
 
-public class Graph {
-    private int verticesNum;
-    private double[][] matrix;
+public interface Graph {
+	/**
+	 * @return the number of vertices in <code>this</code>
+	 */
+	public abstract int getNbVertices();
 
-    public Graph(int verticesNum, double[][] matrix) {
-        this.verticesNum = verticesNum;
-        this.matrix = matrix;
-    }
+	/**
+	 * @param i 
+	 * @param j 
+	 * @return the cost of arc (i,j) if (i,j) is an arc; -1 otherwise
+	 */
+	public abstract double getCost(int i, int j);
 
-    // Getters et Setters
-    public int getVerticesNum() { return verticesNum; }
-    public void setVerticesNum(int verticesNum) { this.verticesNum = verticesNum; }
+	/**
+	 * @param i 
+	 * @param j 
+	 * @return true if <code>(i,j)</code> is an arc of <code>this</code>
+	 */
+	public abstract boolean isArc(int i, int j);
 
-    public double[][] getMatrix() { return matrix; }
-    public void setMatrix(double[][] matrix) { this.matrix = matrix; }
 }
