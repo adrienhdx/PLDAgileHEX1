@@ -20,7 +20,7 @@ public abstract class TemplateTSP implements TSP {
 		Collection<Integer> unvisited = new ArrayList<Integer>(g.getNbVertices()-1);
 		for (int i=1; i<g.getNbVertices(); i++) unvisited.add(i);
 		Collection<Integer> visited = new ArrayList<Integer>(g.getNbVertices());
-		visited.add(0); // The first visited vertex is 0
+		visited.add(0); // The first visited vertex is 0 (warehouse)
 		bestSolCost = Integer.MAX_VALUE;
 		branchAndBound(0, unvisited, visited, 0);
 	}
@@ -72,6 +72,7 @@ public abstract class TemplateTSP implements TSP {
 	    			bestSolCost = currentCost+g.getCost(currentVertex,0);
 	    		}
 	    	}
+			// ici implémenter précédence PickupX->DeliveryX
 	    } else if (currentCost+bound(currentVertex,unvisited) < bestSolCost){
 	        Iterator<Integer> it = iterator(currentVertex, unvisited, g);
 	        while (it.hasNext()){
