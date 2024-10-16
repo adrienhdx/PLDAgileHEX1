@@ -28,12 +28,14 @@ public class MapDisplay {
             DefaultTileFactory tileFactory = new DefaultTileFactory(info);
             mapViewer.setTileFactory(tileFactory);
 
+            List<Vertice> vertices = (List<Vertice>) mapPlan.get(0);
+
             // Initialisation des paramètres de la carte
             mapViewer.setZoom(3);
-            mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
+            //mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
+            mapViewer.setAddressLocation(new GeoPosition(vertices.get(0).getLatitude(), vertices.get(0).getLongitude()));
             // Création de la collection d'objets "Waypoints" à partir de la liste de Noeud obtenue avec le xml parser
             Set<Waypoint> waypoints = new HashSet<>();
-            List<Vertice> vertices = (List<Vertice>) mapPlan.get(0);
             for (Vertice node : vertices) {
                 waypoints.add(new DefaultWaypoint(new GeoPosition(node.getLatitude(), node.getLongitude())));
             }
