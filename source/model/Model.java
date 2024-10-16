@@ -1,10 +1,9 @@
-package source;
-
-import source.modeles.*;
+package source.model;
 
 import java.util.List;
+import java.util.Observable;
 
-public class Systems {
+public class Model {
     private Graph map;
     private List<Delivery> assignedDeliveryList;
     private List<Delivery> postponedDeliveryList;
@@ -13,17 +12,7 @@ public class Systems {
     private List<Segment> segmentList;
     private List<Vertice> verticeList;
 
-    public Systems(Graph map, List<Delivery> assignedDeliveryList, List<Delivery> postponedDeliveryList,
-                  List<Delivery> pendingDeliveryList, List<Courier> courierList,
-                  List<Segment> segmentList, List<Vertice> verticeList) {
-        this.map = map;
-        this.assignedDeliveryList = assignedDeliveryList;
-        this.postponedDeliveryList = postponedDeliveryList;
-        this.pendingDeliveryList = pendingDeliveryList;
-        this.courierList = courierList;
-        this.segmentList = segmentList;
-        this.verticeList = verticeList;
-    }
+    public Model(){}
 
     // Getters et Setters
     public Graph getMap() { return map; }

@@ -1,4 +1,4 @@
-package source.vue;
+package source.view;
 
 import org.jxmapviewer.viewer.*;
 import org.jxmapviewer.JXMapViewer;
@@ -17,19 +17,22 @@ import java.util.Set;
 
 public class MapDisplay {
 
+    private static JXMapViewer mapViewer;
+
+    public MapDisplay(){
+        mapViewer = new JXMapViewer();
+        // Initialisation de la carte via OpenStreetMap
+        OSMTileFactoryInfo info = new OSMTileFactoryInfo();
+        DefaultTileFactory tileFactory = new DefaultTileFactory(info);
+        mapViewer.setTileFactory(tileFactory);
+
+        // Initialisation des paramètres de la carte
+        mapViewer.setZoom(3);
+        mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
+    }
+
     public static void afficherNoeuds(List<double[]> coordinates){
         try {
-            // Initialisation du map viewer
-            JXMapViewer mapViewer = new JXMapViewer();
-
-            // Initialisation de la carte via OpenStreetMap
-            OSMTileFactoryInfo info = new OSMTileFactoryInfo();
-            DefaultTileFactory tileFactory = new DefaultTileFactory(info);
-            mapViewer.setTileFactory(tileFactory);
-
-            // Initialisation des paramètres de la carte
-            mapViewer.setZoom(3);
-            mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
             // Création de la collection d'objets "Waypoints" à partir de la liste de Noeud obtenue avec le xml parser
             Set<Waypoint> waypoints = new HashSet<>();
             for (double[] coord : coordinates) {
@@ -46,19 +49,14 @@ public class MapDisplay {
 
             CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
             mapViewer.setOverlayPainter(painter);
-            Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-            int screenHeight = dimension.height;
-            int screenWidth = dimension.width;
-            JFrame frame = new JFrame("Visualisation des noeuds");
-            frame.getContentPane().add(new JScrollPane(mapViewer));
-            frame.setSize(screenWidth, screenHeight);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setVisible(true);
         } catch (Exception e) {
             System.out.println(e);
         }
 
     }
 
+    public static JXMapViewer getMapViewer() {
+        return mapViewer;
+    }
 }
 
