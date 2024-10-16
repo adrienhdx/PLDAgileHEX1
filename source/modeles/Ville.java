@@ -6,10 +6,10 @@ public class Ville {
 
     private int num_noeuds;
     private int num_segments;
-    private List<Noeud> noeuds;
+    private List<Vertice> vertices;
     private List<Segment> segments;
 
-    public double CalculerDistance(Noeud depart, Noeud arrivee) {
+    public double CalculerDistance(Vertice depart, Vertice arrivee) {
         return 0;
     }
 }
