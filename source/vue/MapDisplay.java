@@ -5,19 +5,20 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.OSMTileFactoryInfo;
+import source.modeles.Vertice;
 
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public class MapDisplay {
 
-    public static void afficherNoeuds(List<double[]> coordinates){
+    public static void afficherNoeuds(List mapPlan){
         try {
             // Initialisation du map viewer
             JXMapViewer mapViewer = new JXMapViewer();
@@ -32,13 +33,30 @@ public class MapDisplay {
             mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
             // Création de la collection d'objets "Waypoints" à partir de la liste de Noeud obtenue avec le xml parser
             Set<Waypoint> waypoints = new HashSet<>();
-            for (double[] coord : coordinates) {
-                waypoints.add(new DefaultWaypoint(new GeoPosition(coord[0], coord[1])));
+            List<Vertice> vertices = (List<Vertice>) mapPlan.get(0);
+            for (Vertice node : vertices) {
+                waypoints.add(new DefaultWaypoint(new GeoPosition(node.getLatitude(), node.getLongitude())));
             }
 
             // Création d'un "waypoint painter" pour afficher les waypoints
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(waypoints);
+
+            //Ajout du zoom de la carte
+            mapViewer.addMouseWheelListener(new MouseWheelListener() {
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    if (e.getWheelRotation() < 0) {
+                        // Zoom avant
+                        int currentZoom = mapViewer.getZoom();
+                        mapViewer.setZoom(Math.max(currentZoom - 1, info.getMinimumZoomLevel()));
+                    } else {
+                        // Zoom arrière
+                        int currentZoom = mapViewer.getZoom();
+                        mapViewer.setZoom(Math.min(currentZoom + 1, info.getMaximumZoomLevel()));
+                    }
+                }
+            });
 
             // Combine the painters (you can add more painters if needed)
             List<Painter<JXMapViewer>> painters = new ArrayList<>();
@@ -57,6 +75,8 @@ public class MapDisplay {
         } catch (Exception e) {
             System.out.println(e);
         }
+
+
 
     }
 
