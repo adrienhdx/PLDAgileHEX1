@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import source.modeles.Noeud;
+import source.modeles.Vertice;
 
 public class Test_xml {
     public static void main(String[] args) throws ParserConfigurationException, SAXException {
@@ -36,7 +36,7 @@ public class Test_xml {
                     double latitude = Double.parseDouble(element.getAttribute("latitude"));
                     double longitude = Double.parseDouble(element.getAttribute("longitude"));
 
-                    Noeud noeud = new Noeud(id, latitude, longitude);
+                    Vertice noeud = new Vertice(id, latitude, longitude);
                     System.out.println(noeud);
                 }
             }
