@@ -45,4 +45,9 @@ public class Segment {
     public void setNomRue(String nomRue) {
         this.nomRue = nomRue;
     }
+
+    @Override
+    public String toString() {
+        return "Segment{origine=" + origine + ", destination=" + destination + ", longueur=" + longueur + ", nomRue='" + nomRue + "'}";
+    }
 }
