@@ -6,11 +6,11 @@ import java.util.List;
 public class Route {
     private String id;
     private Date date;
-    private List<source.Segment> segments;
+    private List<Segment> segments;
     private List<Delivery> deliveries;
     private Courier courier;
 
-    public Route(String id, Date date, List<source.Segment> segments) {
+    public Route(String id, Date date, List<Segment> segments) {
         this.id = id;
         this.date = date;
         this.segments = segments;
@@ -23,7 +23,7 @@ public class Route {
     public Date getDate() { return date; }
     public void setDate(Date date) { this.date = date; }
 
-    public List<source.Segment> getSegments() { return segments; }
+    public List<Segment> getSegments() { return segments; }
     public void setSegments(List<Segment> segments) { this.segments = segments; }
 
     public Courier getCourier() { return courier; }
