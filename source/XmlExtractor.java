@@ -44,7 +44,7 @@ public class XmlExtractor {
             e.printStackTrace();
         }
     }*/
-    public static List<Map<String,?>> extractPlan(String file) {
+    public static List extractPlan(String file) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -52,8 +52,9 @@ public class XmlExtractor {
 
             NodeList nodeList = document.getElementsByTagName("noeud");
 
-            List<Map<String, ?>> returnList = new ArrayList<Map<String, ?>>();
+            List returnList = new ArrayList<Map<String, ?>>();
             Map<String, Vertice> noeudMap = new HashMap<>();
+            List<Vertice> vertices = new ArrayList<>();
 
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -67,14 +68,15 @@ public class XmlExtractor {
 
                     Vertice noeud = new Vertice(id, latitude, longitude);
                     noeudMap.put(id, noeud);
+                    vertices.add(noeud);
                     System.out.println(noeud);
                 }
             }
-            returnList.add(noeudMap);
+            returnList.add(vertices);
 
             // On récupère tous les tronçons "troncon" correspondant aux segments de la carte
             NodeList segmentList = document.getElementsByTagName("troncon");
-            HashMap<String, Segment> segmentMap = new HashMap<>();
+            List segments = new ArrayList();
             for (int i = 0; i < segmentList.getLength(); i++) {
                 Node node = segmentList.item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -87,12 +89,12 @@ public class XmlExtractor {
                     Vertice noeudOrigine = noeudMap.get(origine);
                     Vertice noeudDestination = noeudMap.get(destination);
                     Segment segment = new Segment(nomRue, noeudOrigine, noeudDestination, longueur);
-                    segmentMap.put(nomRue, segment);
+                    segments.add(segment);
                     System.out.println(segment);
                 }
             }
 
-            returnList.add(segmentMap);
+            returnList.add(segments);
             return returnList;
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,14 +1,18 @@
 package source;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
+
+import source.modeles.Vertice;
+
+import source.vue.*;
 
 public class main {
     public static void main(String[] args) {
-        List<Map<String,?>> Points = XmlExtractor.extractPlan("resources/grandPlan.xml");
+        List Points = XmlExtractor.extractPlan("resources/grandPlan.xml");
         System.out.println("Hello world!");
-        System.out.println(Points.get(0));
-        System.out.println(Points.get(1));
+        List<Vertice> noeuds = (List<Vertice>) Points.get(0);
+        for (Vertice v : noeuds) {
+            System.out.println(v.getLatitude());
+        }
     }
 }
