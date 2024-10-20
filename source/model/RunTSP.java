@@ -1,4 +1,4 @@
-package source.modeles;
+package source.model;
 
 public class RunTSP {
 	public static void main(String[] args) {

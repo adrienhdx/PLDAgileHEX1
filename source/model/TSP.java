@@ -1,4 +1,4 @@
-package source.modeles;
+package source.model;
 
 public interface TSP {
 	/**

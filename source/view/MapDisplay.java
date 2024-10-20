@@ -5,14 +5,13 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.OSMTileFactoryInfo;
-import source.modeles.Vertice;
+import source.model.Vertice;
 
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 

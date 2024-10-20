@@ -6,8 +6,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-import source.modeles.Vertice;
-import source.modeles.Segment;
+import source.model.Vertice;
+import source.model.Segment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
