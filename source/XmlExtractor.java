@@ -125,7 +125,7 @@ public class XmlExtractor {
         return null;
     }
 
-    public static List<Segment> extractTroncon(String file, Map<String, Vertex> verticesMap) {
+    public static List<Segment> extractTroncon(String file, Map<String, Vertex> verticesMap, List<Vertex> vertexDelivery) {
         try {
 
             // file
@@ -153,10 +153,10 @@ public class XmlExtractor {
 
                     Segment segment = new Segment(nomRue, noeudOrigine, noeudDestination, longueur);
                     segments.add(segment);
-                    /*
+
                     if (vertexDelivery.contains(segment.getOrigine()) && vertexDelivery.contains(segment.getDestination()))
                         segments.add(segment);
-                     */
+
                 }
             }
 
