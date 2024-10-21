@@ -9,6 +9,7 @@ import source.model.Segment;
 import source.model.Vertex;
 
 
+import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.*;
@@ -74,6 +75,8 @@ public class MapDisplay {
             mapViewer.addMouseWheelListener(new MouseWheelListener() {
                 @Override
                 public void mouseWheelMoved(MouseWheelEvent e) {
+                    Point mousePoint = e.getPoint();
+                    GeoPosition geoBeforeZoom = mapViewer.convertPointToGeoPosition(mousePoint);
                     if (e.getWheelRotation() < 0) {
                         // Zoom avant
                         int currentZoom = mapViewer.getZoom();
@@ -83,6 +86,7 @@ public class MapDisplay {
                         int currentZoom = mapViewer.getZoom();
                         mapViewer.setZoom(Math.min(currentZoom + 1, mapViewer.getTileFactory().getInfo().getMaximumZoomLevel()));
                     }
+                    mapViewer.setAddressLocation(geoBeforeZoom);
                 }
             });
         } catch (Exception e) {
