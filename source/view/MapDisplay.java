@@ -5,6 +5,7 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.OSMTileFactoryInfo;
+import source.model.Delivery;
 import source.model.Vertex;
 
 
@@ -33,7 +34,7 @@ public class MapDisplay {
         try {
 
             //mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
-            mapViewer.setAddressLocation(new GeoPosition(vertices.getFirst().getLatitude(), vertices.getFirst().getLongitude()));
+            mapViewer.setAddressLocation(new GeoPosition(vertices.get(0).getLatitude(), vertices.get(0).getLongitude()));
             // Création de la collection d'objets "Waypoints" à partir de la liste de Noeud obtenue avec le xml parser
             Set<Waypoint> waypoints = new HashSet<>();
             for (Vertex node : vertices) {
@@ -69,6 +70,10 @@ public class MapDisplay {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public void afficherDelivery(List<Delivery> deliveries){
+
     }
 
     public JXMapViewer getMapViewer() {
