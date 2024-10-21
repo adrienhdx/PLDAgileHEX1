@@ -8,8 +8,6 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 import source.model.*;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 import java.io.FileInputStream;
@@ -116,14 +114,12 @@ public class XmlExtractor {
         return null;
     }
 
-    public static List<Vertex> extractVertices(Map<String, Vertex> verticesMap, List<Vertex> vertexDelivery) {
+    public static List<Vertex> extractPlanAsList(Map<String, Vertex> verticesMap) {
         try {
             List<Vertex> vertices = new ArrayList<>();
             for (Map.Entry<String, Vertex> entry : verticesMap.entrySet()) {
                 Vertex vert = entry.getValue();
-
-                if (vertexDelivery.contains(vert))
-                    vertices.add(vert);
+                vertices.add(vert);
             }
             return vertices;
         } catch (Exception e) {
