@@ -6,7 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-import source.model.Vertice;
+import source.model.Vertex;
 import source.model.Segment;
 
 import java.util.ArrayList;
@@ -33,8 +33,8 @@ public class XmlExtractor {
                 Element livraison = (Element) livraisonList.item(i);
 
                 // À remplacer par une classe Delivery
-                String adresseEnlevement = livraison.getAttribute("adresseEnlevement"); // Classe Vertice
-                String adresseLivraison = livraison.getAttribute("adresseLivraison"); // Classe Vertice
+                String adresseEnlevement = livraison.getAttribute("adresseEnlevement"); // Classe Vertex
+                String adresseLivraison = livraison.getAttribute("adresseLivraison"); // Classe Vertex
                 int dureeEnlevement = Integer.parseInt(livraison.getAttribute("dureeEnlevement"));
                 int dureeLivraison = Integer.parseInt(livraison.getAttribute("dureeLivraison"));
                 System.out.println("Livraison - Adresse Enlevement: " + adresseEnlevement + ", Adresse Livraison: " + adresseLivraison + ", Durée Enlevement: " + dureeEnlevement + ", Durée Livraison: " + dureeLivraison);
@@ -53,8 +53,8 @@ public class XmlExtractor {
             NodeList nodeList = document.getElementsByTagName("noeud");
 
             List returnList = new ArrayList<Map<String, ?>>();
-            Map<String, Vertice> noeudMap = new HashMap<>();
-            List<Vertice> vertices = new ArrayList<>();
+            Map<String, Vertex> noeudMap = new HashMap<>();
+            List<Vertex> vertices = new ArrayList<>();
 
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -66,7 +66,7 @@ public class XmlExtractor {
                     double latitude = Double.parseDouble(element.getAttribute("latitude"));
                     double longitude = Double.parseDouble(element.getAttribute("longitude"));
 
-                    Vertice noeud = new Vertice(id, latitude, longitude);
+                    Vertex noeud = new Vertex(id, latitude, longitude);
                     noeudMap.put(id, noeud);
                     vertices.add(noeud);
                     System.out.println(noeud);
@@ -86,8 +86,8 @@ public class XmlExtractor {
                     double longueur = Double.parseDouble(element.getAttribute("longueur"));
                     String nomRue = element.getAttribute("nomRue");
                     String origine = element.getAttribute("origine");
-                    Vertice noeudOrigine = noeudMap.get(origine);
-                    Vertice noeudDestination = noeudMap.get(destination);
+                    Vertex noeudOrigine = noeudMap.get(origine);
+                    Vertex noeudDestination = noeudMap.get(destination);
                     Segment segment = new Segment(nomRue, noeudOrigine, noeudDestination, longueur);
                     segments.add(segment);
                     System.out.println(segment);

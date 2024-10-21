@@ -1,5 +1,4 @@
 package source.model;
-
 import java.util.List;
 
 public class CompleteGraph implements Graph {
@@ -36,10 +35,10 @@ public class CompleteGraph implements Graph {
 		return i != j;
 	}
 
-	public void addDelivery(Delivery delivery, List<Vertice> list_sommets){
+	public void addDelivery(Delivery delivery, List<Vertex> list_sommets){
 		//Il faudrait une liste ordonnée des sommets par rapport a leur numglobal
-		Vertice pickup_pt = delivery.getPickUpPt();
-		Vertice delivery_pt = delivery.getDeliveryPt();
+		Vertex pickup_pt = delivery.getPickUpPt();
+        Vertex delivery_pt = delivery.getDeliveryPt();
 		Astar astar = new Astar();
 		pickup_pt.setTSP_num(1);
 		delivery_pt.setTSP_num(2);

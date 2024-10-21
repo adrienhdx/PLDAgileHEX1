@@ -2,31 +2,31 @@ package source.model;
 
 public class Segment {
 
-    private Vertice origine;
-    private Vertice destination;
+    private Vertex origine;
+    private Vertex destination;
     private double longueur;
     private String nomRue;
 
-    public Segment(String nomRue, Vertice origine, Vertice destination, double longueur) {
+    public Segment(String nomRue, Vertex origine, Vertex destination, double longueur) {
         this.nomRue = nomRue;
         this.origine = origine;
         this.destination = destination;
         this.longueur = longueur;
     }
 
-    public Vertice getOrigine() {
+    public Vertex getOrigine() {
         return origine;
     }
 
-    public void setOrigine(Vertice origine) {
+    public void setOrigine(Vertex origine) {
         this.origine = origine;
     }
 
-    public Vertice getDestination() {
+    public Vertex getDestination() {
         return destination;
     }
 
-    public void setDestination(Vertice destination) {
+    public void setDestination(Vertex destination) {
         this.destination = destination;
     }
 

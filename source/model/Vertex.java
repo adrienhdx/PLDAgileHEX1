@@ -1,13 +1,13 @@
 package source.model;
 
-public class Vertice {
+public class Vertex {
     private String id;
     private double latitude;
     private double longitude;
     private int global_num;
     private int TSP_num;
 
-    public Vertice(String id, double latitude, double longitude) {
+    public Vertex(String id, double latitude, double longitude) {
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;

@@ -2,14 +2,14 @@ package source.model;
 
 public class Delivery {
     private String id;
-    private Vertice pickUpPt;
-    private Vertice deliveryPt;
+    private Vertex pickUpPt;
+    private Vertex deliveryPt;
     private int pickUpTime;
     private int deliveryTime;
     private DeliveryState state;
     private Route route;
 
-    public Delivery(String id, Vertice pickUpPt, Vertice deliveryPt, int pickUpTime, int deliveryTime, DeliveryState state) {
+    public Delivery(String id, Vertex pickUpPt, Vertex deliveryPt, int pickUpTime, int deliveryTime, DeliveryState state) {
         this.id = id;
         this.pickUpPt = pickUpPt;
         this.deliveryPt = deliveryPt;
@@ -22,11 +22,11 @@ public class Delivery {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    public Vertice getPickUpPt() { return pickUpPt; }
-    public void setPickUpPt(Vertice pickUpPt) { this.pickUpPt = pickUpPt; }
+    public Vertex getPickUpPt() { return pickUpPt; }
+    public void setPickUpPt(Vertex pickUpPt) { this.pickUpPt = pickUpPt; }
 
-    public Vertice getDeliveryPt() { return deliveryPt; }
-    public void setDeliveryPt(Vertice deliveryPt) { this.deliveryPt = deliveryPt; }
+    public Vertex getDeliveryPt() { return deliveryPt; }
+    public void setDeliveryPt(Vertex deliveryPt) { this.deliveryPt = deliveryPt; }
 
     public int getPickUpTime() { return pickUpTime; }
     public void setPickUpTime(int pickUpTime) { this.pickUpTime = pickUpTime; }
