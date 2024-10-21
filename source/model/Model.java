@@ -11,6 +11,7 @@ public class Model {
     private List<Courier> courierList;
     private List<Segment> segmentList;
     private List<Vertex> verticeList;
+    private double[][] matrice_adjacence;
 
     public Model(){}
 

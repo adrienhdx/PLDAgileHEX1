@@ -35,7 +35,7 @@ public class CompleteGraph implements Graph {
 		return i != j;
 	}
 
-	public void addDelivery(Delivery delivery, List<Vertice> list_sommets){
+	public void addDelivery(Delivery delivery, List<Vertex> list_sommets){
 		//Il faudrait une liste ordonnée des sommets par rapport a leur numglobal
 		Vertex pickup_pt = delivery.getPickUpPt();
         Vertex delivery_pt = delivery.getDeliveryPt();
