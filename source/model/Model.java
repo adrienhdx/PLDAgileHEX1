@@ -76,34 +76,42 @@ public class Model {
 
     public int[] ObtenirOrdreSommets(int nombreSommets, int[] sommets, int[] precedence) {
 
-        // sommets : [0, 17210, 17385, 19273]
-        // precedence : [-1, -1, 1, -1]
+        //int[] sommets = {0, 17210, 17385, 19273};
+        // 1->2 and 3->2
+        //int[] precedence = {-1, 17385, -1, 17385};
+        // converted to -1 2 0 2
 
         TSP tsp = new TSP1();
-        double[][] matrix = {  	{ 0.0, 10.0, Integer.MAX_VALUE, 1.4 },
-                { Integer.MAX_VALUE, 0.0, 5.1, 8.1 },
-                { 7.0, Integer.MAX_VALUE, 0.0, 3.2 },
-                { Integer.MAX_VALUE, 8.1, 3.2, 0.0} };
+        double[][] matrix = {  	{ 0.0, 	10.0, 	8.0, 1.4 },
+                { 10.0, 0.0, 	5.1, 8.1 },
+                { 8.0, 	5.1, 	0.0, 3.2 },
+                { 1.4, 	8.1, 	3.2, 0.0 } };
 
-        System.out.println(matrix[0].toString());
-        System.out.println(matrix[1].toString());
-        System.out.println(matrix[2].toString());
-        System.out.println(matrix[3].toString());
+        List<Integer> sommetsList = new ArrayList<>();
+        for (int sommet : sommets) {
+            sommetsList.add(sommet);
+        }
+
+        for (int i = 0; i < sommets.length; i++) {
+            if (precedence[i] == -1) continue;
+
+            // trouver indice de precedence[i] dans sommets
+            int index = sommetsList.indexOf(precedence[i]);
+            if (index != -1) {
+                precedence[i] = index;
+            }
+        }
 
         // règles de précédence :
         // C(j, i) = C(0, j) = C(i, 0) = +inf
-        for (int i=1; i<nombreSommets; i++){
-            if (precedence[i] == -1) continue;
-            matrix[i][precedence[i]] = Integer.MAX_VALUE;
-            matrix[0][i] = Integer.MAX_VALUE;
-            matrix[precedence[i]][0] = Integer.MAX_VALUE;
+        for (int i=1; i<4; i++){
+            if (precedence[i] != -1) {
+                matrix[i][0] = Integer.MAX_VALUE;
+                matrix[precedence[i]][i] = Integer.MAX_VALUE;
+            } else {
+                matrix[0][i] = Integer.MAX_VALUE;
+            }
         }
-
-        System.out.println(matrix[0].toString());
-        System.out.println(matrix[1].toString());
-        System.out.println(matrix[2].toString());
-        System.out.println(matrix[3].toString());
-
 
         Graph g = new CompleteGraph(nombreSommets, matrix);
 
