@@ -17,5 +17,8 @@ public class main {
         for (Vertex vertex : demandesVertex) {
             System.out.println(vertex);
         }
+
+        Vertex entrepot = XmlExtractor.extractEntrepot("./resources/demandeMoyen5.xml", map);
+        System.out.println(entrepot);
     }
 }

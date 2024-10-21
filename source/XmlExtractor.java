@@ -13,19 +13,15 @@ import java.util.*;
 import java.io.FileInputStream;
 
 public class XmlExtractor {
-    public static List<String> extractEntrepot(String file) {
-        List<String> entrepotList = new ArrayList<>();
+    public static Vertex extractEntrepot(String file, Map<String, Vertex> mapPlan) {
+
         try{
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new FileInputStream(file));
 
             Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
-            String adresse = entrepot.getAttribute("adresse");
-            String heureDepart = entrepot.getAttribute("heureDepart");
-            entrepotList.add(adresse);
-            entrepotList.add(heureDepart);
-            return entrepotList;
+            return mapPlan.get(entrepot.getAttribute("adresse"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,7 +79,6 @@ public class XmlExtractor {
 
     public static Map<String, Vertex> extractPlan(String file) {
         try {
-
             // file
             DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
             DocumentBuilder builderMap = factoryMap.newDocumentBuilder();
@@ -117,6 +112,8 @@ public class XmlExtractor {
     public static List<Vertex> extractPlanAsList(Map<String, Vertex> verticesMap) {
         try {
             List<Vertex> vertices = new ArrayList<>();
+
+            // Changement de Map à Liste
             for (Map.Entry<String, Vertex> entry : verticesMap.entrySet()) {
                 Vertex vert = entry.getValue();
                 vertices.add(vert);
@@ -128,13 +125,13 @@ public class XmlExtractor {
         return null;
     }
 
-    public static List<Segment> extractTroncon(String mapPlan, Map<String, Vertex> verticesMap, List<Vertex> vertexDelivery) {
+    public static List<Segment> extractTroncon(String file, Map<String, Vertex> verticesMap) {
         try {
 
-            // mapPlan
-            DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builderMap = factoryMap.newDocumentBuilder();
-            Document documentMap = builderMap.parse(new FileInputStream(mapPlan));
+            // file
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document documentMap = builder.parse(new FileInputStream(file));
 
             // On récupère tous les tronçons "troncon" correspondant aux segments de la carte
             NodeList segmentList = documentMap.getElementsByTagName("troncon");
@@ -155,8 +152,11 @@ public class XmlExtractor {
                     Vertex noeudDestination = verticesMap.get(destination);
 
                     Segment segment = new Segment(nomRue, noeudOrigine, noeudDestination, longueur);
+                    segments.add(segment);
+                    /*
                     if (vertexDelivery.contains(segment.getOrigine()) && vertexDelivery.contains(segment.getDestination()))
                         segments.add(segment);
+                     */
                 }
             }
 
