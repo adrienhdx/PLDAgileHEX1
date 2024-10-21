@@ -199,10 +199,6 @@ public class Model {
         // converted to -1 2 0 2
 
         TSP tsp = new TSP1();
-        double[][] matrix = {  	{ 0.0, 	10.0, 	8.0, 1.4 },
-                { 10.0, 0.0, 	5.1, 8.1 },
-                { 8.0, 	5.1, 	0.0, 3.2 },
-                { 1.4, 	8.1, 	3.2, 0.0 } };
 
         List<Integer> sommetsList = new ArrayList<>();
         for (int sommet : sommets) {
@@ -221,19 +217,17 @@ public class Model {
 
         // règles de précédence :
         // C(j, i) = C(0, j) = C(i, 0) = +inf
-        for (int i=1; i<4; i++){
+        for (int i=1; i<nombreSommets; i++){
             if (precedence[i] != -1) {
-                matrix[i][0] = Integer.MAX_VALUE;
-                matrix[precedence[i]][i] = Integer.MAX_VALUE;
+                completeGraph.cost[i][0] = Integer.MAX_VALUE;
+                completeGraph.cost[precedence[i]][i] = Integer.MAX_VALUE;
             } else {
-                matrix[0][i] = Integer.MAX_VALUE;
+                completeGraph.cost[0][i] = Integer.MAX_VALUE;
             }
         }
 
-        Graph g = new CompleteGraph(nombreSommets, matrix);
-
         long startTime = System.currentTimeMillis();
-        tsp.searchSolution(20000, g);
+        tsp.searchSolution(20000, completeGraph);
 
         System.out.print("TSP : Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms");
