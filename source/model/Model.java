@@ -1,6 +1,7 @@
 package source.model;
 
 import java.util.List;
+import java.util.Observable;
 
 public class Model {
     private Graph map;
@@ -9,8 +10,7 @@ public class Model {
     private List<Delivery> pendingDeliveryList;
     private List<Courier> courierList;
     private List<Segment> segmentList;
-    private List<Vertice> verticeList;
-    private double[][] matrice_adjacence;
+    private List<Vertex> verticeList;
 
     public Model(){}
 
@@ -40,8 +40,8 @@ public class Model {
     public List<Segment> getSegmentList() { return segmentList; }
     public void setSegmentList(List<Segment> segmentList) { this.segmentList = segmentList; }
 
-    public List<Vertice> getVerticeList() { return verticeList; }
-    public void setVerticeList(List<Vertice> verticeList) { this.verticeList = verticeList; }
+    public List<Vertex> getVerticeList() { return verticeList; }
+    public void setVerticeList(List<Vertex> verticeList) { this.verticeList = verticeList; }
 
     public void creerMatriceAdjacence(){
         // Création de la matrice d'adjacence entre tous les sommets de la carte chargée
@@ -50,7 +50,7 @@ public class Model {
         double [][] matrice = new double[taille][taille];
         int i = 1;
         // On numérote chaque sommet afin de pouvoir les identifier dans la matrice (leur ID n'est pas pratique)
-        for (Vertice vertice : verticeList){
+        for (Vertex vertice : verticeList){
             vertice.setGlobal_num(i);
             for (int j=0; j<taille; j++){
                 matrice[i][j] = Integer.MAX_VALUE;
@@ -70,6 +70,3 @@ public class Model {
         //a compléter
     }
 }
-
-
-
