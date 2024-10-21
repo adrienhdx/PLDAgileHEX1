@@ -96,18 +96,25 @@ public class Model {
     }
 
     public void addDelivery(Delivery delivery){
-        //Il faudrait une liste ordonnée des sommets par rapport a leur numglobal
         Vertex pickup_pt = delivery.getPickUpPt();
         Vertex delivery_pt = delivery.getDeliveryPt();
-        pickup_pt.setTSP_num(1);
-        delivery_pt.setTSP_num(2);
-
+        // Dans le cas où on ajoute la première commande
+        // TODO modifier en ajoutant l'entrepot de base en premier point (va donc decaler les indices)
         if (completeGraph.cost == null){
+            pickup_pt.setTSP_num(1);
+            delivery_pt.setTSP_num(2);
             completeGraph.cost = new double[2][2];
             completeGraph.cost[0][1] = aStar(pickup_pt, delivery_pt);
+            completeGraph.cost[1][0] = aStar(delivery_pt, pickup_pt);
+            completeGraph.cost[0][0] = 0;
+            completeGraph.cost[1][1] = 0;
         }
         else{
+            //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
+            // distance la plus courte entre les deux points
             int taille = completeGraph.cost.length;
+            pickup_pt.setTSP_num(taille+1);
+            delivery_pt.setTSP_num(taille+2);
             double [][] matrix = new double[taille + 2][taille + 2];
             completeGraph.cost = matrix;
             for (Vertex vertex : Vertex_to_visit) {
@@ -117,6 +124,9 @@ public class Model {
                 completeGraph.cost[vertex.getGlobal_num()-1][taille+1] = aStar(vertex, delivery_pt);
             }
             completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt);
+            completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt);
+            completeGraph.cost[taille+1][taille+1] = 0;
+            completeGraph.cost[taille][taille] = 0;
         }
     }
 
