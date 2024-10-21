@@ -15,6 +15,11 @@ public class CompleteGraph implements Graph {
 	public CompleteGraph() {
 	}
 
+	public CompleteGraph(int nbVertices, double[][] cost) {
+		this.nbVertices = nbVertices;
+		this.cost = cost;
+	}
+
 	@Override
 	public int getNbVertices() {
 		return nbVertices;
