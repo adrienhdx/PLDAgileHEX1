@@ -13,7 +13,7 @@ public class Model {
     private List<Delivery> pendingDeliveryList;
     private List<Courier> courierList;
     private List<Segment> segmentList;
-    private List<Vertex> VertexList;
+    private List<Vertex> vertexList;
     private double[][] matrice_adjacence;
     private CompleteGraph completeGraph;
     private List<Vertex> Vertex_to_visit;
@@ -58,8 +58,8 @@ public class Model {
     public List<Segment> getSegmentList() { return segmentList; }
     public void setSegmentList(List<Segment> segmentList) { this.segmentList = segmentList; }
 
-    public List<Vertex> getVertexList() { return VertexList; }
-    public void setVertexList(List<Vertex> VertexList) { this.VertexList = VertexList; }
+    public ArrayList<Vertex> getVertexList() { return (ArrayList<Vertex>) vertexList; }
+    public void setVertexList(List<Vertex> vertexList) { this.vertexList = vertexList; }
 
     public CompleteGraph getCompleteGraph() { return completeGraph; }
     public void setCompleteGraph(CompleteGraph completeGraph) { this.completeGraph = completeGraph; }
@@ -73,11 +73,11 @@ public class Model {
     public void creerMatriceAdjacence(){
         // Création de la matrice d'adjacence entre tous les sommets de la carte chargée
 
-        int taille = VertexList.size();
+        int taille = vertexList.size();
         double [][] matrice = new double[taille][taille];
         int i = 1;
         // On numérote chaque sommet afin de pouvoir les identifier dans la matrice (leur ID n'est pas pratique)
-        for (Vertex Vertex : VertexList){
+        for (Vertex Vertex : vertexList){
             Vertex.setGlobal_num(i);
             for (int j=0; j<taille; j++){
                 matrice[i-1][j] = -1;
@@ -150,7 +150,7 @@ public class Model {
 
     public double aStar(Vertex start, Vertex goal) {
         // renvoie la distance entre les deux sommets entrés en paramètres
-        int n = VertexList.size(); // Nombre de sommets
+        int n = vertexList.size(); // Nombre de sommets
 
         // Ensembles pour les scores des chemins trouvés
         Map<Vertex, Double> gScore = new HashMap<>();  // Coût de départ au sommet
@@ -161,7 +161,7 @@ public class Model {
 
 
         // On remplit les valeurs de base à l'infini
-        for (Vertex v : VertexList) {
+        for (Vertex v : vertexList) {
             gScore.put(v, Double.POSITIVE_INFINITY);
             fScore.put(v, Double.POSITIVE_INFINITY);
         }
@@ -183,7 +183,7 @@ public class Model {
             // Parcourir les voisins (nœuds adjacents)
             for (int i = 0; i < n; i++) {
                 if (this.matrice_adjacence[current.getGlobal_num() - 1][i] > 0) {  // Si l'arête existe
-                    Vertex neighbor = VertexList.get(i);
+                    Vertex neighbor = vertexList.get(i);
                     double tentativeGScore = gScore.get(current) + this.matrice_adjacence[current.getGlobal_num() - 1][i];
 
                     if (tentativeGScore < gScore.get(neighbor)) {

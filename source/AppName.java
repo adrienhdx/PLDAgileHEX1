@@ -9,8 +9,10 @@ public class AppName {
     public AppName() {
         Model model = new Model();
         Interface view = new Interface();
-        Controller controler = new Controller(model, view);
+        Controller controller = new Controller(model, view);
+
         model.addPropertyChangeListener(view);
+        view.addController(controller);
 
     }
 

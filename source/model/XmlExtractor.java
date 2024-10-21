@@ -1,4 +1,4 @@
-package source;
+package source.model;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -6,7 +6,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-import source.model.*;
 
 import java.util.*;
 
@@ -28,24 +27,29 @@ public class XmlExtractor {
         return null;
     }
 
-    public static List<Delivery> extractDemande(String file, Map<String, Vertex> verticesMap) {
+    public static List<Delivery> extractDemande(String file, ArrayList<Vertex> vertexArrayList) {
         try {
-
             List<Delivery> deliveries = new ArrayList<>();
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new FileInputStream(file));
 
+            HashMap<String, Vertex> vertexIdMap = new HashMap<>();
+
+            for (Vertex vertex : vertexArrayList) {
+                vertexIdMap.put(vertex.getId(), vertex);
+            }
+
             NodeList livraisonList = document.getElementsByTagName("livraison");
             for (int i = 0; i < livraisonList.getLength(); i++) {
                 Element livraison = (Element) livraisonList.item(i);
 
                 String idEnlevement = livraison.getAttribute("adresseEnlevement");
-                Vertex adresseEnlevement = verticesMap.get(idEnlevement);
+                Vertex adresseEnlevement = vertexIdMap.get(idEnlevement);
 
                 String idLivraison = livraison.getAttribute("adresseLivraison");
-                Vertex adresseLivraison = verticesMap.get(idLivraison);
+                Vertex adresseLivraison = vertexIdMap.get(idLivraison);
 
                 int dureeEnlevement = Integer.parseInt(livraison.getAttribute("dureeEnlevement"));
                 int dureeLivraison = Integer.parseInt(livraison.getAttribute("dureeLivraison"));
@@ -77,7 +81,7 @@ public class XmlExtractor {
         return null;
     }
 
-    public static Map<String, Vertex> extractPlan(String file) {
+    public static ArrayList<Vertex> extractPlan(String file) {
         try {
             // file
             DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
@@ -86,7 +90,7 @@ public class XmlExtractor {
 
             NodeList nodesMap = documentMap.getElementsByTagName("noeud");
 
-            Map<String, Vertex> noeudMap = new HashMap<>();
+            ArrayList<Vertex> vertexArrayList = new ArrayList<>();
 
             for (int i = 0; i < nodesMap.getLength(); i++) {
                 Node node = nodesMap.item(i);
@@ -99,10 +103,10 @@ public class XmlExtractor {
                     double longitude = Double.parseDouble(element.getAttribute("longitude"));
 
                     Vertex noeud = new Vertex(id, latitude, longitude);
-                    noeudMap.put(id, noeud);
+                    vertexArrayList.add(noeud);
                 }
             }
-            return noeudMap;
+            return vertexArrayList;
         } catch (Exception e) {
             e.printStackTrace();
         }
