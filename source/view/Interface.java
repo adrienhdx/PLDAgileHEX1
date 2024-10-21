@@ -2,8 +2,10 @@ package source.view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class Interface {
+public class Interface implements PropertyChangeListener {
 
     private JPanel panelMain;
     private JButton chargerLaCarteButton;
@@ -32,5 +34,10 @@ public class Interface {
         map = new MapDisplay();
         scrollPanelMap = new JScrollPane(map.getMapViewer());
         // TODO: place custom component creation code here
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+
     }
 }

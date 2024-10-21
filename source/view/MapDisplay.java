@@ -53,7 +53,7 @@ public class MapDisplay {
                 routePainters.add(routePainter);
             }
 
-
+            
             // Création d'un "waypoint painter" pour afficher les waypoints
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(waypoints);

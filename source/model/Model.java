@@ -1,5 +1,8 @@
 package source.model;
 
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.Observable;
 
@@ -14,9 +17,19 @@ public class Model {
     private double[][] matrice_adjacence;
     private CompleteGraph completeGraph;
     private List<Vertex> Vertex_to_visit;
+    private PropertyChangeSupport propertyChangeSupport;
 
     public Model(){
+        propertyChangeSupport = new PropertyChangeSupport(this);
         this.completeGraph = new CompleteGraph();
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener){
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener){
+        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
     // Getters et Setters
