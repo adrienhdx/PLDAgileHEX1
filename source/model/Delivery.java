@@ -1,7 +1,6 @@
 package source.model;
 
 public class Delivery {
-    private String id;
     private Vertex pickUpPt;
     private Vertex deliveryPt;
     private int pickUpTime;
@@ -9,8 +8,7 @@ public class Delivery {
     private DeliveryState state;
     private Route route;
 
-    public Delivery(String id, Vertex pickUpPt, Vertex deliveryPt, int pickUpTime, int deliveryTime, DeliveryState state) {
-        this.id = id;
+    public Delivery(Vertex pickUpPt, Vertex deliveryPt, int pickUpTime, int deliveryTime, DeliveryState state) {
         this.pickUpPt = pickUpPt;
         this.deliveryPt = deliveryPt;
         this.pickUpTime = pickUpTime;
@@ -19,8 +17,6 @@ public class Delivery {
     }
 
     // Getters et Setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
 
     public Vertex getPickUpPt() { return pickUpPt; }
     public void setPickUpPt(Vertex pickUpPt) { this.pickUpPt = pickUpPt; }
@@ -40,4 +36,8 @@ public class Delivery {
     public Route getRoute() { return route; }
     public void setRoute(Route route) { this.route = route; }
 
+    @Override
+    public String toString() {
+        return "Delivery{pickUpPt=" + pickUpPt + ", deliveryPt=" + deliveryPt + ", pickUpTime=" + pickUpTime + ", deliveryTime=" + deliveryTime + ", state=" + state+ '}';
+    }
 }
