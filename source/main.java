@@ -2,17 +2,26 @@ package source;
 
 import java.util.*;
 
-import source.modeles.Vertice;
+import source.model.Delivery;
+import source.model.Vertex;
 
-import source.vue.*;
 
 public class main {
     public static void main(String[] args) {
-        List Points = XmlExtractor.extractPlan("resources/grandPlan.xml");
+        Map<String, Vertex> map = XmlExtractor.extractPlan("./resources/grandPlan.xml");
+        List<Delivery> demandes = XmlExtractor.extractDemande("./resources/demandeMoyen5.xml", map);
         System.out.println("Hello world!");
-        List<Vertice> noeuds = (List<Vertice>) Points.get(0);
-        for (Vertice v : noeuds) {
-            System.out.println(v.getLatitude());
+        for (Delivery demande : demandes) {
+            System.out.println(demande);
+        }
+        List<Vertex> demandesVertex = XmlExtractor.extractDeliveryVertices(demandes);
+        for (Vertex vertex : demandesVertex) {
+            System.out.println(vertex);
+        }
+
+        List<Vertex> vertices = XmlExtractor.extractVertices(map, demandesVertex);
+        for (Vertex vertex : vertices) {
+            System.out.println(vertex);
         }
     }
 }
