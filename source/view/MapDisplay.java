@@ -5,11 +5,10 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.OSMTileFactoryInfo;
+import source.model.Segment;
 import source.model.Vertex;
 
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.*;
@@ -29,22 +28,49 @@ public class MapDisplay {
         mapViewer.setZoom(3);
     }
 
-    public void afficherNoeuds(List<Vertex> vertices){
+    public void afficherNoeuds_Segments(List<Vertex> vertices, List<Segment> segments){
         try {
-
-            //mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
-            mapViewer.setAddressLocation(new GeoPosition(vertices.getFirst().getLatitude(), vertices.getFirst().getLongitude()));
-            // Création de la collection d'objets "Waypoints" à partir de la liste de Noeud obtenue avec le xml parser
-            Set<Waypoint> waypoints = new HashSet<>();
+            //Création de la liste de GeoPosition à partir des coordonnées du Xml
+            List<GeoPosition> geoCoordinates = new ArrayList<GeoPosition>(vertices.size());
             for (Vertex node : vertices) {
-                waypoints.add(new DefaultWaypoint(new GeoPosition(node.getLatitude(), node.getLongitude())));
+                geoCoordinates.add(new GeoPosition(node.getLatitude(), node.getLongitude()));
             }
+
+            // Création de la collection d'objets "Waypoints" à partir de la liste de GeoPosition
+            Set<Waypoint> waypoints = new HashSet<>();
+            for (GeoPosition geoCoord : geoCoordinates) {
+                waypoints.add(new DefaultWaypoint(geoCoord));
+            }
+
+            // Création des segments et de leurs painters
+            List<RoutePainter> routePainters = new ArrayList<>();
+            for(Segment segment : segments){
+                GeoPosition origine = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
+                GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
+                List<GeoPosition> track = Arrays.asList(origine,destination);
+                RoutePainter routePainter = new RoutePainter(track);
+                routePainters.add(routePainter);
+            }
+
 
             // Création d'un "waypoint painter" pour afficher les waypoints
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(waypoints);
 
-            //Ajout du zoom de la carte
+
+            //Création d'un Compound Painter pour utiliser plusieurs painters
+            List<Painter<JXMapViewer>> painters = new ArrayList<>();
+            painters.add(waypointPainter);
+            painters.addAll(routePainters);
+
+            CompoundPainter<JXMapViewer> MainPainter = new CompoundPainter<>(painters);
+            mapViewer.setOverlayPainter(MainPainter);
+
+            //mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
+            mapViewer.setAddressLocation(new GeoPosition(vertices.get(0).getLatitude(), vertices.get(0).getLongitude()));
+
+
+            //Ajout du zoom de la carte avec écouteur sur la souris
             mapViewer.addMouseWheelListener(new MouseWheelListener() {
                 @Override
                 public void mouseWheelMoved(MouseWheelEvent e) {
@@ -59,13 +85,6 @@ public class MapDisplay {
                     }
                 }
             });
-
-            // Combine the painters (you can add more painters if needed)
-            List<Painter<JXMapViewer>> painters = new ArrayList<>();
-            painters.add(waypointPainter);
-
-            CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
-            mapViewer.setOverlayPainter(painter);
         } catch (Exception e) {
             System.out.println(e);
         }
