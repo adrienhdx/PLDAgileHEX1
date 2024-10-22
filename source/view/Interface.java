@@ -1,6 +1,7 @@
 package source.view;
 
 import source.controller.Controller;
+import source.model.Courier;
 import source.model.Vertex;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
@@ -19,8 +21,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JButton mapButton, deliveryButton, addDeliveryButton, removeDeliveryButton, assignCourierButton, showRoutesButton, addCourierButton, removeCourierButton;
     private JComboBox<String> unassignedList, assignedList, courierDropdown;
     private DefaultComboBoxModel<String> unassignedModel, assignedModel, courierModel;
-    private String[] initialDeliveries = {"Livraison 1", "Livraison 2", "Livraison 3"};
-    private String[] initialCouriers = {"Livreur 1", "Livreur 2"};
+    private String[] initialDeliveries = {};
+    private Vector<String> couriers = new Vector<String>();
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
@@ -29,7 +31,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
         fileChooserMap.addActionListener(controller);
-        addDeliveryButton.addActionListener(controller);
+        addCourierButton.addActionListener(controller);
     }
 
     public Interface() {
@@ -204,7 +206,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.insets = new Insets(10, 10, 10, 10);  // Espacement entre les composants
 
         // Liste déroulante des livreurs existants
-        courierModel = new DefaultComboBoxModel<>(initialCouriers);
+        courierModel = new DefaultComboBoxModel<>(couriers);
         courierDropdown = new JComboBox<>(courierModel);  // Utilisation d'un modèle dynamique pour faciliter les modifications
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -277,6 +279,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
             map = new MapDisplay(vertexArrayList.getFirst());
             scrollPanelMap = new JScrollPane(map.getMapViewer());
             tabPan.setComponentAt(0,scrollPanelMap);
+        }
+        if (evt.getPropertyName().equals("addCourierList")) {
+            ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
+            couriers.add(courierList.getLast().getFirstName()+ " " + courierList.getLast().getLastName());
         }
     }
 

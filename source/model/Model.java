@@ -22,6 +22,7 @@ public class Model {
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
         this.completeGraph = new CompleteGraph();
+        this.courierList = new ArrayList<>();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener){
@@ -38,7 +39,9 @@ public class Model {
                 return;
             }
         }
+        ArrayList<Courier> oldCourierList = new ArrayList<>();
         courierList.add(new Courier(lastName,firstName,phoneNumber));
+        propertyChangeSupport.firePropertyChange("addCourierList", oldCourierList, courierList);
     }
 
     public void deleteCourier(String firstName, String lastName){
@@ -72,7 +75,11 @@ public class Model {
     }
 
     public List<Courier> getCourierList() { return courierList; }
-    public void setCourierList(List<Courier> courierList) { this.courierList = courierList; }
+    public void setCourierList(List<Courier> courierList) {
+        ArrayList<Courier> oldCourierList = (ArrayList<Courier>) this.courierList;
+        this.courierList = courierList;
+        propertyChangeSupport.firePropertyChange("setCourierList", oldCourierList, courierList);
+    }
 
     public List<Segment> getSegmentList() { return segmentList; }
     public void setSegmentList(List<Segment> segmentList) { this.segmentList = segmentList; }
