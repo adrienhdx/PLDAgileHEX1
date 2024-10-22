@@ -50,7 +50,11 @@ public class Model {
     public void setPostponedDeliveryList(List<Delivery> postponedDeliveryList) { this.postponedDeliveryList = postponedDeliveryList; }
 
     public List<Delivery> getPendingDeliveryList() { return pendingDeliveryList; }
-    public void setPendingDeliveryList(List<Delivery> pendingDeliveryList) { this.pendingDeliveryList = pendingDeliveryList; }
+    public void setPendingDeliveryList(List<Delivery> pendingDeliveryList) {
+        ArrayList<Delivery> oldPendingDeliveryList = (ArrayList<Delivery>) this.pendingDeliveryList;
+        this.pendingDeliveryList = pendingDeliveryList;
+        propertyChangeSupport.firePropertyChange("pendingDeliveryList", oldPendingDeliveryList, pendingDeliveryList);
+    }
 
     public List<Courier> getCourierList() { return courierList; }
     public void setCourierList(List<Courier> courierList) { this.courierList = courierList; }
@@ -59,7 +63,11 @@ public class Model {
     public void setSegmentList(List<Segment> segmentList) { this.segmentList = segmentList; }
 
     public ArrayList<Vertex> getVertexList() { return (ArrayList<Vertex>) vertexList; }
-    public void setVertexList(List<Vertex> vertexList) { this.vertexList = vertexList; }
+    public void setVertexList(List<Vertex> vertexList) {
+        ArrayList<Vertex> oldVertexList = (ArrayList<Vertex>) this.vertexList;
+        this.vertexList = vertexList;
+        propertyChangeSupport.firePropertyChange("vertexList",oldVertexList,vertexList);
+    }
 
     public CompleteGraph getCompleteGraph() { return completeGraph; }
     public void setCompleteGraph(CompleteGraph completeGraph) { this.completeGraph = completeGraph; }

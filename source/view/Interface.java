@@ -1,6 +1,7 @@
 package source.view;
 
 import source.controller.Controller;
+import source.model.Vertex;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,10 +10,12 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.ArrayList;
 
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
     private JPanel mapPanel, deliveryPanel;
+    private JScrollPane scrollPanelMap;
     private JButton mapButton, deliveryButton, addDeliveryButton, removeDeliveryButton, assignCourierButton, showRoutesButton;
     private JComboBox<String> unassignedList, assignedList, courierDropdown;
     private DefaultComboBoxModel<String> unassignedModel, assignedModel, courierModel;
@@ -61,20 +64,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         mapButton.addActionListener(e -> {
             int result = fileChooserMap.showOpenDialog(null);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooserMap.getSelectedFile();
-                showMap(selectedFile);
-            }
         });
     }
 
-    private void showMap(File file) {
-        mapPanel.removeAll();  // Retire tous les composants
-        JLabel mapLabel = new JLabel("Carte chargée: " + file.getName());
-        mapPanel.add(mapLabel);
-        mapPanel.revalidate();
-        mapPanel.repaint();
-    }
 
     private void setupDeliveryPanel() {
         deliveryPanel = new JPanel(new GridLayout(0, 1));  // Utiliser GridLayout pour une meilleure ergonomie
@@ -269,7 +261,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
+        if (evt.getPropertyName().equals("vertexList")) {
+            mapPanel.removeAll();  // Retire tous les composants
+            ArrayList<Vertex> vertexArrayList = (ArrayList<Vertex>) evt.getNewValue();
+            map = new MapDisplay(vertexArrayList.getFirst());
+            scrollPanelMap = new JScrollPane(map.getMapViewer());
+            tabPan.setComponentAt(0,scrollPanelMap);
+        }
     }
 
     public JFileChooser getFileChooserDelivery() {

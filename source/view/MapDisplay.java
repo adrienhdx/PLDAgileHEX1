@@ -19,12 +19,17 @@ public class MapDisplay {
 
     private JXMapViewer mapViewer;
 
-    public MapDisplay(){
+    public MapDisplay(Vertex centre){
         mapViewer = new JXMapViewer();
+
         // Initialisation de la carte via OpenStreetMap
         OSMTileFactoryInfo info = new OSMTileFactoryInfo();
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
         mapViewer.setTileFactory(tileFactory);
+
+        // Initialisation du centre
+        mapViewer.setAddressLocation(new GeoPosition(centre.getLatitude(), centre.getLongitude()));
+
         // Initialisation des paramètres de la carte
         mapViewer.setZoom(3);
     }
@@ -45,12 +50,14 @@ public class MapDisplay {
 
             // Création des segments et de leurs painters
             List<RoutePainter> routePainters = new ArrayList<>();
-            for(Segment segment : segments){
-                GeoPosition origine = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
-                GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
-                List<GeoPosition> track = Arrays.asList(origine,destination);
-                RoutePainter routePainter = new RoutePainter(track);
-                routePainters.add(routePainter);
+            if (segments != null) {
+                for (Segment segment : segments) {
+                    GeoPosition origine = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
+                    GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
+                    List<GeoPosition> track = Arrays.asList(origine, destination);
+                    RoutePainter routePainter = new RoutePainter(track);
+                    routePainters.add(routePainter);
+                }
             }
 
             
@@ -66,10 +73,6 @@ public class MapDisplay {
 
             CompoundPainter<JXMapViewer> MainPainter = new CompoundPainter<>(painters);
             mapViewer.setOverlayPainter(MainPainter);
-
-            //mapViewer.setAddressLocation(new GeoPosition(45.75555, 4.86922));
-            mapViewer.setAddressLocation(new GeoPosition(vertices.get(0).getLatitude(), vertices.get(0).getLongitude()));
-
 
             //Ajout du zoom de la carte avec écouteur sur la souris
             mapViewer.addMouseWheelListener(new MouseWheelListener() {
