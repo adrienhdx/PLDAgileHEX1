@@ -16,7 +16,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
     private JPanel mapPanel, deliveryPanel;
     private JScrollPane scrollPanelMap;
-    private JButton mapButton, deliveryButton, addDeliveryButton, removeDeliveryButton, assignCourierButton, showRoutesButton;
+    private JButton mapButton, deliveryButton, addDeliveryButton, removeDeliveryButton, assignCourierButton, showRoutesButton, addCourierButton, removeCourierButton;
     private JComboBox<String> unassignedList, assignedList, courierDropdown;
     private DefaultComboBoxModel<String> unassignedModel, assignedModel, courierModel;
     private String[] initialDeliveries = {"Livraison 1", "Livraison 2", "Livraison 3"};
@@ -24,10 +24,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
+    private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
         fileChooserMap.addActionListener(controller);
+        addDeliveryButton.addActionListener(controller);
     }
 
     public Interface() {
@@ -214,37 +216,45 @@ public class Interface extends JFrame implements PropertyChangeListener {
         managementPanel.add(courierDropdown, gbc);
 
         // Champ de texte pour ajouter un nouveau livreur
-        JTextField newCourierField = new JTextField(15);
+        this.courierFieldFirstName = new JTextField(15);
         gbc.gridy = 2;
         gbc.gridwidth = 1;
-        managementPanel.add(new JLabel("Nouveau livreur :"), gbc);
+        managementPanel.add(new JLabel("First Name :"), gbc);
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        managementPanel.add(newCourierField, gbc);
+        managementPanel.add(courierFieldFirstName, gbc);
+
+        this.courierFieldLastName = new JTextField(15);
+        gbc.gridy = 3;
+        gbc.gridx = 0;
+        gbc.gridwidth = 1;
+        managementPanel.add(new JLabel("Last Name :"), gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        managementPanel.add(courierFieldLastName, gbc);
+
+        this.courierFieldPhoneNumber = new JTextField(15);
+        gbc.gridy = 4;
+        gbc.gridx = 0;
+        gbc.gridwidth = 1;
+        managementPanel.add(new JLabel("Phone number :"), gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        managementPanel.add(courierFieldPhoneNumber, gbc);
 
         // Bouton pour ajouter un nouveau livreur
-        JButton addCourierButton = new JButton("Ajouter livreur");
+        addCourierButton = new JButton("Ajouter livreur");
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 5;
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE;
         managementPanel.add(addCourierButton, gbc);
 
         // Bouton pour supprimer le livreur sélectionné
-        JButton removeCourierButton = new JButton("Supprimer livreur");
+        removeCourierButton = new JButton("Supprimer livreur");
         gbc.gridx = 1;
         managementPanel.add(removeCourierButton, gbc);
 
-        // Action pour ajouter un nouveau livreur
-        addCourierButton.addActionListener(e -> {
-            String newCourier = newCourierField.getText().trim();
-            if (!newCourier.isEmpty()) {
-                courierModel.addElement(newCourier);  // Ajouter le nouveau livreur à la liste
-                newCourierField.setText("");  // Réinitialiser le champ de texte
-            } else {
-                JOptionPane.showMessageDialog(null, "Veuillez entrer un nom de livreur.");
-            }
-        });
 
         // Action pour supprimer un livreur sélectionné
         removeCourierButton.addActionListener(e -> {
@@ -277,4 +287,25 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public JFileChooser getFileChooserMap() {
         return fileChooserMap;
     }
+
+    public JTextField getCourierFieldFirstName() {
+        return courierFieldFirstName;
+    }
+
+    public JTextField getCourierFieldLastName() {
+        return courierFieldLastName;
+    }
+
+    public JTextField getCourierFieldPhoneNumber() {
+        return courierFieldPhoneNumber;
+    }
+
+    public JButton getAddCourierButton() {
+        return addCourierButton;
+    }
+
+    public JButton getRemoveCourierButton() {
+        return removeCourierButton;
+    }
 }
+

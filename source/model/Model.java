@@ -32,14 +32,29 @@ public class Model {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
-    // Getters et Setters
+    public void addCourrier(String firstName, String lastName, String phoneNumber){
+        for(Courier courier : courierList){
+            if(courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                return;
+            }
+        }
+        courierList.add(new Courier(lastName,firstName,phoneNumber));
+    }
 
+    public void deleteCourier(String firstName, String lastName){
+        for(Courier courier : courierList){
+            if(courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                courierList.remove(courier);
+            }
+        }
+    }
 
     public double[][] getMatrice_adjacence() {
         return matrice_adjacence;
     }
     public void setMatrice_adjacence(double[][] matrice_adjacence) {}
 
+    // Getters et Setters
     public Graph getMap() { return map; }
     public void setMap(Graph map) { this.map = map; }
 

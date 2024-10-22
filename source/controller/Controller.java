@@ -23,6 +23,9 @@ public class Controller implements ActionListener {
         if(e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserMap()){
             this.loadMap();
         }
+        if (e.getSource() == view.getAddCourierButton()) {
+            this.createCourier();
+        }
     }
 
     public Controller(Model model, Interface view) {
@@ -46,6 +49,16 @@ public class Controller implements ActionListener {
             System.out.println(deliveryList.size());
         }
     }
+
+    public void createCourier(){
+        String newCourierFirstName = view.getCourierFieldFirstName().getText().trim();
+        String newCourierLastName = view.getCourierFieldLastName().getText().trim();
+        String newCourierPhoneNumber = view.getCourierFieldPhoneNumber().getText().trim();
+        if(!newCourierFirstName.equals("") & !newCourierLastName.equals("") & !newCourierPhoneNumber.equals("")){
+            model.addCourrier(newCourierFirstName, newCourierLastName, newCourierPhoneNumber);
+        }
+    }
+
     public void assignDelivery(){}
     public void withdrawDelivery(){}
 }
