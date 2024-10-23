@@ -307,6 +307,8 @@ public class Model {
             addDelivery(delivery); // ici chaque vertex est ajoutée dans vertex_to_visit
         }
 
+        System.out.println("Deliveries chargées : " + deliveries.size());
+
         // sommets
         int[] sommets = new int[Vertex_to_visit.size()];
         HashMap<Integer, Vertex> dictionnaire = new HashMap<>();
@@ -328,6 +330,8 @@ public class Model {
 
         int[] ordre = ObtenirOrdreSommets(sommets, precedence);
 
+        System.out.println("Ordre calculé "+Arrays.toString(ordre));
+
         // recomposer l'ordre en une liste de segments et retour (ne pas oublier le dépôt)
         List<Segment> segments = new ArrayList<>();
         for (int i = 1; i < ordre.length; i++) {
@@ -335,6 +339,11 @@ public class Model {
             Vertex destination = dictionnaire.get(ordre[i]);
             Segment seg = new Segment(origine, destination);
             segments.add(seg);
+        }
+
+        System.out.println("Segments : " + segments.size());
+        for (Segment seg : segments) {
+            System.out.println(seg);
         }
 
         return segments;
