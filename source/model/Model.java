@@ -46,10 +46,16 @@ public class Model {
     }
 
     public void deleteCourier(String firstName, String lastName){
-        for(Courier courier : courierList){
-            if(courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
-                courierList.remove(courier);
+        ArrayList<Courier> oldCourierList = (ArrayList<Courier>) courierList; // faire copy en profondeur
+        int index = Integer.MAX_VALUE;
+        for(int i = 0; i < courierList.size(); i++){
+            if(courierList.get(i).getFirstName().equals(firstName) && courierList.get(i).getLastName().equals(lastName)) {
+                index = i;
             }
+        }
+        if(index != Integer.MAX_VALUE){
+            courierList.remove(index);
+            propertyChangeSupport.firePropertyChange("deleteCourierList", null, courierList);
         }
     }
 

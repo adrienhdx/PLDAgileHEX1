@@ -26,6 +26,9 @@ public class Controller implements ActionListener {
         if (e.getSource() == view.getAddCourierButton()) {
             this.createCourier();
         }
+        if(e.getSource() == view.getRemoveCourierButton()){
+            this.deleteCourier();
+        }
     }
 
     public Controller(Model model, Interface view) {
@@ -59,6 +62,16 @@ public class Controller implements ActionListener {
         String newCourierPhoneNumber = view.getCourierFieldPhoneNumber().getText().trim();
         if(!newCourierFirstName.equals("") & !newCourierLastName.equals("") & !newCourierPhoneNumber.equals("")){
             model.addCourrier(newCourierFirstName, newCourierLastName, newCourierPhoneNumber);
+        }
+    }
+
+    public void deleteCourier(){
+        String courierInfo = (String) view.getCourierComboBox().getSelectedItem();
+        if (courierInfo != null) {
+            String[] splitInfo = courierInfo.split(" ");
+            String firstName = splitInfo[0];
+            String lastName = splitInfo[1];
+            model.deleteCourier(firstName, lastName);
         }
     }
 
