@@ -245,7 +245,7 @@ public class Model {
         return Double.POSITIVE_INFINITY;
     }
 
-    public int[] ObtenirOrdreSommets(int[] sommets, int[] precedence) {
+    public long[] ObtenirOrdreSommets(long[] sommets, long[] precedence) {
 
         //int[] sommets = {0, 17210, 17385, 19273};
         // 1->2 and 3->2
@@ -257,10 +257,12 @@ public class Model {
 
         TSP tsp = new TSP1();
 
-        List<Integer> sommetsList = new ArrayList<>();
-        for (int sommet : sommets) {
+        List<Long> sommetsList = new ArrayList<>();
+        for (long sommet : sommets) {
             sommetsList.add(sommet);
         }
+
+        int[] precedenceReindexed = new int[precedence.length];
 
         for (int i = 0; i < sommets.length; i++) {
             if (precedence[i] == -1) continue;
@@ -268,7 +270,7 @@ public class Model {
             // trouver indice de precedence[i] dans sommets
             int index = sommetsList.indexOf(precedence[i]);
             if (index != -1) {
-                precedence[i] = index;
+                precedenceReindexed[i] = index;
             }
         }
 
@@ -277,7 +279,7 @@ public class Model {
         for (int i=1; i<sommets.length; i++){
             if (precedence[i] != -1) {
                 completeGraph.cost[i][0] = Integer.MAX_VALUE;
-                completeGraph.cost[precedence[i]][i] = Integer.MAX_VALUE;
+                completeGraph.cost[precedenceReindexed[i]][i] = Integer.MAX_VALUE;
             } else {
                 completeGraph.cost[0][i] = Integer.MAX_VALUE;
             }
@@ -289,7 +291,7 @@ public class Model {
         System.out.print("TSP : Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms");
 
-        int[] ordre = new int[sommets.length+1];
+        long[] ordre = new long[sommets.length+1];
         for (int i=1; i<sommets.length; i++)
         {
             ordre[i] = sommets[tsp.getSolution(i)];
@@ -310,8 +312,8 @@ public class Model {
         System.out.println("Deliveries chargées : " + deliveries.size());
 
         // sommets
-        int[] sommets = new int[Vertex_to_visit.size()];
-        HashMap<Integer, Vertex> dictionnaire = new HashMap<>();
+        long[] sommets = new long[Vertex_to_visit.size()];
+        HashMap<Long, Vertex> dictionnaire = new HashMap<>();
         for (int i = 0; i < Vertex_to_visit.size(); i++) {
             Vertex current = Vertex_to_visit.get(i);
             sommets[i] = current.getId();
@@ -321,14 +323,14 @@ public class Model {
         System.out.println("Sommets : " + Arrays.toString(sommets));
 
         // precedence (TEMPLATE)
-        int[] precedence = new int[Vertex_to_visit.size()];
+        long[] precedence = new long[Vertex_to_visit.size()];
         for (int i = 0; i < Vertex_to_visit.size(); i++) {
             precedence[i] = -1;
         }
 
         // obtenir l'ordre d'après ObtenirOrdreSommets()
 
-        int[] ordre = ObtenirOrdreSommets(sommets, precedence);
+        long[] ordre = ObtenirOrdreSommets(sommets, precedence);
 
         System.out.println("Ordre calculé "+Arrays.toString(ordre));
 
