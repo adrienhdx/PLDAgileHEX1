@@ -32,6 +32,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         fileChooserDelivery.addActionListener(controller);
         fileChooserMap.addActionListener(controller);
         addCourierButton.addActionListener(controller);
+        removeCourierButton.addActionListener(controller);
     }
 
     public Interface() {
@@ -62,7 +63,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     private void setupMapPanel() {
         mapPanel = new JPanel();
-        mapButton = new JButton("Charger la carte");
+        mapButton = new JButton("Upload Map");
         mapPanel.add(mapButton);
         tabPan.addTab("Map", mapPanel);
 
@@ -107,7 +108,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         // Livraisons non attribuées
         gbc.gridx = 0;
         gbc.gridy = 0;
-        deliveryPanel.add(new JLabel("Livraisons non attribuées:"), gbc);
+        deliveryPanel.add(new JLabel("Pending Deliveries:"), gbc);
 
         unassignedList = new JComboBox<>(unassignedModel);
         gbc.gridx = 1;
@@ -116,40 +117,40 @@ public class Interface extends JFrame implements PropertyChangeListener {
         // Livraisons attribuées
         gbc.gridx = 0;
         gbc.gridy = 1;
-        deliveryPanel.add(new JLabel("Livraisons attribuées:"), gbc);
+        deliveryPanel.add(new JLabel("Assigned Deliveries:"), gbc);
 
         assignedList = new JComboBox<>(assignedModel);
         gbc.gridx = 1;
         deliveryPanel.add(assignedList, gbc);
 
         // Bouton pour attribuer une livraison
-        addDeliveryButton = new JButton("Attribuer Livraison");
+        addDeliveryButton = new JButton("Assign Deliveries");
         gbc.gridx = 0;
         gbc.gridy = 2;
         deliveryPanel.add(addDeliveryButton, gbc);
 
         // Bouton pour retirer une livraison
-        removeDeliveryButton = new JButton("Retirer Livraison");
+        removeDeliveryButton = new JButton("Remove Deliveries");
         gbc.gridx = 1;
         deliveryPanel.add(removeDeliveryButton, gbc);
 
         // Choisir un livreur
         gbc.gridx = 0;
         gbc.gridy = 3;
-        deliveryPanel.add(new JLabel("Choisir un livreur:"), gbc);
+        deliveryPanel.add(new JLabel("Choose Courier:"), gbc);
 
         courierDropdown = new JComboBox<>(courierModel);
         gbc.gridx = 1;
         deliveryPanel.add(courierDropdown, gbc);
 
         // Bouton pour affecter le livreur
-        assignCourierButton = new JButton("Affecter Livreur");
+        assignCourierButton = new JButton("Assign Courier");
         gbc.gridx = 0;
         gbc.gridy = 4;
         deliveryPanel.add(assignCourierButton, gbc);
 
         // Bouton pour calculer l'itinéraire
-        showRoutesButton = new JButton("Calculer Itinéraire");
+        showRoutesButton = new JButton("Compute Route");
         gbc.gridx = 1;
         gbc.gridy = 4;
         deliveryPanel.add(showRoutesButton, gbc);
@@ -171,7 +172,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
             assignedModel.addElement(selectedDelivery);
             unassignedModel.removeElement(selectedDelivery);
         } else {
-            JOptionPane.showMessageDialog(this, "Aucune livraison sélectionnée.");
+            JOptionPane.showMessageDialog(this, "No delivery selected.");
         }
     }
 
@@ -181,7 +182,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
             unassignedModel.addElement(selectedDelivery);
             assignedModel.removeElement(selectedDelivery);
         } else {
-            JOptionPane.showMessageDialog(this, "Aucune livraison sélectionnée.");
+            JOptionPane.showMessageDialog(this, "No delivery selected.");
         }
     }
 
@@ -189,14 +190,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
         String selectedCourier = (String) courierDropdown.getSelectedItem();
         String assignedDelivery = (String) assignedList.getSelectedItem();
         if (selectedCourier != null && assignedDelivery != null) {
-            JOptionPane.showMessageDialog(this, "Livraison " + assignedDelivery + " assignée à " + selectedCourier);
+            JOptionPane.showMessageDialog(this, "Delivery " + assignedDelivery + " managed by " + selectedCourier);
         } else {
-            JOptionPane.showMessageDialog(this, "Aucun livreur ou aucune livraison sélectionnée.");
+            JOptionPane.showMessageDialog(this, "No courier or delivery selected");
         }
     }
 
     private void calculateRoute() {
-        JOptionPane.showMessageDialog(this, "Calcul de l'itinéraire...");
+        JOptionPane.showMessageDialog(this, "Computing route...");
         // Logique pour calculer l'itinéraire
     }
 
@@ -212,14 +213,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
-        managementPanel.add(new JLabel("Liste des livreurs :"), gbc);
+        managementPanel.add(new JLabel("Couriers :"), gbc);
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierDropdown, gbc);
 
         // Champ de texte pour ajouter un nouveau livreur
         this.courierFieldFirstName = new JTextField(15);
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.gridwidth = 1;
         managementPanel.add(new JLabel("First Name :"), gbc);
         gbc.gridx = 1;
@@ -227,7 +228,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         managementPanel.add(courierFieldFirstName, gbc);
 
         this.courierFieldLastName = new JTextField(15);
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridx = 0;
         gbc.gridwidth = 1;
         managementPanel.add(new JLabel("Last Name :"), gbc);
@@ -236,7 +237,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         managementPanel.add(courierFieldLastName, gbc);
 
         this.courierFieldPhoneNumber = new JTextField(15);
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.gridx = 0;
         gbc.gridwidth = 1;
         managementPanel.add(new JLabel("Phone number :"), gbc);
@@ -245,30 +246,31 @@ public class Interface extends JFrame implements PropertyChangeListener {
         managementPanel.add(courierFieldPhoneNumber, gbc);
 
         // Bouton pour ajouter un nouveau livreur
-        addCourierButton = new JButton("Ajouter livreur");
+        addCourierButton = new JButton("Add courier");
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE;
         managementPanel.add(addCourierButton, gbc);
 
-        // Bouton pour supprimer le livreur sélectionné
-        removeCourierButton = new JButton("Supprimer livreur");
-        gbc.gridx = 1;
-        managementPanel.add(removeCourierButton, gbc);
-
-
-        // Action pour supprimer un livreur sélectionné
-        removeCourierButton.addActionListener(e -> {
-            String selectedCourier = (String) courierDropdown.getSelectedItem();
-            if (selectedCourier != null) {
-                courierModel.removeElement(selectedCourier);  // Supprimer le livreur de la liste
-            } else {
-                JOptionPane.showMessageDialog(null, "Aucun livreur sélectionné.");
+        addCourierButton.addActionListener(e ->{
+            if(!courierFieldFirstName.getText().trim().equals("") && !courierFieldLastName.getText().trim().equals("") && !courierFieldPhoneNumber.getText().trim().equals("")) {
+                courierFieldFirstName.setText("");
+                courierFieldLastName.setText("");
+                courierFieldPhoneNumber.setText("");
+                JOptionPane.showMessageDialog(null, "Courier added");
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Please fill in all fields");
             }
         });
 
-        tabPan.addTab("Gestion des livreurs", managementPanel);
+        // Bouton pour supprimer le livreur sélectionné
+        removeCourierButton = new JButton("Remove courier");
+        gbc.gridy = 2;
+        managementPanel.add(removeCourierButton, gbc);
+
+        tabPan.addTab("Courier Management", managementPanel);
     }
 
     @Override
@@ -283,10 +285,23 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
         if (evt.getPropertyName().equals("addCourierList")) {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
-            couriers.add(courierList.getLast().getFirstName()+ " " + courierList.getLast().getLastName());
+            updateCourierList(courierList);
+        }
+        if (evt.getPropertyName().equals("deleteCourierList")) {
+            courierDropdown.removeAllItems();
+            ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
+            updateCourierList(courierList);
         }
     }
 
+    private void updateCourierList(ArrayList<Courier> courierList) {
+        this.couriers.clear();
+        for (Courier courier : courierList) {
+            this.couriers.add(courier.getFirstName()+ " " + courier.getLastName());
+        }
+    }
+
+    // Getters
     public JFileChooser getFileChooserDelivery() {
         return fileChooserDelivery;
     }
@@ -313,6 +328,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JButton getRemoveCourierButton() {
         return removeCourierButton;
+    }
+
+    public JComboBox<String> getCourierComboBox() {
+        return courierDropdown;
     }
 }
 
