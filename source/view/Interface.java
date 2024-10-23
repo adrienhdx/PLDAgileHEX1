@@ -277,6 +277,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
             mapPanel.removeAll();  // Retire tous les composants
             ArrayList<Vertex> vertexArrayList = (ArrayList<Vertex>) evt.getNewValue();
             map = new MapDisplay(vertexArrayList.getFirst());
+            map.afficherNoeuds(vertexArrayList);
             scrollPanelMap = new JScrollPane(map.getMapViewer());
             tabPan.setComponentAt(0,scrollPanelMap);
         }
