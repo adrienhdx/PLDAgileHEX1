@@ -2,6 +2,7 @@ package source.view;
 
 import source.controller.Controller;
 import source.model.Courier;
+import source.model.Segment;
 import source.model.Vertex;
 
 import javax.swing.*;
@@ -281,6 +282,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
             scrollPanelMap = new JScrollPane(map.getMapViewer());
             tabPan.setComponentAt(0,scrollPanelMap);
         }
+
         if (evt.getPropertyName().equals("addCourierList")) {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
             couriers.add(courierList.getLast().getFirstName()+ " " + courierList.getLast().getLastName());

@@ -92,22 +92,27 @@ public class MapDisplay {
 
 
     public void afficherSegments(List<Segment> segments){
-        List<RoutePainter> routePainters = new ArrayList<>();
-        if (segments != null) {
-            for (Segment segment : segments) {
-                GeoPosition origine = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
-                GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
-                List<GeoPosition> track = Arrays.asList(origine, destination);
-                RoutePainter routePainter = new RoutePainter(track);
-                routePainters.add(routePainter);
-                painters.add(routePainter);
-                MainPainter.addPainter(routePainter);
-            }
+        try{
+            List<RoutePainter> routePainters = new ArrayList<>();
+            if (segments != null) {
+                for (Segment segment : segments) {
+                    GeoPosition origine = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
+                    GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
+                    List<GeoPosition> track = Arrays.asList(origine, destination);
+                    RoutePainter routePainter = new RoutePainter(track);
+                    routePainters.add(routePainter);
+                    painters.add(routePainter);
+                    MainPainter.addPainter(routePainter);
+                }
 
+            }
+        }catch (Exception e) {
+            System.out.println(e);
         }
+
     }
 
-    public void afficherNoeuds_Segments(List<Vertex> vertices  /*, List<Segment> segments*/){
+    /*public void afficherNoeuds_Segments(List<Vertex> vertices  /*, List<Segment> segments){
         try {
             //Création de la liste de GeoPosition à partir des coordonnées du Xml
             List<GeoPosition> geoCoordinates = new ArrayList<GeoPosition>(vertices.size());
@@ -131,7 +136,7 @@ public class MapDisplay {
                     RoutePainter routePainter = new RoutePainter(track);
                     routePainters.add(routePainter);
                 }
-            }*/
+            }
 
             
             // Création d'un "waypoint painter" pour afficher les waypoints
@@ -151,7 +156,7 @@ public class MapDisplay {
         } catch (Exception e) {
             System.out.println(e);
         }
-    }
+    }*/
 
     public JXMapViewer getMapViewer() {
         return mapViewer;

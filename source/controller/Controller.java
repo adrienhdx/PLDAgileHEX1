@@ -35,9 +35,12 @@ public class Controller implements ActionListener {
 
     public void loadMap(){
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
-        ArrayList<Vertex> vertexList = (ArrayList<Vertex>) XmlExtractor.extractPlan(filePath);
+        ArrayList<Vertex> vertexList = (ArrayList<Vertex>) XmlExtractor.extractPlan(filePath).getFirst();
+        ArrayList<Segment> segmentList = (ArrayList<Segment>) XmlExtractor.extractPlan(filePath).getLast();
+        model.setSegmentList(segmentList);
         model.setVertexList(vertexList);
         System.out.println(vertexList.size());
+        System.out.println(segmentList.size());
     }
 
     public void loadDeliveries(){
