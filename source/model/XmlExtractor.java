@@ -12,7 +12,7 @@ import java.util.*;
 import java.io.FileInputStream;
 
 public class XmlExtractor {
-    public static Vertex extractEntrepot(String file, Map<String, Vertex> mapPlan) {
+    public static Vertex extractEntrepot(String file, ArrayList<Vertex> vertexArrayList) {
 
         try{
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -20,7 +20,12 @@ public class XmlExtractor {
             Document document = builder.parse(new FileInputStream(file));
 
             Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
-            return mapPlan.get(entrepot.getAttribute("adresse"));
+            HashMap<Integer, Vertex> vertexIdMap = new HashMap<>();
+
+            for (Vertex vertex : vertexArrayList) {
+                vertexIdMap.put(vertex.getId(), vertex);
+            }
+            return vertexIdMap.get(entrepot.getAttribute("adresse"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,7 +40,7 @@ public class XmlExtractor {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new FileInputStream(file));
 
-            HashMap<String, Vertex> vertexIdMap = new HashMap<>();
+            HashMap<Integer, Vertex> vertexIdMap = new HashMap<>();
 
             for (Vertex vertex : vertexArrayList) {
                 vertexIdMap.put(vertex.getId(), vertex);
@@ -99,10 +104,11 @@ public class XmlExtractor {
                     Element element = (Element) node;
                     // On recupere les attributs pour creer chaque objet noeud
                     String id = element.getAttribute("id");
+                    int id_int = Integer.valueOf(id);
                     double latitude = Double.parseDouble(element.getAttribute("latitude"));
                     double longitude = Double.parseDouble(element.getAttribute("longitude"));
 
-                    Vertex noeud = new Vertex(id, latitude, longitude);
+                    Vertex noeud = new Vertex(id_int, latitude, longitude);
                     vertexArrayList.add(noeud);
                 }
             }

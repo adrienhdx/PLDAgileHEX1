@@ -23,6 +23,7 @@ public class Model {
         propertyChangeSupport = new PropertyChangeSupport(this);
         this.completeGraph = new CompleteGraph();
         this.courierList = new ArrayList<>();
+
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener){
@@ -139,38 +140,48 @@ public class Model {
     }
 
     public void addDelivery(Delivery delivery){
+        //ajout entrepot en dur
+        if (Vertex_to_visit.size() == 0){
+            Vertex_to_visit.add(vertexList.get(256));
+            vertexList.get(256).setTSP_num(1);
+            completeGraph.cost = new double[1][1];
+            completeGraph.cost[0][0] = 0;
+        }
         Vertex pickup_pt = delivery.getPickUpPt();
         Vertex delivery_pt = delivery.getDeliveryPt();
+        Vertex_to_visit.add(pickup_pt);
+        Vertex_to_visit.add(delivery_pt);
         // Dans le cas où on ajoute la première commande
-        // TODO modifier en ajoutant l'entrepot de base en premier point (va donc decaler les indices)
-        if (completeGraph.cost == null){
-            pickup_pt.setTSP_num(1);
-            delivery_pt.setTSP_num(2);
-            completeGraph.cost = new double[2][2];
-            completeGraph.cost[0][1] = aStar(pickup_pt, delivery_pt);
-            completeGraph.cost[1][0] = aStar(delivery_pt, pickup_pt);
-            completeGraph.cost[0][0] = 0;
-            completeGraph.cost[1][1] = 0;
+
+//        if (completeGraph.cost == null){
+//            pickup_pt.setTSP_num(2);
+//            delivery_pt.setTSP_num(3);
+//            completeGraph.cost = new double[3][3];
+//            completeGraph.cost[1][2] = aStar(pickup_pt, delivery_pt);
+//            completeGraph.cost[2][1] = aStar(delivery_pt, pickup_pt);
+//            completeGraph.cost[1][1] = 0;
+//            completeGraph.cost[2][2] = 0;
+//        }
+
+        //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
+        // distance la plus courte entre les deux points
+        int taille = completeGraph.cost.length;
+        pickup_pt.setTSP_num(taille+1);
+        delivery_pt.setTSP_num(taille+2);
+        double [][] matrix = new double[taille + 2][taille + 2];
+        completeGraph.cost = matrix;
+        for (Vertex vertex : Vertex_to_visit) {
+            completeGraph.cost[taille][vertex.getTSP_num()-1] = aStar(vertex, pickup_pt);
+            completeGraph.cost[taille+1][vertex.getTSP_num()-1] = aStar(vertex, delivery_pt);
+            completeGraph.cost[vertex.getTSP_num()-1][taille] = aStar(vertex, pickup_pt);
+            completeGraph.cost[vertex.getTSP_num()-1][taille+1] = aStar(vertex, delivery_pt);
         }
-        else{
-            //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
-            // distance la plus courte entre les deux points
-            int taille = completeGraph.cost.length;
-            pickup_pt.setTSP_num(taille+1);
-            delivery_pt.setTSP_num(taille+2);
-            double [][] matrix = new double[taille + 2][taille + 2];
-            completeGraph.cost = matrix;
-            for (Vertex vertex : Vertex_to_visit) {
-                completeGraph.cost[taille][vertex.getGlobal_num()-1] = aStar(vertex, pickup_pt);
-                completeGraph.cost[taille+1][vertex.getGlobal_num()-1] = aStar(vertex, delivery_pt);
-                completeGraph.cost[vertex.getGlobal_num()-1][taille] = aStar(vertex, pickup_pt);
-                completeGraph.cost[vertex.getGlobal_num()-1][taille+1] = aStar(vertex, delivery_pt);
-            }
-            completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt);
-            completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt);
-            completeGraph.cost[taille+1][taille+1] = 0;
-            completeGraph.cost[taille][taille] = 0;
-        }
+
+        completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt);
+        completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt);
+        completeGraph.cost[taille+1][taille+1] = 0;
+        completeGraph.cost[taille][taille] = 0;
+
     }
 
     private double heuristique(Vertex v1, Vertex v2) {
