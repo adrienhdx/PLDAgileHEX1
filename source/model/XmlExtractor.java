@@ -7,6 +7,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 
+import java.math.BigInteger;
+import java.sql.Array;
 import java.util.*;
 
 import java.io.FileInputStream;
@@ -20,7 +22,7 @@ public class XmlExtractor {
             Document document = builder.parse(new FileInputStream(file));
 
             Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
-            HashMap<Integer, Vertex> vertexIdMap = new HashMap<>();
+            HashMap<Long, Vertex> vertexIdMap = new HashMap<>();
 
             for (Vertex vertex : vertexArrayList) {
                 vertexIdMap.put(vertex.getId(), vertex);
@@ -40,7 +42,7 @@ public class XmlExtractor {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new FileInputStream(file));
 
-            HashMap<Integer, Vertex> vertexIdMap = new HashMap<>();
+            HashMap<Long, Vertex> vertexIdMap = new HashMap<>();
 
             for (Vertex vertex : vertexArrayList) {
                 vertexIdMap.put(vertex.getId(), vertex);
@@ -86,7 +88,7 @@ public class XmlExtractor {
         return null;
     }
 
-    public static ArrayList<Vertex> extractPlan(String file) {
+    public static List extractPlan(String file) {
         try {
             // file
             DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
@@ -95,7 +97,9 @@ public class XmlExtractor {
 
             NodeList nodesMap = documentMap.getElementsByTagName("noeud");
 
+            HashMap<Long, Vertex> verticesMap = new HashMap<Long, Vertex>();
             ArrayList<Vertex> vertexArrayList = new ArrayList<>();
+            ArrayList plan = new ArrayList<>();
 
             for (int i = 0; i < nodesMap.getLength(); i++) {
                 Node node = nodesMap.item(i);
@@ -103,16 +107,44 @@ public class XmlExtractor {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) node;
                     // On recupere les attributs pour creer chaque objet noeud
-                    String id = element.getAttribute("id");
-                    int id_int = Integer.valueOf(id);
+                    Long id = Long.valueOf(element.getAttribute("id"));
+                    System.out.println(id);
                     double latitude = Double.parseDouble(element.getAttribute("latitude"));
                     double longitude = Double.parseDouble(element.getAttribute("longitude"));
 
-                    Vertex noeud = new Vertex(id_int, latitude, longitude);
+                    Vertex noeud = new Vertex(id, latitude, longitude);
                     vertexArrayList.add(noeud);
+                    verticesMap.put(id, noeud);
                 }
             }
-            return vertexArrayList;
+
+            plan.add(vertexArrayList);
+
+            // On récupère tous les tronçons "troncon" correspondant aux segments de la carte
+            NodeList segmentList = documentMap.getElementsByTagName("troncon");
+            ArrayList<Segment> segments = new ArrayList<>();
+
+
+            for (int i = 0; i < segmentList.getLength(); i++) {
+                Node node = segmentList.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+
+                    // On recupere les attributs pour creer chaque objet segment: destination (noeud), longueur, nomRue et origine (noeud)
+                    String destination = element.getAttribute("destination");
+                    double longueur = Double.parseDouble(element.getAttribute("longueur"));
+                    String nomRue = element.getAttribute("nomRue");
+                    String origine = element.getAttribute("origine");
+
+                    Vertex noeudOrigine = verticesMap.get(origine);
+                    Vertex noeudDestination = verticesMap.get(destination);
+
+                    Segment segment = new Segment(nomRue, noeudOrigine, noeudDestination, longueur);
+                    segments.add(segment);
+                }
+            }
+            plan.add(segments);
+            return plan;
         } catch (Exception e) {
             e.printStackTrace();
         }
