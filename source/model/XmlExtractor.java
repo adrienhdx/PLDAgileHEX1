@@ -12,7 +12,7 @@ import java.util.*;
 import java.io.FileInputStream;
 
 public class XmlExtractor {
-    public static Vertex extractEntrepot(String file, Map<String, Vertex> mapPlan) {
+    public static Vertex extractEntrepot(String file, ArrayList<Vertex> vertexArrayList) {
 
         try{
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -20,7 +20,12 @@ public class XmlExtractor {
             Document document = builder.parse(new FileInputStream(file));
 
             Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
-            return mapPlan.get(entrepot.getAttribute("adresse"));
+            HashMap<Long, Vertex> vertexIdMap = new HashMap<>();
+
+            for (Vertex vertex : vertexArrayList) {
+                vertexIdMap.put(vertex.getId(), vertex);
+            }
+            return vertexIdMap.get(entrepot.getAttribute("adresse"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,7 +40,7 @@ public class XmlExtractor {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new FileInputStream(file));
 
-            HashMap<String, Vertex> vertexIdMap = new HashMap<>();
+            HashMap<Long, Vertex> vertexIdMap = new HashMap<>();
 
             for (Vertex vertex : vertexArrayList) {
                 vertexIdMap.put(vertex.getId(), vertex);
@@ -81,7 +86,7 @@ public class XmlExtractor {
         return null;
     }
 
-    public static ArrayList<Vertex> extractPlan(String file) {
+    public static List extractPlan(String file) {
         try {
             // file
             DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
@@ -90,7 +95,9 @@ public class XmlExtractor {
 
             NodeList nodesMap = documentMap.getElementsByTagName("noeud");
 
+            HashMap<Long, Vertex> verticesMap = new HashMap<Long, Vertex>();
             ArrayList<Vertex> vertexArrayList = new ArrayList<>();
+            ArrayList plan = new ArrayList<>();
 
             for (int i = 0; i < nodesMap.getLength(); i++) {
                 Node node = nodesMap.item(i);
@@ -98,15 +105,44 @@ public class XmlExtractor {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) node;
                     // On recupere les attributs pour creer chaque objet noeud
-                    String id = element.getAttribute("id");
+                    Long id = Long.valueOf(element.getAttribute("id"));
+                    System.out.println(id);
                     double latitude = Double.parseDouble(element.getAttribute("latitude"));
                     double longitude = Double.parseDouble(element.getAttribute("longitude"));
 
                     Vertex noeud = new Vertex(id, latitude, longitude);
                     vertexArrayList.add(noeud);
+                    verticesMap.put(id, noeud);
                 }
             }
-            return vertexArrayList;
+
+            plan.add(vertexArrayList);
+
+            // On récupère tous les tronçons "troncon" correspondant aux segments de la carte
+            NodeList segmentList = documentMap.getElementsByTagName("troncon");
+            ArrayList<Segment> segments = new ArrayList<>();
+
+
+            for (int i = 0; i < segmentList.getLength(); i++) {
+                Node node = segmentList.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+
+                    // On recupere les attributs pour creer chaque objet segment: destination (noeud), longueur, nomRue et origine (noeud)
+                    Long destination = Long.valueOf(element.getAttribute("destination"));
+                    double longueur = Double.parseDouble(element.getAttribute("longueur"));
+                    String nomRue = element.getAttribute("nomRue");
+                    Long origine = Long.valueOf(element.getAttribute("origine"));
+
+                    Vertex noeudOrigine = verticesMap.get(origine);
+                    Vertex noeudDestination = verticesMap.get(destination);
+
+                    Segment segment = new Segment(nomRue, noeudOrigine, noeudDestination, longueur);
+                    segments.add(segment);
+                }
+            }
+            plan.add(segments);
+            return plan;
         } catch (Exception e) {
             e.printStackTrace();
         }

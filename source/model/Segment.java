@@ -14,6 +14,11 @@ public class Segment {
         this.longueur = longueur;
     }
 
+    public Segment(Vertex origine, Vertex destination) {
+        this.origine = origine;
+        this.destination = destination;
+    }
+
     public Vertex getOrigine() {
         return origine;
     }

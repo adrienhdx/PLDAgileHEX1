@@ -30,6 +30,9 @@ public class Controller implements ActionListener {
         if (e.getSource() == view.getAssignCourierButton()) {
             this.assignDeliveriesCourier();
         }
+        if(e.getSource() == view.getRemoveCourierButton()){
+            this.deleteCourier();
+        }
     }
 
     public Controller(Model model, Interface view) {
@@ -39,9 +42,12 @@ public class Controller implements ActionListener {
 
     public void loadMap(){
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
-        ArrayList<Vertex> vertexList = (ArrayList<Vertex>) XmlExtractor.extractPlan(filePath);
+        ArrayList<Vertex> vertexList = (ArrayList<Vertex>) XmlExtractor.extractPlan(filePath).getFirst();
+        ArrayList<Segment> segmentList = (ArrayList<Segment>) XmlExtractor.extractPlan(filePath).getLast();
+        model.setSegmentList(segmentList);
         model.setVertexList(vertexList);
         System.out.println(vertexList.size());
+        System.out.println(segmentList.size());
     }
 
     public void loadDeliveries(){
@@ -99,6 +105,16 @@ public class Controller implements ActionListener {
     }
     public void assignDelivery(Courier courier, Delivery delivery){
         courier.getRoute().getDeliveries().add(delivery);
+    }
+
+    public void deleteCourier(){
+        String courierInfo = (String) view.getCourierComboBox().getSelectedItem();
+        if (courierInfo != null) {
+            String[] splitInfo = courierInfo.split(" ");
+            String firstName = splitInfo[0];
+            String lastName = splitInfo[1];
+            model.deleteCourier(firstName, lastName);
+        }
     }
 
     public void assignDelivery(){}

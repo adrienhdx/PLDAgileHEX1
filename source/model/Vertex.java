@@ -1,20 +1,20 @@
 package source.model;
 
 public class Vertex {
-    private String id;
+    private Long id;
     private double latitude;
     private double longitude;
     private int global_num;
     private int TSP_num;
 
-    public Vertex(String id, double latitude, double longitude) {
+    public Vertex(Long id, double latitude, double longitude) {
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public int getTSP_num() { return TSP_num; }
     public void setTSP_num(int TSP_num) { this.TSP_num = TSP_num; }

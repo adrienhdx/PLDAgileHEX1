@@ -48,10 +48,16 @@ public class Model {
     }
 
     public void deleteCourier(String firstName, String lastName){
-        for(Courier courier : courierList){
-            if(courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
-                courierList.remove(courier);
+        ArrayList<Courier> oldCourierList = (ArrayList<Courier>) courierList; // faire copy en profondeur
+        int index = Integer.MAX_VALUE;
+        for(int i = 0; i < courierList.size(); i++){
+            if(courierList.get(i).getFirstName().equals(firstName) && courierList.get(i).getLastName().equals(lastName)) {
+                index = i;
             }
+        }
+        if(index != Integer.MAX_VALUE){
+            courierList.remove(index);
+            propertyChangeSupport.firePropertyChange("deleteCourierList", null, courierList);
         }
     }
 
@@ -142,38 +148,48 @@ public class Model {
     }
 
     public void addDelivery(Delivery delivery){
+        //ajout entrepot en dur
+        if (Vertex_to_visit.size() == 0){
+            Vertex_to_visit.add(vertexList.get(256));
+            vertexList.get(256).setTSP_num(1);
+            completeGraph.cost = new double[1][1];
+            completeGraph.cost[0][0] = 0;
+        }
         Vertex pickup_pt = delivery.getPickUpPt();
         Vertex delivery_pt = delivery.getDeliveryPt();
+        Vertex_to_visit.add(pickup_pt);
+        Vertex_to_visit.add(delivery_pt);
         // Dans le cas où on ajoute la première commande
-        // TODO modifier en ajoutant l'entrepot de base en premier point (va donc decaler les indices)
-        if (completeGraph.cost == null){
-            pickup_pt.setTSP_num(1);
-            delivery_pt.setTSP_num(2);
-            completeGraph.cost = new double[2][2];
-            completeGraph.cost[0][1] = aStar(pickup_pt, delivery_pt);
-            completeGraph.cost[1][0] = aStar(delivery_pt, pickup_pt);
-            completeGraph.cost[0][0] = 0;
-            completeGraph.cost[1][1] = 0;
+
+//        if (completeGraph.cost == null){
+//            pickup_pt.setTSP_num(2);
+//            delivery_pt.setTSP_num(3);
+//            completeGraph.cost = new double[3][3];
+//            completeGraph.cost[1][2] = aStar(pickup_pt, delivery_pt);
+//            completeGraph.cost[2][1] = aStar(delivery_pt, pickup_pt);
+//            completeGraph.cost[1][1] = 0;
+//            completeGraph.cost[2][2] = 0;
+//        }
+
+        //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
+        // distance la plus courte entre les deux points
+        int taille = completeGraph.cost.length;
+        pickup_pt.setTSP_num(taille+1);
+        delivery_pt.setTSP_num(taille+2);
+        double [][] matrix = new double[taille + 2][taille + 2];
+        completeGraph.cost = matrix;
+        for (Vertex vertex : Vertex_to_visit) {
+            completeGraph.cost[taille][vertex.getTSP_num()-1] = aStar(vertex, pickup_pt);
+            completeGraph.cost[taille+1][vertex.getTSP_num()-1] = aStar(vertex, delivery_pt);
+            completeGraph.cost[vertex.getTSP_num()-1][taille] = aStar(vertex, pickup_pt);
+            completeGraph.cost[vertex.getTSP_num()-1][taille+1] = aStar(vertex, delivery_pt);
         }
-        else{
-            //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
-            // distance la plus courte entre les deux points
-            int taille = completeGraph.cost.length;
-            pickup_pt.setTSP_num(taille+1);
-            delivery_pt.setTSP_num(taille+2);
-            double [][] matrix = new double[taille + 2][taille + 2];
-            completeGraph.cost = matrix;
-            for (Vertex vertex : Vertex_to_visit) {
-                completeGraph.cost[taille][vertex.getGlobal_num()-1] = aStar(vertex, pickup_pt);
-                completeGraph.cost[taille+1][vertex.getGlobal_num()-1] = aStar(vertex, delivery_pt);
-                completeGraph.cost[vertex.getGlobal_num()-1][taille] = aStar(vertex, pickup_pt);
-                completeGraph.cost[vertex.getGlobal_num()-1][taille+1] = aStar(vertex, delivery_pt);
-            }
-            completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt);
-            completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt);
-            completeGraph.cost[taille+1][taille+1] = 0;
-            completeGraph.cost[taille][taille] = 0;
-        }
+
+        completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt);
+        completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt);
+        completeGraph.cost[taille+1][taille+1] = 0;
+        completeGraph.cost[taille][taille] = 0;
+
     }
 
     private double heuristique(Vertex v1, Vertex v2) {
@@ -237,19 +253,24 @@ public class Model {
         return Double.POSITIVE_INFINITY;
     }
 
-    public int[] ObtenirOrdreSommets(int nombreSommets, int[] sommets, int[] precedence) {
+    public long[] ObtenirOrdreSommets(long[] sommets, long[] precedence) {
 
         //int[] sommets = {0, 17210, 17385, 19273};
         // 1->2 and 3->2
+
+        // PRECEDENCE DANS LES DEUX SENS -_-
+
         //int[] precedence = {-1, 17385, -1, 17385};
         // converted to -1 2 0 2
 
         TSP tsp = new TSP1();
 
-        List<Integer> sommetsList = new ArrayList<>();
-        for (int sommet : sommets) {
+        List<Long> sommetsList = new ArrayList<>();
+        for (long sommet : sommets) {
             sommetsList.add(sommet);
         }
+
+        int[] precedenceReindexed = new int[precedence.length];
 
         for (int i = 0; i < sommets.length; i++) {
             if (precedence[i] == -1) continue;
@@ -257,16 +278,16 @@ public class Model {
             // trouver indice de precedence[i] dans sommets
             int index = sommetsList.indexOf(precedence[i]);
             if (index != -1) {
-                precedence[i] = index;
+                precedenceReindexed[i] = index;
             }
         }
 
         // règles de précédence :
         // C(j, i) = C(0, j) = C(i, 0) = +inf
-        for (int i=1; i<nombreSommets; i++){
+        for (int i=1; i<sommets.length; i++){
             if (precedence[i] != -1) {
                 completeGraph.cost[i][0] = Integer.MAX_VALUE;
-                completeGraph.cost[precedence[i]][i] = Integer.MAX_VALUE;
+                completeGraph.cost[precedenceReindexed[i]][i] = Integer.MAX_VALUE;
             } else {
                 completeGraph.cost[0][i] = Integer.MAX_VALUE;
             }
@@ -278,14 +299,63 @@ public class Model {
         System.out.print("TSP : Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms");
 
-        int[] ordre = new int[nombreSommets+1];
-        for (int i=1; i<nombreSommets; i++)
+        long[] ordre = new long[sommets.length+1];
+        for (int i=1; i<sommets.length; i++)
         {
             ordre[i] = sommets[tsp.getSolution(i)];
         }
 
-        ordre[nombreSommets] = 0;
+        ordre[sommets.length] = 0;
 
         return ordre;
+    }
+
+    public List<Segment> ObtenirListeSegmentsTSP(List<Delivery> deliveries) {
+        // décomposer deliveries en un int[] de sommets et un int[] de précédence
+
+        for (Delivery delivery : deliveries) {
+            addDelivery(delivery); // ici chaque vertex est ajoutée dans vertex_to_visit
+        }
+
+        System.out.println("Deliveries chargées : " + deliveries.size());
+
+        // sommets
+        long[] sommets = new long[Vertex_to_visit.size()];
+        HashMap<Long, Vertex> dictionnaire = new HashMap<>();
+        for (int i = 0; i < Vertex_to_visit.size(); i++) {
+            Vertex current = Vertex_to_visit.get(i);
+            sommets[i] = current.getId();
+            dictionnaire.put(current.getId(), current);
+        }
+
+        System.out.println("Sommets : " + Arrays.toString(sommets));
+
+        // precedence (TEMPLATE)
+        long[] precedence = new long[Vertex_to_visit.size()];
+        for (int i = 0; i < Vertex_to_visit.size(); i++) {
+            precedence[i] = -1;
+        }
+
+        // obtenir l'ordre d'après ObtenirOrdreSommets()
+
+        long[] ordre = ObtenirOrdreSommets(sommets, precedence);
+
+        System.out.println("Ordre calculé "+Arrays.toString(ordre));
+
+        // recomposer l'ordre en une liste de segments et retour (ne pas oublier le dépôt)
+        List<Segment> segments = new ArrayList<>();
+        for (int i = 1; i < ordre.length; i++) {
+            Vertex origine = dictionnaire.get(ordre[i-1]);
+            Vertex destination = dictionnaire.get(ordre[i]);
+            Segment seg = new Segment(origine, destination);
+            segments.add(seg);
+        }
+
+        System.out.println("Segments : " + segments.size());
+        for (Segment seg : segments) {
+            System.out.println(seg);
+        }
+
+        return segments;
     }
 }
