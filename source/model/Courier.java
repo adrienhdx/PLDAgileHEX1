@@ -4,6 +4,7 @@ public class Courier {
     private String lastName;
     private String firstName;
     private String phoneNum;
+    private Courier courier;
 
     public Courier(String lastName, String firstName, String phoneNum) {
         this.lastName = lastName;
@@ -20,4 +21,8 @@ public class Courier {
 
     public String getPhoneNum() { return phoneNum; }
     public void setPhoneNum(String phoneNum) { this.phoneNum = phoneNum; }
+
+
+    public Courier getCourier() { return courier; }
+    public void setCourier(Courier courier) { this.courier = courier; }
 }

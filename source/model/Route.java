@@ -8,7 +8,7 @@ public class Route {
     private Date date;
     private List<Segment> segments;
     private List<Delivery> deliveries;
-    private Courier courier;
+
 
     public Route(String id, Date date, List<Segment> segments) {
         this.id = id;
@@ -25,9 +25,6 @@ public class Route {
 
     public List<Segment> getSegments() { return segments; }
     public void setSegments(List<Segment> segments) { this.segments = segments; }
-
-    public Courier getCourier() { return courier; }
-    public void setCourier(Courier courier) { this.courier = courier; }
 
     public List<Delivery> getDeliveries() { return deliveries; }
     public void setDeliveries(List<Delivery> deliveries) { this.deliveries = deliveries; }
