@@ -234,10 +234,13 @@ public class Model {
         return Double.POSITIVE_INFINITY;
     }
 
-    public int[] ObtenirOrdreSommets(int nombreSommets, int[] sommets, int[] precedence) {
+    public int[] ObtenirOrdreSommets(int[] sommets, int[] precedence) {
 
         //int[] sommets = {0, 17210, 17385, 19273};
         // 1->2 and 3->2
+
+        // PRECEDENCE DANS LES DEUX SENS -_-
+
         //int[] precedence = {-1, 17385, -1, 17385};
         // converted to -1 2 0 2
 
@@ -260,7 +263,7 @@ public class Model {
 
         // règles de précédence :
         // C(j, i) = C(0, j) = C(i, 0) = +inf
-        for (int i=1; i<nombreSommets; i++){
+        for (int i=1; i<sommets.length; i++){
             if (precedence[i] != -1) {
                 completeGraph.cost[i][0] = Integer.MAX_VALUE;
                 completeGraph.cost[precedence[i]][i] = Integer.MAX_VALUE;
@@ -275,14 +278,54 @@ public class Model {
         System.out.print("TSP : Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms");
 
-        int[] ordre = new int[nombreSommets+1];
-        for (int i=1; i<nombreSommets; i++)
+        int[] ordre = new int[sommets.length+1];
+        for (int i=1; i<sommets.length; i++)
         {
             ordre[i] = sommets[tsp.getSolution(i)];
         }
 
-        ordre[nombreSommets] = 0;
+        ordre[sommets.length] = 0;
 
         return ordre;
+    }
+
+    public List<Segment> ObtenirListeSegmentsTSP(List<Delivery> deliveries) {
+        // décomposer deliveries en un int[] de sommets et un int[] de précédence
+
+        for (Delivery delivery : deliveries) {
+            addDelivery(delivery); // ici chaque vertex est ajoutée dans vertex_to_visit
+        }
+
+        // sommets
+        int[] sommets = new int[Vertex_to_visit.size()];
+        HashMap<Integer, Vertex> dictionnaire = new HashMap<>();
+        for (int i = 0; i < Vertex_to_visit.size(); i++) {
+            Vertex current = Vertex_to_visit.get(i);
+            sommets[i] = current.getId();
+            dictionnaire.put(current.getId(), current);
+        }
+
+        System.out.println("Sommets : " + Arrays.toString(sommets));
+
+        // precedence (TEMPLATE)
+        int[] precedence = new int[Vertex_to_visit.size()];
+        for (int i = 0; i < Vertex_to_visit.size(); i++) {
+            precedence[i] = -1;
+        }
+
+        // obtenir l'ordre d'après ObtenirOrdreSommets()
+
+        int[] ordre = ObtenirOrdreSommets(sommets, precedence);
+
+        // recomposer l'ordre en une liste de segments et retour (ne pas oublier le dépôt)
+        List<Segment> segments = new ArrayList<>();
+        for (int i = 1; i < ordre.length; i++) {
+            Vertex origine = dictionnaire.get(ordre[i-1]);
+            Vertex destination = dictionnaire.get(ordre[i]);
+            Segment seg = new Segment(origine, destination);
+            segments.add(seg);
+        }
+
+        return segments;
     }
 }
