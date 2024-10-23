@@ -7,8 +7,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 
-import java.math.BigInteger;
-import java.sql.Array;
 import java.util.*;
 
 import java.io.FileInputStream;
@@ -131,10 +129,10 @@ public class XmlExtractor {
                     Element element = (Element) node;
 
                     // On recupere les attributs pour creer chaque objet segment: destination (noeud), longueur, nomRue et origine (noeud)
-                    String destination = element.getAttribute("destination");
+                    Long destination = Long.valueOf(element.getAttribute("destination"));
                     double longueur = Double.parseDouble(element.getAttribute("longueur"));
                     String nomRue = element.getAttribute("nomRue");
-                    String origine = element.getAttribute("origine");
+                    Long origine = Long.valueOf(element.getAttribute("origine"));
 
                     Vertex noeudOrigine = verticesMap.get(origine);
                     Vertex noeudDestination = verticesMap.get(destination);
