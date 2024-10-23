@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -57,6 +58,10 @@ public class Controller implements ActionListener {
             ArrayList<Delivery> deliveryList = (ArrayList<Delivery>) XmlExtractor.extractDemande(filePath, model.getVertexList());
             model.setPendingDeliveryList(deliveryList);
             System.out.println(deliveryList.size());
+            List<Segment> tour = model.computeTour(deliveryList);
+            for (Segment s : tour) {
+                System.out.println(s);
+            }
         }
     }
 

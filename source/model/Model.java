@@ -358,4 +358,28 @@ public class Model {
 
         return segments;
     }
+
+
+    public List<Segment> computeTour(List<Delivery> dlist) {
+        // create warehouse
+        // create segment from warehouse to p1 then p1 to d1 then d1 to p2 etc
+        System.out.println("Calcul du tour par TSP :");
+        List<Segment> segments = new ArrayList<>();
+        Vertex origin;
+        Vertex warehouse = new Vertex(1349383079L, 45.731087, 4.9053183); // entrepot
+        Vertex destination = warehouse;
+        for (Delivery delivery : dlist) {
+            origin = delivery.getPickUpPt();
+            Segment seg = new Segment(destination, origin);
+            segments.add(seg);
+            destination = delivery.getDeliveryPt();
+            Segment seg2 = new Segment(origin, destination);
+            segments.add(seg2);
+        }
+
+        Segment fin = new Segment(destination, warehouse);
+        segments.add(fin);
+        return segments;
+
+    }
 }
