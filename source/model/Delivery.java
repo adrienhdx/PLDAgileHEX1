@@ -6,7 +6,6 @@ public class Delivery {
     private int pickUpTime;
     private int deliveryTime;
     private DeliveryState state;
-    private Route route;
 
     public Delivery(Vertex pickUpPt, Vertex deliveryPt, int pickUpTime, int deliveryTime, DeliveryState state) {
         this.pickUpPt = pickUpPt;
@@ -33,8 +32,6 @@ public class Delivery {
     public DeliveryState getState() { return state; }
     public void setState(DeliveryState state) { this.state = state; }
 
-    public Route getRoute() { return route; }
-    public void setRoute(Route route) { this.route = route; }
 
     @Override
     public String toString() {
