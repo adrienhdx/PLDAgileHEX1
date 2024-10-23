@@ -2,6 +2,7 @@ package source.view;
 
 import source.controller.Controller;
 import source.model.Courier;
+import source.model.Delivery;
 import source.model.Vertex;
 
 import javax.swing.*;
@@ -21,8 +22,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JButton mapButton, deliveryButton, addDeliveryButton, removeDeliveryButton, assignCourierButton, showRoutesButton, addCourierButton, removeCourierButton;
     private JComboBox<String> unassignedList, assignedList, courierDropdown;
     private DefaultComboBoxModel<String> unassignedModel, assignedModel, courierModel;
-    private String[] initialDeliveries = {};
-    private Vector<String> couriers = new Vector<String>();
+    private Vector<String> couriers, attributedDeliveries;
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
@@ -32,13 +32,26 @@ public class Interface extends JFrame implements PropertyChangeListener {
         fileChooserDelivery.addActionListener(controller);
         fileChooserMap.addActionListener(controller);
         addCourierButton.addActionListener(controller);
+        assignCourierButton.addActionListener(controller);
     }
 
     public Interface() {
+        couriers = new Vector<String>();
+        attributedDeliveries = new Vector<String>();
         fileChooserDelivery = new JFileChooser();
         fileChooserDelivery.setCurrentDirectory(new File("."));
         fileChooserMap = new JFileChooser();
         fileChooserMap.setCurrentDirectory(new File("."));
+        unassignedModel = new DefaultComboBoxModel<>();
+        assignedModel = new DefaultComboBoxModel<>(attributedDeliveries);
+        courierModel = new DefaultComboBoxModel<>(couriers);
+        unassignedList = new JComboBox<>(unassignedModel);
+        assignedList = new JComboBox<>(assignedModel);
+        addDeliveryButton = new JButton("Attribuer Livraison");
+        removeDeliveryButton = new JButton("Retirer Livraison");
+        courierDropdown = new JComboBox<>(courierModel);
+        assignCourierButton = new JButton("Affecter Livreur");
+        showRoutesButton = new JButton("Calculer Itinéraire");
 
         setTitle("App Delivery Services");
         setSize(600, 300);
@@ -73,7 +86,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
 
     private void setupDeliveryPanel() {
-        deliveryPanel = new JPanel(new GridLayout(0, 1));  // Utiliser GridLayout pour une meilleure ergonomie
+        deliveryPanel = new JPanel();  // Utiliser GridLayout pour une meilleure ergonomie
         deliveryButton = new JButton("Load Delivery");
         deliveryPanel.add(deliveryButton);  // Ajout du bouton dans le panel "Delivery"
         tabPan.addTab("Delivery", deliveryPanel);
@@ -100,16 +113,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        unassignedModel = new DefaultComboBoxModel<>(initialDeliveries);
-        assignedModel = new DefaultComboBoxModel<>();
-        courierDropdown.setModel(courierModel);
-
         // Livraisons non attribuées
         gbc.gridx = 0;
         gbc.gridy = 0;
         deliveryPanel.add(new JLabel("Livraisons non attribuées:"), gbc);
 
-        unassignedList = new JComboBox<>(unassignedModel);
         gbc.gridx = 1;
         deliveryPanel.add(unassignedList, gbc);
 
@@ -118,18 +126,15 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridy = 1;
         deliveryPanel.add(new JLabel("Livraisons attribuées:"), gbc);
 
-        assignedList = new JComboBox<>(assignedModel);
         gbc.gridx = 1;
         deliveryPanel.add(assignedList, gbc);
 
         // Bouton pour attribuer une livraison
-        addDeliveryButton = new JButton("Attribuer Livraison");
         gbc.gridx = 0;
         gbc.gridy = 2;
         deliveryPanel.add(addDeliveryButton, gbc);
 
         // Bouton pour retirer une livraison
-        removeDeliveryButton = new JButton("Retirer Livraison");
         gbc.gridx = 1;
         deliveryPanel.add(removeDeliveryButton, gbc);
 
@@ -138,18 +143,15 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridy = 3;
         deliveryPanel.add(new JLabel("Choisir un livreur:"), gbc);
 
-        courierDropdown = new JComboBox<>(courierModel);
         gbc.gridx = 1;
         deliveryPanel.add(courierDropdown, gbc);
 
         // Bouton pour affecter le livreur
-        assignCourierButton = new JButton("Affecter Livreur");
         gbc.gridx = 0;
         gbc.gridy = 4;
         deliveryPanel.add(assignCourierButton, gbc);
 
         // Bouton pour calculer l'itinéraire
-        showRoutesButton = new JButton("Calculer Itinéraire");
         gbc.gridx = 1;
         gbc.gridy = 4;
         deliveryPanel.add(showRoutesButton, gbc);
@@ -168,7 +170,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private void assignDelivery() {
         String selectedDelivery = (String) unassignedList.getSelectedItem();
         if (selectedDelivery != null) {
-            assignedModel.addElement(selectedDelivery);
+            attributedDeliveries.add(selectedDelivery);
             unassignedModel.removeElement(selectedDelivery);
         } else {
             JOptionPane.showMessageDialog(this, "Aucune livraison sélectionnée.");
@@ -206,8 +208,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.insets = new Insets(10, 10, 10, 10);  // Espacement entre les composants
 
         // Liste déroulante des livreurs existants
-        courierModel = new DefaultComboBoxModel<>(couriers);
-        courierDropdown = new JComboBox<>(courierModel);  // Utilisation d'un modèle dynamique pour faciliter les modifications
+        // Utilisation d'un modèle dynamique pour faciliter les modifications
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -283,6 +284,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
         if (evt.getPropertyName().equals("addCourierList")) {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
             couriers.add(courierList.getLast().getFirstName()+ " " + courierList.getLast().getLastName());
+
+        }
+        if (evt.getPropertyName().equals("pendingDeliveryList")) {
+            ArrayList<Delivery> deliveryArrayList = (ArrayList<Delivery>) evt.getNewValue();
+            for (Delivery delivery : deliveryArrayList) {
+                String deliveryString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
+                unassignedModel.addElement(deliveryString);
+            }
         }
     }
 
@@ -312,6 +321,18 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JButton getRemoveCourierButton() {
         return removeCourierButton;
+    }
+
+    public JButton getAssignCourierButton(){
+        return assignCourierButton;
+    }
+
+    public JComboBox<String> getCourierComboBox() {
+        return courierDropdown;
+    }
+
+    public Vector<String> getAttributedDeliveries() {
+        return attributedDeliveries;
     }
 }
 

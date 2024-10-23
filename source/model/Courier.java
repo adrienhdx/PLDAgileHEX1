@@ -4,12 +4,13 @@ public class Courier {
     private String lastName;
     private String firstName;
     private String phoneNum;
-    private Courier courier;
+    private Route route;
 
     public Courier(String lastName, String firstName, String phoneNum) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.phoneNum = phoneNum;
+        this.route = new Route();
     }
 
     // Getters et Setters
@@ -22,7 +23,7 @@ public class Courier {
     public String getPhoneNum() { return phoneNum; }
     public void setPhoneNum(String phoneNum) { this.phoneNum = phoneNum; }
 
+    public Route getRoute() { return route; }
+    public void setRoute(Route route) { this.route = route; }
 
-    public Courier getCourier() { return courier; }
-    public void setCourier(Courier courier) { this.courier = courier; }
 }

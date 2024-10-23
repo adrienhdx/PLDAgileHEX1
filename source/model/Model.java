@@ -23,6 +23,9 @@ public class Model {
         propertyChangeSupport = new PropertyChangeSupport(this);
         this.completeGraph = new CompleteGraph();
         this.courierList = new ArrayList<>();
+        this.pendingDeliveryList = new ArrayList<>();
+        this.assignedDeliveryList = new ArrayList<>();
+        this.postponedDeliveryList = new ArrayList<>();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener){

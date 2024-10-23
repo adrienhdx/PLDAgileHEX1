@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 public class Controller implements ActionListener {
     private Model model;
@@ -25,6 +26,9 @@ public class Controller implements ActionListener {
         }
         if (e.getSource() == view.getAddCourierButton()) {
             this.createCourier();
+        }
+        if (e.getSource() == view.getAssignCourierButton()) {
+            this.assignDeliveriesCourier();
         }
     }
 
@@ -57,6 +61,44 @@ public class Controller implements ActionListener {
         if(!newCourierFirstName.equals("") & !newCourierLastName.equals("") & !newCourierPhoneNumber.equals("")){
             model.addCourrier(newCourierFirstName, newCourierLastName, newCourierPhoneNumber);
         }
+    }
+
+    public void assignDeliveriesCourier(){
+        String courierStr = view.getCourierComboBox().getSelectedItem().toString();
+        int index = courierStr.indexOf(' '); //trouve l'index de l'espace
+        String lastName = courierStr.substring(index+1);
+        String firstName = courierStr.substring(0,index);
+        Courier selectedCourier = null;
+        for (Courier courier : model.getCourierList()) {
+            if (courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                selectedCourier = courier;
+            }
+        }
+        if (selectedCourier != null){
+            Vector<String> attributedDeliveriesList = view.getAttributedDeliveries();
+            ArrayList<Delivery> deliveryArrayList = new ArrayList<>();
+            for (String attributedDelivery : attributedDeliveriesList) {
+                index = attributedDelivery.indexOf('-'); //trouve l'index de l'espace
+                String deliveryPtStr = attributedDelivery.substring(index+1);
+                String pickUpPtStr = attributedDelivery.substring(0,index);
+                for (Delivery delivery : model.getPendingDeliveryList()) {
+                    if (delivery.getPickUpPt().getId().equals(pickUpPtStr) && delivery.getDeliveryPt().getId().equals(deliveryPtStr)) {
+                        deliveryArrayList.add(delivery);
+                    }
+                }
+                System.out.println(deliveryArrayList);
+                for (Delivery deliveryAtt : deliveryArrayList) {
+                    assignDelivery(selectedCourier, deliveryAtt);
+                    model.getPendingDeliveryList().remove(deliveryAtt);
+                    model.getAssignedDeliveryList().add(deliveryAtt);
+                    deliveryAtt.setState(DeliveryState.ASSIGNED);
+                }
+            }
+        }
+        System.out.println(selectedCourier);
+    }
+    public void assignDelivery(Courier courier, Delivery delivery){
+        courier.getRoute().getDeliveries().add(delivery);
     }
 
     public void assignDelivery(){}
