@@ -1,5 +1,7 @@
 package source.view;
 
+import org.jxmapviewer.input.PanMouseInputListener;
+import org.jxmapviewer.input.ZoomMouseWheelListenerCursor;
 import org.jxmapviewer.viewer.*;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.CompoundPainter;
@@ -10,6 +12,8 @@ import source.model.Vertex;
 
 
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.*;
@@ -45,24 +49,13 @@ public class MapDisplay {
 
     private void initListenersMap(){
         try {
-            //Ajout du zoom de la carte avec écouteur sur la souris
-            mapViewer.addMouseWheelListener(new MouseWheelListener() {
-                @Override
-                public void mouseWheelMoved(MouseWheelEvent e) {
-                    Point mousePoint = e.getPoint();
-                    GeoPosition geoBeforeZoom = mapViewer.convertPointToGeoPosition(mousePoint);
-                    if (e.getWheelRotation() < 0) {
-                        // Zoom avant
-                        int currentZoom = mapViewer.getZoom();
-                        mapViewer.setZoom(Math.max(currentZoom - 1, mapViewer.getTileFactory().getInfo().getMinimumZoomLevel()));
-                    } else {
-                        // Zoom arrière
-                        int currentZoom = mapViewer.getZoom();
-                        mapViewer.setZoom(Math.min(currentZoom + 1, mapViewer.getTileFactory().getInfo().getMaximumZoomLevel()));
-                    }
-                    mapViewer.setAddressLocation(geoBeforeZoom);
-                }
-            });
+            //Ajout du zoom et du drag de la carte avec écouteurs sur la souris
+            PanMouseInputListener dragListener = new PanMouseInputListener(mapViewer);
+            ZoomMouseWheelListenerCursor zoomWheelListener = new ZoomMouseWheelListenerCursor(mapViewer);
+            mapViewer.addMouseWheelListener(zoomWheelListener);
+            mapViewer.addMouseMotionListener(dragListener);
+            mapViewer.setFocusable(true);
+            mapViewer.requestFocusInWindow();
         }catch (Exception e) {
             System.out.println(e);
         }
