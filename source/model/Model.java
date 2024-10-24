@@ -4,64 +4,36 @@ package source.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
-import java.util.Observable;
 
 public class Model {
     private Graph map;
-    private List<Delivery> assignedDeliveryList;
-    private List<Delivery> postponedDeliveryList;
-    private List<Delivery> pendingDeliveryList;
-    private List<Courier> courierList;
-    private List<Segment> segmentList;
-    private List<Vertex> vertexList;
+    private ArrayList<Delivery> assignedDeliveryArrayList;
+    private ArrayList<Delivery> postponedDeliveryArrayList;
+    private ArrayList<Delivery> pendingDeliveryArrayList;
+    private ArrayList<Courier> courierArrayList;
+    private ArrayList<Segment> segmentArrayList;
+    private ArrayList<Vertex> vertexArrayList;
     private double[][] matrice_adjacence;
     private CompleteGraph completeGraph;
-    private List<Vertex> Vertex_to_visit;
+    private ArrayList<Vertex> Vertex_to_visit;
     private PropertyChangeSupport propertyChangeSupport;
+    private Entrepot entrepot;
 
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
         this.completeGraph = new CompleteGraph();
-        this.courierList = new ArrayList<>();
-        this.pendingDeliveryList = new ArrayList<>();
-        this.assignedDeliveryList = new ArrayList<>();
-        this.postponedDeliveryList = new ArrayList<>();
+        this.courierArrayList = new ArrayList<>();
+        this.pendingDeliveryArrayList = new ArrayList<>();
+        this.assignedDeliveryArrayList = new ArrayList<>();
+        this.postponedDeliveryArrayList = new ArrayList<>();
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener){
-        propertyChangeSupport.addPropertyChangeListener(listener);
+    public void addPropertyChangeListener(PropertyChangeListener ArrayListener){
+        propertyChangeSupport.addPropertyChangeListener(ArrayListener);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener){
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
-    public void addCourrier(String firstName, String lastName, String phoneNumber){
-        for(Courier courier : courierList){
-            if(courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
-                return;
-            }
-        }
-        ArrayList<Courier> oldCourierList = new ArrayList<>();
-        courierList.add(new Courier(lastName,firstName,phoneNumber));
-        propertyChangeSupport.firePropertyChange("addCourierList", oldCourierList, courierList);
-    }
-
-    public void deleteCourier(String firstName, String lastName){
-        ArrayList<Courier> oldCourierList = (ArrayList<Courier>) courierList; // faire copy en profondeur
-        int index = Integer.MAX_VALUE;
-        for(int i = 0; i < courierList.size(); i++){
-            if(courierList.get(i).getFirstName().equals(firstName) && courierList.get(i).getLastName().equals(lastName)) {
-                index = i;
-            }
-        }
-        if(index != Integer.MAX_VALUE){
-            courierList.remove(index);
-            propertyChangeSupport.firePropertyChange("deleteCourierList", null, courierList);
-        }
-    }
-
-    public double[][] getMatrice_adjacence() {
+    //Getters and setters
+   public double[][] getMatrice_adjacence() {
         return matrice_adjacence;
     }
     public void setMatrice_adjacence(double[][] matrice_adjacence) {}
@@ -70,53 +42,97 @@ public class Model {
     public Graph getMap() { return map; }
     public void setMap(Graph map) { this.map = map; }
 
-    public List<Delivery> getAssignedDeliveryList() { return assignedDeliveryList; }
-    public void setAssignedDeliveryList(List<Delivery> assignedDeliveryList) { this.assignedDeliveryList = assignedDeliveryList; }
-
-    public List<Delivery> getPostponedDeliveryList() { return postponedDeliveryList; }
-    public void setPostponedDeliveryList(List<Delivery> postponedDeliveryList) { this.postponedDeliveryList = postponedDeliveryList; }
-
-    public List<Delivery> getPendingDeliveryList() { return pendingDeliveryList; }
-    public void setPendingDeliveryList(List<Delivery> pendingDeliveryList) {
-        ArrayList<Delivery> oldPendingDeliveryList = (ArrayList<Delivery>) this.pendingDeliveryList;
-        this.pendingDeliveryList = pendingDeliveryList;
-        propertyChangeSupport.firePropertyChange("pendingDeliveryList", oldPendingDeliveryList, pendingDeliveryList);
+    public ArrayList<Delivery> getAssignedDeliveryArrayList() { return assignedDeliveryArrayList; }
+    public void setAssignedDeliveryArrayList(ArrayList<Delivery> assignedDeliveryArrayList) {
+        this.assignedDeliveryArrayList = assignedDeliveryArrayList;
+        propertyChangeSupport.firePropertyChange("assignedDeliveryArrayList", null, assignedDeliveryArrayList);
     }
 
-    public List<Courier> getCourierList() { return courierList; }
-    public void setCourierList(List<Courier> courierList) {
-        ArrayList<Courier> oldCourierList = (ArrayList<Courier>) this.courierList;
-        this.courierList = courierList;
-        propertyChangeSupport.firePropertyChange("setCourierList", oldCourierList, courierList);
+    public ArrayList<Delivery> getPostponedDeliveryArrayList() { return postponedDeliveryArrayList; }
+    public void setPostponedDeliveryArrayList(ArrayList<Delivery> postponedDeliveryArrayList) {
+        this.postponedDeliveryArrayList = postponedDeliveryArrayList;
+        propertyChangeSupport.firePropertyChange("postponedDeliveryArrayList",null,postponedDeliveryArrayList);
     }
 
-    public List<Segment> getSegmentList() { return segmentList; }
-    public void setSegmentList(List<Segment> segmentList) { this.segmentList = segmentList; }
+    public ArrayList<Delivery> getPendingDeliveryArrayList() { return pendingDeliveryArrayList; }
+    public void setPendingDeliveryArrayList(ArrayList<Delivery> pendingDeliveryArrayList) {
+        this.pendingDeliveryArrayList = pendingDeliveryArrayList;
+        propertyChangeSupport.firePropertyChange("pendingDeliveryArrayList", null, pendingDeliveryArrayList);
+    }
 
-    public ArrayList<Vertex> getVertexList() { return (ArrayList<Vertex>) vertexList; }
-    public void setVertexList(List<Vertex> vertexList) {
-        ArrayList<Vertex> oldVertexList = (ArrayList<Vertex>) this.vertexList;
-        this.vertexList = vertexList;
-        propertyChangeSupport.firePropertyChange("vertexList",oldVertexList,vertexList);
+    public ArrayList<Courier> getCourierArrayList() { return courierArrayList; }
+    public void setCourierArrayList(ArrayList<Courier> courierArrayList) {
+        this.courierArrayList = courierArrayList;
+        propertyChangeSupport.firePropertyChange("setCourierArrayList", null, courierArrayList);
+    }
+
+    public ArrayList<Segment> getSegmentArrayList() { return segmentArrayList; }
+    public void setSegmentArrayList(ArrayList<Segment> segmentArrayList) {
+        this.segmentArrayList = segmentArrayList;
+        propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
+    }
+
+    public ArrayList<Vertex> getVertexArrayList() { return (ArrayList<Vertex>) vertexArrayList; }
+    public void setVertexArrayList(ArrayList<Vertex> vertexArrayList) {
+        this.vertexArrayList = vertexArrayList;
+        propertyChangeSupport.firePropertyChange("vertexArrayList",null,vertexArrayList);
     }
 
     public CompleteGraph getCompleteGraph() { return completeGraph; }
     public void setCompleteGraph(CompleteGraph completeGraph) { this.completeGraph = completeGraph; }
 
-    public List<Vertex> getVertex_to_visit() { return Vertex_to_visit; }
+    public ArrayList<Vertex> getVertex_to_visit() { return Vertex_to_visit; }
 
-    public void setVertex_to_visit(List<Vertex> vertex_to_visit) {
+    public void setVertex_to_visit(ArrayList<Vertex> vertex_to_visit) {
         Vertex_to_visit = vertex_to_visit;
     }
 
+    public Entrepot getEntrepot(){
+        return entrepot;
+    }
+
+    public void setEntrepot(Entrepot entrepot){
+        this.entrepot = entrepot;
+    }
+
+    //Method
+    public void addCourier (String firstName, String lastName, String phoneNumber){
+        for(Courier courier : courierArrayList){
+            if(courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                return;
+            }
+        }
+        ArrayList<Courier> oldCourierArrayList = new ArrayList<>();
+        courierArrayList.add(new Courier(lastName,firstName,phoneNumber));
+        propertyChangeSupport.firePropertyChange("addCourierArrayList", oldCourierArrayList, courierArrayList);
+    }
+
+    public void deleteCourier(String firstName, String lastName){
+        ArrayList<Courier> oldCourierArrayList = (ArrayList<Courier>) courierArrayList; // faire copy en profondeur
+        int index = Integer.MAX_VALUE;
+        for(int i = 0; i < courierArrayList.size(); i++){
+            if(courierArrayList.get(i).getFirstName().equals(firstName) && courierArrayList.get(i).getLastName().equals(lastName)) {
+                index = i;
+            }
+        }
+        if(index != Integer.MAX_VALUE){
+            courierArrayList.remove(index);
+            propertyChangeSupport.firePropertyChange("deleteCourierArrayList", null, courierArrayList);
+        }
+    }
+
+
+
+
+    //Recherche de chemin
     public void creerMatriceAdjacence(){
         // Création de la matrice d'adjacence entre tous les sommets de la carte chargée
 
-        int taille = vertexList.size();
+        int taille = vertexArrayList.size();
         double [][] matrice = new double[taille][taille];
         int i = 1;
         // On numérote chaque sommet afin de pouvoir les identifier dans la matrice (leur ID n'est pas pratique)
-        for (Vertex Vertex : vertexList){
+        for (Vertex Vertex : vertexArrayList){
             Vertex.setGlobal_num(i);
             for (int j=0; j<taille; j++){
                 matrice[i-1][j] = -1;
@@ -124,7 +140,7 @@ public class Model {
             i++;
         }
         // On remplit les longueurs entre deux sommets en récupérant leur numéro
-        for (Segment segment : segmentList){
+        for (Segment segment : segmentArrayList){
             int num_ligne = segment.getOrigine().getGlobal_num();
             int num_colonne = segment.getDestination().getGlobal_num();
             matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
@@ -150,8 +166,8 @@ public class Model {
     public void addDelivery(Delivery delivery){
         //ajout entrepot en dur
         if (Vertex_to_visit.size() == 0){
-            Vertex_to_visit.add(vertexList.get(256));
-            vertexList.get(256).setTSP_num(1);
+            Vertex_to_visit.add(vertexArrayList.get(256));
+            vertexArrayList.get(256).setTSP_num(1);
             completeGraph.cost = new double[1][1];
             completeGraph.cost[0][0] = 0;
         }
@@ -199,7 +215,7 @@ public class Model {
 
     public double aStar(Vertex start, Vertex goal) {
         // renvoie la distance entre les deux sommets entrés en paramètres
-        int n = vertexList.size(); // Nombre de sommets
+        int n = vertexArrayList.size(); // Nombre de sommets
 
         // Ensembles pour les scores des chemins trouvés
         Map<Vertex, Double> gScore = new HashMap<>();  // Coût de départ au sommet
@@ -210,7 +226,7 @@ public class Model {
 
 
         // On remplit les valeurs de base à l'infini
-        for (Vertex v : vertexList) {
+        for (Vertex v : vertexArrayList) {
             gScore.put(v, Double.POSITIVE_INFINITY);
             fScore.put(v, Double.POSITIVE_INFINITY);
         }
@@ -232,7 +248,7 @@ public class Model {
             // Parcourir les voisins (nœuds adjacents)
             for (int i = 0; i < n; i++) {
                 if (this.matrice_adjacence[current.getGlobal_num() - 1][i] > 0) {  // Si l'arête existe
-                    Vertex neighbor = vertexList.get(i);
+                    Vertex neighbor = vertexArrayList.get(i);
                     double tentativeGScore = gScore.get(current) + this.matrice_adjacence[current.getGlobal_num() - 1][i];
 
                     if (tentativeGScore < gScore.get(neighbor)) {
@@ -265,9 +281,9 @@ public class Model {
 
         TSP tsp = new TSP1();
 
-        List<Long> sommetsList = new ArrayList<>();
+        ArrayList<Long> sommetsArrayList = new ArrayList<>();
         for (long sommet : sommets) {
-            sommetsList.add(sommet);
+            sommetsArrayList.add(sommet);
         }
 
         int[] precedenceReindexed = new int[precedence.length];
@@ -276,7 +292,7 @@ public class Model {
             if (precedence[i] == -1) continue;
 
             // trouver indice de precedence[i] dans sommets
-            int index = sommetsList.indexOf(precedence[i]);
+            int index = sommetsArrayList.indexOf(precedence[i]);
             if (index != -1) {
                 precedenceReindexed[i] = index;
             }
@@ -310,7 +326,7 @@ public class Model {
         return ordre;
     }
 
-    public List<Segment> ObtenirListeSegmentsTSP(List<Delivery> deliveries) {
+    public ArrayList<Segment> ObtenirArrayListeSegmentsTSP(ArrayList<Delivery> deliveries) {
         // décomposer deliveries en un int[] de sommets et un int[] de précédence
 
         for (Delivery delivery : deliveries) {
@@ -342,8 +358,8 @@ public class Model {
 
         System.out.println("Ordre calculé "+Arrays.toString(ordre));
 
-        // recomposer l'ordre en une liste de segments et retour (ne pas oublier le dépôt)
-        List<Segment> segments = new ArrayList<>();
+        // recomposer l'ordre en une ArrayListe de segments et retour (ne pas oublier le dépôt)
+        ArrayList<Segment> segments = new ArrayList<>();
         for (int i = 1; i < ordre.length; i++) {
             Vertex origine = dictionnaire.get(ordre[i-1]);
             Vertex destination = dictionnaire.get(ordre[i]);
@@ -360,15 +376,15 @@ public class Model {
     }
 
 
-    public List<Segment> computeTour(List<Delivery> dlist) {
+    public ArrayList<Segment> computeTour(ArrayList<Delivery> dArrayList) {
         // create warehouse
         // create segment from warehouse to p1 then p1 to d1 then d1 to p2 etc
         System.out.println("Calcul du tour par TSP :");
-        List<Segment> segments = new ArrayList<>();
+        ArrayList<Segment> segments = new ArrayList<>();
         Vertex origin;
-        Vertex warehouse = new Vertex(1349383079L, 45.731087, 4.9053183); // entrepot
+        Vertex warehouse = entrepot.getAddress();
         Vertex destination = warehouse;
-        for (Delivery delivery : dlist) {
+        for (Delivery delivery : dArrayList) {
             origin = delivery.getPickUpPt();
             Segment seg = new Segment(destination, origin);
             segments.add(seg);

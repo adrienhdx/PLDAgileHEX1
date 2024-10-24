@@ -7,30 +7,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.io.FileInputStream;
 
 public class XmlExtractor {
-    public static Vertex extractEntrepot(String file, ArrayList<Vertex> vertexArrayList) {
-        try{
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new FileInputStream(file));
 
-            Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
-            HashMap<Long, Vertex> vertexIdMap = vertexListToMap(vertexArrayList);
-
-            return vertexIdMap.get(entrepot.getAttribute("adresse"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static List<Delivery> extractDemande(String file, ArrayList<Vertex> vertexArrayList) {
+    public static ArrayList<Object> extractDeliveryDemand(String file, ArrayList<Vertex> vertexArrayList) {
         try {
-            List<Delivery> deliveries = new ArrayList<>();
+            ArrayList<Object> deliveryDemand = new ArrayList<>();
+            ArrayList<Delivery> deliveryArrayList = new ArrayList<>();
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -38,97 +26,109 @@ public class XmlExtractor {
 
             HashMap<Long, Vertex> vertexIdMap = vertexListToMap(vertexArrayList);
 
-            NodeList livraisonList = document.getElementsByTagName("livraison");
-            for (int i = 0; i < livraisonList.getLength(); i++) {
-                Element livraison = (Element) livraisonList.item(i);
+            NodeList deliveryList = document.getElementsByTagName("livraison");
+            for (int i = 0; i < deliveryList.getLength(); i++) {
+                Element delivery = (Element) deliveryList.item(i);
 
-                Long idEnlevement = Long.valueOf(livraison.getAttribute("adresseEnlevement"));
-                Vertex adresseEnlevement = vertexIdMap.get(idEnlevement);
+                Long idPickUp = Long.valueOf(delivery.getAttribute("adresseEnlevement"));
+                Vertex pickUpAddress = vertexIdMap.get(idPickUp);
 
-                Long idLivraison = Long.valueOf(livraison.getAttribute("adresseLivraison"));
-                Vertex adresseLivraison = vertexIdMap.get(idLivraison);
+                Long idDelivery = Long.valueOf(delivery.getAttribute("adresseLivraison"));
+                Vertex deliveryAddress = vertexIdMap.get(idDelivery);
 
-                int dureeEnlevement = Integer.parseInt(livraison.getAttribute("dureeEnlevement"));
-                int dureeLivraison = Integer.parseInt(livraison.getAttribute("dureeLivraison"));
+                int pickUpTime = Integer.parseInt(delivery.getAttribute("dureeEnlevement"));
+                int deliveryTime = Integer.parseInt(delivery.getAttribute("dureeLivraison"));
 
-                Delivery delivery = new Delivery(adresseEnlevement, adresseLivraison, dureeEnlevement, dureeLivraison, DeliveryState.PENDING);
-                deliveries.add(delivery);
+                deliveryArrayList.add(new Delivery(pickUpAddress, deliveryAddress, pickUpTime, deliveryTime, DeliveryState.PENDING));
             }
 
-            return deliveries;
+            Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
+
+            Long idAddress = Long.valueOf(entrepot.getAttribute("adresse"));
+            Vertex address = vertexIdMap.get(idAddress);
+
+            String departureHourStr = entrepot.getAttribute("heureDepart");
+
+            String[] departureHourStrParts = departureHourStr.split(":");
+            String hours = String.format("%02d", Integer.parseInt(departureHourStrParts[0]));
+            String minutes = String.format("%02d", Integer.parseInt(departureHourStrParts[1]));
+            String seconds = String.format("%02d", Integer.parseInt(departureHourStrParts[2]));
+
+            String normalizedDepartureHourStr = hours + ":" + minutes + ":" + seconds;
+
+            LocalTime departureHour = LocalTime.parse(normalizedDepartureHourStr, DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+            deliveryDemand.add(new Entrepot(address, departureHour));
+            deliveryDemand.add(deliveryArrayList);
+
+            return deliveryDemand;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    // Pour appeller la fonction:
-    // List plan = XmlExtractor.extractPlan("./resources/grandPlan.xml");
-    //        List<Vertex> vertex = (List<Vertex>) plan.get(0);
-    //        List<Segment> segment = (List<Segment>) plan.get(1);
-    public static List extractPlan(String file) {
+    public static ArrayList<Object> extractMap(String file) {
         try {
             // file
             DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
             DocumentBuilder builderMap = factoryMap.newDocumentBuilder();
             Document documentMap = builderMap.parse(new FileInputStream(file));
 
-            NodeList nodesMap = documentMap.getElementsByTagName("noeud");
-
-            HashMap<Long, Vertex> verticesMap = new HashMap<Long, Vertex>();
+            HashMap<Long, Vertex> verticesMap = new HashMap<>();
             ArrayList<Vertex> vertexArrayList = new ArrayList<>();
-            ArrayList plan = new ArrayList<>();
+            ArrayList<Object> map = new ArrayList<>();
 
-            for (int i = 0; i < nodesMap.getLength(); i++) {
-                Node node = nodesMap.item(i);
+            NodeList vertexNodeList = documentMap.getElementsByTagName("noeud");
 
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) node;
+            for (int i = 0; i < vertexNodeList.getLength(); i++) {
+                Node vertexNode = vertexNodeList.item(i);
+                if (vertexNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) vertexNode;
                     // On recupere les attributs pour creer chaque objet noeud
                     Long id = Long.valueOf(element.getAttribute("id"));
                     double latitude = Double.parseDouble(element.getAttribute("latitude"));
                     double longitude = Double.parseDouble(element.getAttribute("longitude"));
 
-                    Vertex noeud = new Vertex(id, latitude, longitude);
-                    vertexArrayList.add(noeud);
-                    verticesMap.put(id, noeud);
+                    Vertex vertex = new Vertex(id, latitude, longitude);
+                    vertexArrayList.add(vertex);
+                    verticesMap.put(id,vertex);
                 }
             }
 
-            plan.add(vertexArrayList);
+            map.add(vertexArrayList);
 
             // On récupère tous les tronçons "troncon" correspondant aux segments de la carte
-            NodeList segmentList = documentMap.getElementsByTagName("troncon");
-            ArrayList<Segment> segments = new ArrayList<>();
+            NodeList segmentNodeList = documentMap.getElementsByTagName("troncon");
+            ArrayList<Segment> segmentArrayList = new ArrayList<>();
 
-
-            for (int i = 0; i < segmentList.getLength(); i++) {
-                Node node = segmentList.item(i);
+            for (int i = 0; i < segmentNodeList.getLength(); i++) {
+                Node node = segmentNodeList.item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) node;
 
                     // On recupere les attributs pour creer chaque objet segment: destination (noeud), longueur, nomRue et origine (noeud)
                     Long destination = Long.valueOf(element.getAttribute("destination"));
-                    double longueur = Double.parseDouble(element.getAttribute("longueur"));
+                    double length = Double.parseDouble(element.getAttribute("longueur"));
                     String nomRue = element.getAttribute("nomRue");
-                    Long origine = Long.valueOf(element.getAttribute("origine"));
+                    Long origin = Long.valueOf(element.getAttribute("origine"));
 
-                    Vertex noeudOrigine = verticesMap.get(origine);
-                    Vertex noeudDestination = verticesMap.get(destination);
+                    Vertex originNode = verticesMap.get(origin);
+                    Vertex destinationNode = verticesMap.get(destination);
 
-                    Segment segment = new Segment(nomRue, noeudOrigine, noeudDestination, longueur);
-                    segments.add(segment);
+                    Segment segment = new Segment(nomRue, originNode, destinationNode, length);
+                    segmentArrayList.add(segment);
                 }
             }
-            plan.add(segments);
-            return plan;
+            map.add(segmentArrayList);
+            return map;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static HashMap<Long, Vertex> vertexListToMap(ArrayList<Vertex> vertexArrayList) {
+    private static HashMap<Long, Vertex> vertexListToMap(ArrayList<Vertex> vertexArrayList) {
         HashMap<Long, Vertex> vertexIdMap = new HashMap<>();
         for (Vertex vertex : vertexArrayList) {
             vertexIdMap.put(vertex.getId(), vertex);
