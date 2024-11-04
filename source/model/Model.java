@@ -19,6 +19,7 @@ public class Model {
     private PropertyChangeSupport propertyChangeSupport;
     private Entrepot entrepot;
     private Map<Long, List<Long>> contraintesPrecedence;
+    private Map<Long, Integer> vertexToGlobalNum;
 
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -27,6 +28,7 @@ public class Model {
         this.pendingDeliveryArrayList = new ArrayList<>();
         this.assignedDeliveryArrayList = new ArrayList<>();
         this.postponedDeliveryArrayList = new ArrayList<>();
+        this.vertexToGlobalNum = new HashMap<>();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener ArrayListener){
@@ -185,8 +187,8 @@ public class Model {
         double [][] matrice = new double[taille][taille];
         int i = 1;
         // On numérote chaque sommet afin de pouvoir les identifier dans la matrice (leur ID n'est pas pratique)
-        for (Vertex Vertex : vertexArrayList){
-            Vertex.setGlobal_num(i);
+        for (Vertex vertex : vertexArrayList){
+            vertexToGlobalNum.put(vertex.getId(), i);
             for (int j=0; j<taille; j++){
                 matrice[i-1][j] = -1;
             }
@@ -194,8 +196,8 @@ public class Model {
         }
         // On remplit les longueurs entre deux sommets en récupérant leur numéro
         for (Segment segment : segmentArrayList){
-            int num_ligne = segment.getOrigine().getGlobal_num();
-            int num_colonne = segment.getDestination().getGlobal_num();
+            Integer num_ligne = vertexToGlobalNum.get(segment.getOrigine().getId());
+            Integer num_colonne = vertexToGlobalNum.get(segment.getDestination().getId());
             if (num_colonne != 0 && num_ligne != 0){
                 matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
             }
@@ -204,18 +206,19 @@ public class Model {
 
         this.matrice_adjacence = matrice;
 
-//        System.out.println("Matrice d'adjacence :");
-//        for (int row = 0; row < taille; row++) {
-//            for (int col = 0; col < taille; col++) {
-//                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
-//                if (matrice[row][col] == Integer.MAX_VALUE) {
-//                    System.out.print("INF ");
-//                } else {
-//                    System.out.print(matrice[row][col] + " ");
-//                }
-//            }
-//            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
-//        }
+        System.out.println("Matrice d'adjacence :");
+        for (int row = 0; row < taille; row++) {
+            for (int col = 0; col < taille; col++) {
+                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
+                if (matrice[row][col] == Integer.MAX_VALUE) {
+                    System.out.print("INF ");
+                } else {
+                    if (matrice[row][col] == -1) continue;
+                    System.out.print(matrice[row][col] + " ");
+                }
+            }
+            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
+        }
 
     }
 
@@ -252,36 +255,58 @@ public class Model {
 
 
         double [][] matrix = new double[taille+2][taille+2];
-        completeGraph.cost = matrix;
+        for (int i = 0; i < taille; i++) {
+            for (int j = 0; j < taille; j++) {
+                matrix[i][j] = completeGraph.cost[i][j];
+            }
+        }
+
         for (Vertex vertex : Vertex_to_visit) {
             if (newptA && !newptB) {
                 pickup_pt.setTSP_num(taille+1);
-                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
-                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, pickup_pt).distance;
-                completeGraph.cost[taille][taille] = 0;
+                matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(vertex, pickup_pt).distance;
+                matrix[taille][taille] = 0;
 
             }
             else if (newptB && newptA) {
                 pickup_pt.setTSP_num(taille+1);
                 delivery_pt.setTSP_num(taille + 2);
-                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
-                completeGraph.cost[taille+1][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                completeGraph.cost[vertex.getTSP_num() - 1][taille+1] = aStar(vertex, delivery_pt).distance;
+                matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+                matrix[taille+1][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille+1] = aStar(vertex, delivery_pt).distance;
             }
 
             else if (newptB ) {
                 delivery_pt.setTSP_num(taille + 1);
-                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+                matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+                matrix[taille][taille] = 0;
             }
         }
 
         if (newptA && newptB) {
-            completeGraph.cost[taille][taille + 1] = aStar(pickup_pt, delivery_pt).distance;
-            completeGraph.cost[taille + 1][taille] = aStar(delivery_pt, pickup_pt).distance;
-            completeGraph.cost[taille + 1][taille + 1] = 0;
+            matrix[taille][taille + 1] = aStar(pickup_pt, delivery_pt).distance;
+            matrix[taille + 1][taille] = aStar(delivery_pt, pickup_pt).distance;
+            matrix[taille + 1][taille + 1] = 0;
+            matrix[taille][taille] = 0;
 
+        }
+        completeGraph.cost = matrix;
+        //print cost matrix
+        System.out.println("Matrice de coût après ajout de la livraison :");
+        for (int row = 0; row < completeGraph.nbVertices; row++) {
+            for (int col = 0; col < completeGraph.nbVertices; col++) {
+                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
+                if (completeGraph.cost[row][col] == Integer.MAX_VALUE) {
+                    System.out.print("INF ");
+                } else {
+                    if (completeGraph.cost[row][col] == -1) continue;
+                    System.out.print(completeGraph.cost[row][col] + " ");
+                }
+            }
+            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
         }
 
         // On ajoute les contraintes de précédence
@@ -366,9 +391,9 @@ public class Model {
 
             // Parcourir les voisins (nœuds adjacents)
             for (int i = 0; i < n; i++) {
-                if (this.matrice_adjacence[current.getGlobal_num() - 1][i] > 0) {  // Si l'arête existe
+                if (this.matrice_adjacence[vertexToGlobalNum.get(current.getId()) - 1][i] > 0) {  // Si l'arête existe
                     Vertex neighbor = vertexArrayList.get(i);
-                    double tentativeGScore = gScore.get(current) + this.matrice_adjacence[current.getGlobal_num() - 1][i];
+                    double tentativeGScore = gScore.get(current) + this.matrice_adjacence[vertexToGlobalNum.get(current.getId()) - 1][i];
 
                     if (tentativeGScore < gScore.get(neighbor)) {
                         // Meilleur chemin trouvé vers ce voisin
@@ -401,7 +426,7 @@ public class Model {
 
         }
         ArrayList<Segment> reelRoute = new ArrayList<>();
-        for (int i = 0; i < sommetsAVisiter.size(); i++) {
+        for (int i = 0; i < sommetsAVisiter.size()-1; i++) {
             Segment seg = new Segment(sommetsAVisiter.get(i), sommetsAVisiter.get(i+1));
             reelRoute.add(seg);
         }
@@ -514,7 +539,13 @@ public class Model {
         ArrayList<Segment> segments = new ArrayList<>();
         for (int i = 1; i < ordre.length; i++) {
             Vertex origine = dictionnaire.get(ordre[i-1]);
+            if (origine == null) {
+                origine = entrepot.getAddress();
+            }
             Vertex destination = dictionnaire.get(ordre[i]);
+            if (destination == null) {
+                destination = entrepot.getAddress();
+            }
             Segment seg = new Segment(origine, destination);
             segments.add(seg);
         }

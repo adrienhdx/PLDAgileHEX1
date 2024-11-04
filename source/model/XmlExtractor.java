@@ -81,7 +81,6 @@ public class XmlExtractor {
 
     public static ArrayList<Object> extractMap(String file) {
         if (!isXMLFile(file)) {
-            System.out.println("The file " + file + " is not an XML file");
             return null;
         }
         try {

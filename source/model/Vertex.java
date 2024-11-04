@@ -4,7 +4,6 @@ public class Vertex {
     private Long id;
     private double latitude;
     private double longitude;
-    private int global_num;
     private int TSP_num;
 
     public Vertex(Long id, double latitude, double longitude) {
@@ -18,9 +17,6 @@ public class Vertex {
 
     public int getTSP_num() { return TSP_num; }
     public void setTSP_num(int TSP_num) { this.TSP_num = TSP_num; }
-
-    public int getGlobal_num() { return global_num; }
-    public void setGlobal_num(int global_num) { this.global_num = global_num; }
 
     public double getLatitude() {
         return latitude;
