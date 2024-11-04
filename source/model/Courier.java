@@ -6,7 +6,7 @@ public class Courier {
     private String phoneNum;
     private Route route;
 
-    public Courier(String lastName, String firstName, String phoneNum) {
+    public Courier(String firstName, String lastName, String phoneNum) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.phoneNum = phoneNum;

@@ -2,11 +2,15 @@ package source.model;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -16,6 +20,10 @@ import java.io.FileInputStream;
 public class XmlExtractor {
 
     public static ArrayList<Object> extractDeliveryDemand(String file, ArrayList<Vertex> vertexArrayList) {
+        if (!isXMLFile(file)) {
+            System.out.println("The file " + file + " is not an XML file");
+            return null;
+        }
         try {
             ArrayList<Object> deliveryDemand = new ArrayList<>();
             ArrayList<Delivery> deliveryArrayList = new ArrayList<>();
@@ -44,31 +52,37 @@ public class XmlExtractor {
 
             Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
 
-            Long idAddress = Long.valueOf(entrepot.getAttribute("adresse"));
-            Vertex address = vertexIdMap.get(idAddress);
+            if (entrepot != null) {
+                Long idAddress = Long.valueOf(entrepot.getAttribute("adresse"));
+                Vertex address = vertexIdMap.get(idAddress);
 
-            String departureHourStr = entrepot.getAttribute("heureDepart");
+                String departureHourStr = entrepot.getAttribute("heureDepart");
 
-            String[] departureHourStrParts = departureHourStr.split(":");
-            String hours = String.format("%02d", Integer.parseInt(departureHourStrParts[0]));
-            String minutes = String.format("%02d", Integer.parseInt(departureHourStrParts[1]));
-            String seconds = String.format("%02d", Integer.parseInt(departureHourStrParts[2]));
+                String[] departureHourStrParts = departureHourStr.split(":");
+                String hours = String.format("%02d", Integer.parseInt(departureHourStrParts[0]));
+                String minutes = String.format("%02d", Integer.parseInt(departureHourStrParts[1]));
+                String seconds = String.format("%02d", Integer.parseInt(departureHourStrParts[2]));
 
-            String normalizedDepartureHourStr = hours + ":" + minutes + ":" + seconds;
+                String normalizedDepartureHourStr = hours + ":" + minutes + ":" + seconds;
 
-            LocalTime departureHour = LocalTime.parse(normalizedDepartureHourStr, DateTimeFormatter.ofPattern("HH:mm:ss"));
+                LocalTime departureHour = LocalTime.parse(normalizedDepartureHourStr, DateTimeFormatter.ofPattern("HH:mm:ss"));
 
-            deliveryDemand.add(new Entrepot(address, departureHour));
+                deliveryDemand.add(new Entrepot(address, departureHour));
+            } else {
+                deliveryDemand.add(null);
+            }
             deliveryDemand.add(deliveryArrayList);
-
             return deliveryDemand;
-        } catch (Exception e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public static ArrayList<Object> extractMap(String file) {
+        if (!isXMLFile(file)) {
+            return null;
+        }
         try {
             // file
             DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
@@ -122,10 +136,10 @@ public class XmlExtractor {
             }
             map.add(segmentArrayList);
             return map;
-        } catch (Exception e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     private static HashMap<Long, Vertex> vertexListToMap(ArrayList<Vertex> vertexArrayList) {
@@ -135,4 +149,9 @@ public class XmlExtractor {
         }
         return vertexIdMap;
     }
+
+    private static boolean isXMLFile(String file) {
+        return file.endsWith(".xml");
+    }
+
 }

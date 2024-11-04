@@ -26,4 +26,9 @@ public class Entrepot {
     public void setDepartureHour(LocalTime departureHour) {
         this.departureHour = departureHour;
     }
+
+    @Override
+    public String toString() {
+        return "Entrepot{Address='" + address + "', DepartureHour=" + departureHour +"}";
+    }
 }
