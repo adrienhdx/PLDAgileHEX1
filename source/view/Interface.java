@@ -20,10 +20,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
     private JPanel mapPanel, deliveryPanel;
     private JScrollPane scrollPanelMap;
-    private JButton mapButton, deliveryButton, addDeliveryButton, removeDeliveryButton, assignCourierButton, showRoutesButton, addCourierButton, removeCourierButton;
-    private JComboBox<String> unassignedDeliveryDropdown, assignedDeliveryDropdown, courierManagementDropdown, courierDeliveryDropdown;
-    private DefaultComboBoxModel<String> unassignedModel, assignedModel, courierModel;
-    private Vector<String> couriers, attributedDeliveries;
+    private JButton mapButton, deliveryButton, assignCourierButton, showRoutesButton, addCourierButton, removeCourierButton;
+    private JComboBox<String> unassignedDeliveryDropdown, courierManagementDropdown, courierDeliveryDropdown;
+    private DefaultComboBoxModel<String> unassignedModel,courierModel;
+    private Vector<String> couriers;
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
@@ -39,21 +39,16 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public Interface() {
         couriers = new Vector<String>();
-        attributedDeliveries = new Vector<String>();
         fileChooserDelivery = new JFileChooser();
         fileChooserDelivery.setCurrentDirectory(new File("."));
         fileChooserMap = new JFileChooser();
         fileChooserMap.setCurrentDirectory(new File("."));
         unassignedModel = new DefaultComboBoxModel<>();
-        assignedModel = new DefaultComboBoxModel<>(attributedDeliveries);
         courierModel = new DefaultComboBoxModel<>(couriers);
         unassignedDeliveryDropdown = new JComboBox<>(unassignedModel);
-        assignedDeliveryDropdown = new JComboBox<>(assignedModel);
         courierDeliveryDropdown = new JComboBox<>(courierModel);
-        addDeliveryButton = new JButton("Assign Delivery");
-        removeDeliveryButton = new JButton("Remove Delivery");
         courierManagementDropdown = new JComboBox<>(courierModel);
-        assignCourierButton = new JButton("Assign Courier");
+        assignCourierButton = new JButton("Assign the delivery to this courier");
         showRoutesButton = new JButton("Compute Route");
         map = new MapDisplay();
         scrollPanelMap = new JScrollPane(map.getMapViewer());
@@ -121,29 +116,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
         // Livraisons non attribuées
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         deliveryPanel.add(new JLabel("Pending Deliveries:"), gbc);
 
         gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
         deliveryPanel.add(unassignedDeliveryDropdown, gbc);
-
-        // Livraisons attribuées
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        deliveryPanel.add(new JLabel("Assigned Deliveries:"), gbc);
-
-        gbc.gridx = 1;
-        deliveryPanel.add(assignedDeliveryDropdown, gbc);
-
-        // Bouton pour attribuer une livraison
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        deliveryPanel.add(addDeliveryButton, gbc);
-
-        // Bouton pour retirer une livraison
-        gbc.gridx = 1;
-        deliveryPanel.add(removeDeliveryButton, gbc);
 
         // Choisir un livreur
         gbc.gridx = 0;
@@ -151,7 +128,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         deliveryPanel.add(new JLabel("Choose Courier:"), gbc);
 
         gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
         deliveryPanel.add(courierDeliveryDropdown, gbc);
 
         // Bouton pour affecter le livreur
@@ -164,51 +140,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridy = 4;
         deliveryPanel.add(showRoutesButton, gbc);
 
-        // Actions des boutons
-        addDeliveryButton.addActionListener(e -> assignDelivery());
-        removeDeliveryButton.addActionListener(e -> removeDelivery());
-        assignCourierButton.addActionListener(e -> assignCourier());
-        showRoutesButton.addActionListener(e -> calculateRoute());
-
         //tabPan.addTab("Delivery", deliveryPanel);
         deliveryPanel.revalidate();  // Met à jour le layout
         deliveryPanel.repaint();  // Redessine le panel
     }
 
-    private void assignDelivery() {
-        String selectedDelivery = (String) unassignedDeliveryDropdown.getSelectedItem();
-        if (selectedDelivery != null) {
-            attributedDeliveries.add(selectedDelivery);
-            unassignedModel.removeElement(selectedDelivery);
-        } else {
-            JOptionPane.showMessageDialog(this, "No delivery selected.");
-        }
-    }
-
-    private void removeDelivery() {
-        String selectedDelivery = (String) assignedDeliveryDropdown.getSelectedItem();
-        if (selectedDelivery != null) {
-            unassignedModel.addElement(selectedDelivery);
-            assignedModel.removeElement(selectedDelivery);
-        } else {
-            JOptionPane.showMessageDialog(this, "No delivery selected.");
-        }
-    }
-
-    private void assignCourier() {
-        String selectedCourier = (String) courierManagementDropdown.getSelectedItem();
-        String assignedDelivery = (String) assignedDeliveryDropdown.getSelectedItem();
-        if (selectedCourier != null && assignedDelivery != null) {
-            JOptionPane.showMessageDialog(this, "Delivery " + assignedDelivery + " managed by " + selectedCourier);
-        } else {
-            JOptionPane.showMessageDialog(this, "No courier or delivery selected");
-        }
-    }
-
-    private void calculateRoute() {
-        JOptionPane.showMessageDialog(this, "Computing route...");
-        // Logique pour calculer l'itinéraire
-    }
 
     private void setupCourierManagementPanel() {
         JPanel managementPanel = new JPanel(new GridBagLayout());  // Utilisation de GridBagLayout pour une disposition flexible et esthétique
@@ -278,18 +214,21 @@ public class Interface extends JFrame implements PropertyChangeListener {
         if (evt.getPropertyName().equals("errorMessage")) {
             JOptionPane.showMessageDialog(this, evt.getNewValue());
         }
-        if (evt.getPropertyName().equals("vertexArrayList")) {
+        if (evt.getPropertyName().equals("courierRouteDeliveries")) {
+            //maj de la liste des livraisons du livreur
+        }
+        if (evt.getPropertyName().equals("map")) {
             mapPanel.removeAll();
+            map.setCentre((Vertex) evt.getNewValue());
+            tabPan.setComponentAt(0,scrollPanelMap);
+        }
+        if (evt.getPropertyName().equals("vertexArrayList")) { //Test display vertex
             ArrayList<Vertex> vertexArrayList = (ArrayList<Vertex>) evt.getNewValue();
-            if (!vertexArrayList.isEmpty()){
-                map.setCentre(vertexArrayList.getFirst());
-                tabPan.setComponentAt(0,scrollPanelMap);
-                for(Vertex vertex : vertexArrayList){ //Test affichage intersections
-                    map.displayVertex(vertex);
-                }
+            for(Vertex vertex : vertexArrayList){ //Test affichage intersections
+                map.displayVertex(vertex);
             }
         }
-        if (evt.getPropertyName().equals("segmentArrayList")) { //Test affichage segments
+        if (evt.getPropertyName().equals("segmentArrayList")) { //Test display segment
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
             if (!segmentArrayList.isEmpty()){
                 for(Segment segment : segmentArrayList){
@@ -304,11 +243,17 @@ public class Interface extends JFrame implements PropertyChangeListener {
             JOptionPane.showMessageDialog(this, "Courier list updated");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
+            unassignedModel.removeAllElements();
             ArrayList<Delivery> deliveryArrayList = (ArrayList<Delivery>) evt.getNewValue();
             for (Delivery delivery : deliveryArrayList) {
                 String deliveryString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
                 unassignedModel.addElement(deliveryString);
             }
+        }
+        if (evt.getPropertyName().equals("pendingDeliveryRemoved")) {
+            Delivery delivery = (Delivery) evt.getNewValue();
+            String deliveryString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
+            unassignedModel.removeElement(deliveryString);
         }
     }
 
@@ -360,8 +305,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return courierDeliveryDropdown;
     }
 
-    public Vector<String> getAttributedDeliveries() {
-        return attributedDeliveries;
+    public JComboBox<String> getPendingDeliveryComboBox() {
+        return unassignedDeliveryDropdown;
     }
 
 }

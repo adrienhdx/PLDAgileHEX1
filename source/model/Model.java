@@ -44,45 +44,22 @@ public class Model {
     public void setMap(Graph map) { this.map = map; }
 
     public ArrayList<Delivery> getAssignedDeliveryArrayList() { return assignedDeliveryArrayList; }
-    public void setAssignedDeliveryArrayList(ArrayList<Delivery> assignedDeliveryArrayList) {
-        this.assignedDeliveryArrayList = assignedDeliveryArrayList;
-        propertyChangeSupport.firePropertyChange("assignedDeliveryArrayList", null, assignedDeliveryArrayList);
-    }
+
 
     public ArrayList<Delivery> getPostponedDeliveryArrayList() { return postponedDeliveryArrayList; }
-    public void setPostponedDeliveryArrayList(ArrayList<Delivery> postponedDeliveryArrayList) {
-        this.postponedDeliveryArrayList = postponedDeliveryArrayList;
-        propertyChangeSupport.firePropertyChange("postponedDeliveryArrayList",null,postponedDeliveryArrayList);
-    }
+
 
     public ArrayList<Delivery> getPendingDeliveryArrayList() { return pendingDeliveryArrayList; }
-    public void setPendingDeliveryArrayList(ArrayList<Delivery> pendingDeliveryArrayList) {
-        this.pendingDeliveryArrayList = pendingDeliveryArrayList;
-        propertyChangeSupport.firePropertyChange("pendingDeliveryArrayList", null, pendingDeliveryArrayList);
-    }
 
     public ArrayList<Courier> getCourierArrayList() { return courierArrayList; }
-    public void setCourierArrayList(ArrayList<Courier> courierArrayList) {
-        this.courierArrayList = courierArrayList;
-        propertyChangeSupport.firePropertyChange("setCourierArrayList", null, courierArrayList);
-    }
 
     public ArrayList<Segment> getSegmentArrayList() { return segmentArrayList; }
-    public void setSegmentArrayList(ArrayList<Segment> segmentArrayList) {
-        this.segmentArrayList = segmentArrayList;
-        propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
-    }
-
-    public ArrayList<Vertex> getVertexArrayList() { return (ArrayList<Vertex>) vertexArrayList; }
-    public void setVertexArrayList(ArrayList<Vertex> vertexArrayList) {
-        this.vertexArrayList = vertexArrayList;
-        propertyChangeSupport.firePropertyChange("vertexArrayList",null,vertexArrayList);
-    }
-
     public CompleteGraph getCompleteGraph() { return completeGraph; }
     public void setCompleteGraph(CompleteGraph completeGraph) { this.completeGraph = completeGraph; }
 
     public ArrayList<Vertex> getVertex_to_visit() { return Vertex_to_visit; }
+
+    public ArrayList<Vertex> getVertexArrayList() { return vertexArrayList; }
 
     public void setVertex_to_visit(ArrayList<Vertex> vertex_to_visit) {
         Vertex_to_visit = vertex_to_visit;
@@ -127,6 +104,15 @@ public class Model {
         return null;
     }
 
+    public Delivery getPendingDelivery(Long pickUpPtStr, Long deliveryPtStr) {
+        for (Delivery delivery : pendingDeliveryArrayList){
+            if (delivery.getPickUpPt().getId().equals(pickUpPtStr) && delivery.getDeliveryPt().getId().equals(deliveryPtStr)) {
+                return delivery;
+            }
+        }
+        return null;
+    }
+
     public void deleteCourier(Courier courier){
         if (courier != null) {
             courierArrayList.remove(courier);
@@ -136,6 +122,53 @@ public class Model {
         }
     }
 
+    public void assignDelivery(Courier courier, Delivery delivery){
+        if (courier != null) {
+            if (delivery != null) {
+                courier.getRoute().getDeliveries().add(delivery);
+                if (true) { //fonction compute route qui marche
+                    pendingDeliveryArrayList.remove(delivery);
+                    assignedDeliveryArrayList.add(delivery);
+                    delivery.setState(DeliveryState.ASSIGNED);
+                    propertyChangeSupport.firePropertyChange("courierRouteDeliveries", null, courier.getRoute().getDeliveries());
+                    propertyChangeSupport.firePropertyChange("pendingDeliveryRemoved", null, delivery);
+                } else {
+                    courier.getRoute().getDeliveries().remove(delivery);
+                    propertyChangeSupport.firePropertyChange("errorMessage", null, "No route found : the delivery can't be assigned to this courier");
+                }
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "No delivery selected");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
+        }
+    }
+
+    public void updateMap(ArrayList<Vertex> vertexList, ArrayList<Segment> segmentList){
+        if (segmentList != null && vertexList != null) {
+            segmentArrayList = segmentList;
+            vertexArrayList = vertexList;
+            propertyChangeSupport.firePropertyChange("vertexArrayList", null, vertexArrayList);
+            propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
+            propertyChangeSupport.firePropertyChange("map", null, vertexArrayList.getFirst());
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "Wrong file selected");
+        }
+    }
+
+    public void updateDeliveryList(ArrayList<Delivery> deliveryList, Entrepot entrepot){
+        if (deliveryList != null) {
+            if (entrepot != null){
+                pendingDeliveryArrayList = deliveryList;
+                propertyChangeSupport.firePropertyChange("pendingDeliveryArrayList", null, pendingDeliveryArrayList);
+                this.entrepot = entrepot;
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "Entrepot location missing");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "Wrong file selected");
+        }
+    }
 
 
 
