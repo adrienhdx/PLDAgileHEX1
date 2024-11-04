@@ -68,10 +68,10 @@ public class Controller implements ActionListener,ListSelectionListener {
             ArrayList<Object> demandArrayList = XmlExtractor.extractDeliveryDemand(filePath,model.getVertexArrayList());
             model.setPendingDeliveryArrayList((ArrayList<Delivery>) demandArrayList.get(1));
             model.setEntrepot((Entrepot) demandArrayList.getFirst());
-//            List<Segment> tour = model.computeTour(deliveryArrayList);
-//            for (Segment s : tour) {
-//                System.out.println(s);
-//            }
+            ArrayList<Segment> tour = model.ObtenirArrayListeSegmentsTSP(model.getPendingDeliveryArrayList());
+            for (Segment s : tour) {
+                System.out.println(s);
+            }
         }
     }
 

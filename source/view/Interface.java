@@ -7,6 +7,7 @@ import source.model.Segment;
 import source.model.Vertex;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,10 +19,10 @@ import java.util.Vector;
 
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
-    private JPanel mapPanel, deliveryPanel;
+    private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap ;
     private JScrollPane scrollPanelMap;
     private JButton mapButton, deliveryButton, addDeliveryButton, removeDeliveryButton, assignCourierButton, showRoutesButton, addCourierButton, removeCourierButton;
-    private JComboBox<String> unassignedDeliveryDropdown, assignedDeliveryDropdown, courierManagementDropdown, courierDeliveryDropdown;
+    private JComboBox<String> unassignedDeliveryDropdown, assignedDeliveryDropdown, courierManagementDropdown, courierDeliveryDropdown, courierMapDropdown;
     private DefaultComboBoxModel<String> unassignedModel, assignedModel, courierModel;
     private Vector<String> couriers, attributedDeliveries;
     private JList<String> courierList, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
@@ -57,6 +58,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierManagementDropdown = new JComboBox<>(courierModel);
         assignCourierButton = new JButton("Assign Courier");
         showRoutesButton = new JButton("Compute Route");
+        courierMapDropdown = new JComboBox<>(courierModel);
         map = new MapDisplay();
         scrollPanelMap = new JScrollPane(map.getMapViewer());
         courierList = new JList<>(courierModel);
@@ -92,7 +94,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
             int result = fileChooserMap.showOpenDialog(null);
         });
     }
-
 
     private void setupDeliveryPanel() {
         deliveryPanel = new JPanel();  // Utiliser GridLayout pour une meilleure ergonomie
@@ -286,11 +287,80 @@ public class Interface extends JFrame implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("vertexArrayList")) {
+            // remise à jour de l'onglet map
             mapPanel.removeAll();
+
+            // Initialisation du panneau principal
+            mainPanelMap = new JPanel(new BorderLayout());
+
+            // Panneau de contrôle amélioré
+            controlMapPanel = new JPanel();
+            controlMapPanel.setLayout(new BoxLayout(controlMapPanel, BoxLayout.Y_AXIS));
+            controlMapPanel.setBorder(new EmptyBorder(15, 15, 15, 15)); // Ajouter des marges internes
+
+            // Espacement entre les composants
+            int componentSpacing = 15;
+
+            // Création des composants
+            JLabel select = new JLabel("Select a Courier:");
+            select.setFont(new Font("Arial", Font.BOLD, 14)); // Font plus visible
+            select.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            courierMapDropdown.setMaximumSize(new Dimension(Integer.MAX_VALUE, courierMapDropdown.getPreferredSize().height));
+            courierMapDropdown.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JButton selectCourier = new JButton("Select Courier");
+            selectCourier.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JButton exportRoutes = new JButton("Export Routes");
+            exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JButton importRoutes = new JButton("Import Routes");
+            importRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // Ajout des composants avec des espaces entre eux
+            controlMapPanel.add(select);
+            controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+            controlMapPanel.add(courierMapDropdown);
+            controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+            controlMapPanel.add(selectCourier);
+            controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+            controlMapPanel.add(exportRoutes);
+            controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+            controlMapPanel.add(importRoutes);
+
+            // Ajouter une bordure pour encadrer visuellement le panneau
+            controlMapPanel.setBorder(BorderFactory.createTitledBorder("Control Panel"));
+
+            // Ajout de controlMapPanel et scrollPanelMap dans mainPanelMap
+            mainPanelMap.add(controlMapPanel, BorderLayout.EAST);
+            mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);
+
+            /*controlMapPanel = new JPanel(new GridLayout(0,1,100,100));
+            mainPanelMap = new JPanel(new BorderLayout());
+
+            JLabel select = new JLabel("Select a Courier :");
+
+            JButton selectCourier = new JButton("Select Courier");
+            JButton exportRoutes = new JButton("Export Routes");
+            JButton importRoutes = new JButton("Import Routes");
+
+            controlMapPanel.add(select);
+            controlMapPanel.add(courierMapDropdown);
+            controlMapPanel.add(selectCourier);
+            controlMapPanel.add(exportRoutes);
+            controlMapPanel.add(importRoutes);
+
+            mainPanelMap.add(controlMapPanel, BorderLayout.EAST);
+            mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);*/
+
+
+            tabPan.setComponentAt(0,mainPanelMap);
+
+            //pour afficher les intersections sur la carte
             ArrayList<Vertex> vertexArrayList = (ArrayList<Vertex>) evt.getNewValue();
             if (!vertexArrayList.isEmpty()){
                 map.setCentre(vertexArrayList.getFirst());
-                tabPan.setComponentAt(0,scrollPanelMap);
                 for(Vertex vertex : vertexArrayList){ //Test affichage intersections
                     map.displayVertex(vertex);
                 }

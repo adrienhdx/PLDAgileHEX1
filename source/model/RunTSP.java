@@ -1,53 +1,70 @@
 package source.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class RunTSP {
 	public static void main(String[] args) {
+
+		// CLASSE TEST POUR TSP
+
 		int[] sommets = {0, 17210, 17385, 19273};
-		// 1->2 and 3->2
-		int[] precedence = {-1, 17385, -1, 17385};
-		// converted to -1 2 0 2
+		// 0 1 2 3
+		// Supposons le cas 2->3 2->1
 
-		TSP tsp = new TSP1();
-		double[][] matrix = {  	{ 0.0, 	10.0, 	8.0, 1.4 },
-								{ 10.0, 0.0, 	5.1, 8.1 },
-								{ 8.0, 	5.1, 	0.0, 3.2 },
-								{ 1.4, 	8.1, 	3.2, 0.0 } };
+		// Contraintes de précédence : clé = sommet, valeur = liste des suivants
+		// Passé en paramètre
+		/*Map<Integer, List<Integer>> precedence = new HashMap<>();
+		precedence.put(17385, Arrays.asList(-1)); // vide
+		precedence.put(17210, Arrays.asList(17385)); // 1->2
+		precedence.put(19273, Arrays.asList(17385)); // 3->2*/
 
+		Map<Integer, List<Integer>> precedence = new HashMap<>();
+		precedence.put(17385, Arrays.asList(17210, 19273)); // 2->1 2->3
+		precedence.put(17210, Arrays.asList(-1)); // vide
+		precedence.put(19273, Arrays.asList(-1)); // vide
+
+		// Matrice de distance
+		double[][] matrix = {
+				{ 0.0,  10.0,  8.0,  1.4 },
+				{ 10.0,  0.0,  5.1,  8.1 },
+				{ 8.0,  5.1,  0.0,  3.2 },
+				{ 1.4,  8.1,  3.2,  0.0 }
+		};
+
+		// Conversion des sommets dans une liste pour chiper les indices tel un renard rusé
 		List<Integer> sommetsList = new ArrayList<>();
 		for (int sommet : sommets) {
 			sommetsList.add(sommet);
 		}
 
-		for (int i = 0; i < sommets.length; i++) {
-			if (precedence[i] == -1) continue;
-
-			// trouver indice de precedence[i] dans sommets
-			int index = sommetsList.indexOf(precedence[i]);
-			if (index != -1) {
-				precedence[i] = index;
-			}
-		}
-
-		for (int i = 0; i < sommets.length; i++) {
-			System.out.println(precedence[i]); // ici precedence n'a pas changé
-		}
-
-
-		// règles de précédence :
+		// Règles de précédence :
 		// C(j, i) = C(0, j) = C(i, 0) = +inf
-		for (int i=1; i<4; i++){
-			if (precedence[i] != -1) {
-				matrix[i][0] = Integer.MAX_VALUE;
-				matrix[precedence[i]][i] = Integer.MAX_VALUE;
+		// Pour chaque entrée dans la hashmap de précédence
+		for (Map.Entry<Integer, List<Integer>> entry : precedence.entrySet()) {
+			// Si la liste des suivants n'est pas vide
+			int courantIndex = sommetsList.indexOf(entry.getKey());
+			if (courantIndex == -1 || courantIndex == 0) {
+				// Si le sommet courant n'existe pas ou est le dépot
+				continue;
+			}
+			if (!entry.getValue().contains(-1)) {
+				// Pour chaque suivant
+				// On obtient l'indice du sommet courant dans la liste des sommets
+				for (int suivant : entry.getValue()) {
+					// On obtient l'indice du sommet suivant
+					int suivantIndex = sommetsList.indexOf(suivant);
+					// On empêche de retourner au dépot
+					matrix[courantIndex][0] = Integer.MAX_VALUE;
+					// On empêche d'aller du suivant vers le courant
+					matrix[suivantIndex][courantIndex] = Integer.MAX_VALUE;
+				}
 			} else {
-				matrix[0][i] = Integer.MAX_VALUE;
+				// On empêche d'aller du dépot vers le sommet courant directement
+				matrix[0][courantIndex] = Integer.MAX_VALUE;
 			}
 		}
 
+		// Affichage de la matrice modifiée
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
 				if (matrix[i][j] == Integer.MAX_VALUE) {
@@ -59,14 +76,16 @@ public class RunTSP {
 			System.out.println();
 		}
 
+		// Solution avec TSP
 		Graph g = new CompleteGraph(4, matrix);
 
+		TSP tsp = new TSP1();
 		long startTime = System.currentTimeMillis();
 		tsp.searchSolution(20000, g);
-		System.out.print("Solution of cost "+tsp.getSolutionCost()+" found in "
-				+(System.currentTimeMillis() - startTime)+"ms : ");
-		for (int i=0; i<4; i++)
-			System.out.print(tsp.getSolution(i)+" ");
+		System.out.print("Solution of cost " + tsp.getSolutionCost() + " found in "
+				+ (System.currentTimeMillis() - startTime) + "ms : ");
+		for (int i = 0; i < 4; i++)
+			System.out.print(tsp.getSolution(i) + " ");
 		System.out.println("0");
 
 	}
