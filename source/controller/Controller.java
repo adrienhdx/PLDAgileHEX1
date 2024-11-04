@@ -4,6 +4,7 @@ import source.model.*;
 import source.model.XmlExtractor;
 import source.view.Interface;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.ListSelectionEvent;
@@ -26,10 +27,20 @@ public class Controller implements ActionListener,ListSelectionListener {
     public void actionPerformed(ActionEvent e) {
         System.out.println(e);
         if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserDelivery()) {
-            this.loadDeliveries();
+            if (this.loadDeliveries()) {
+                view.setSettingsDelivery(true);
+                view.showMessage("Deliveries loaded successfully");
+            } else {
+                view.setSettingsDelivery(false);
+                view.showMessage("Deliveries load failed: file is not an XML file or is not well formatted");
+            };
         }
-        if(e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserMap()){
-            this.loadMap();
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserMap()) {
+            if (this.loadMap()) {
+                view.showMessage("Map loaded successfully");
+            } else {
+                view.showMessage("Map load failed: file is not an XML file or is not well formatted");
+            };
         }
         if (e.getSource() == view.getAddCourierButton()) {
             this.createCourier();
@@ -37,7 +48,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getSource() == view.getAssignCourierButton()) {
             this.assignDeliveriesCourier();
         }
-        if(e.getSource() == view.getRemoveCourierButton()){
+        if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
         }
     }
@@ -53,26 +64,37 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void loadMap(){
+    public boolean loadMap(){
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
-        ArrayList<Vertex> vertexList = (ArrayList<Vertex>) XmlExtractor.extractMap(filePath).getFirst();
-        ArrayList<Segment> segmentList = (ArrayList<Segment>) XmlExtractor.extractMap(filePath).getLast();
+        ArrayList<Object> map = XmlExtractor.extractMap(filePath);
+        if (map == null){
+            System.out.println("The file is not an XML file or the file is not well formatted");
+            return false;
+        }
+        ArrayList<Vertex> vertexList = (ArrayList<Vertex>) map.getFirst();
+        ArrayList<Segment> segmentList = (ArrayList<Segment>) map.getLast();
         model.setSegmentArrayList(segmentList);
         model.setVertexArrayList(vertexList);
+        return true;
     }
 
-    public void loadDeliveries(){
+    public boolean loadDeliveries(){
         String filePath = view.getFileChooserDelivery().getSelectedFile().getAbsolutePath();
-        Map<String, Vertex> vertexIdMap = new HashMap<>();
         if (model.getVertexArrayList() != null) {
-            ArrayList<Object> demandArrayList = XmlExtractor.extractDeliveryDemand(filePath,model.getVertexArrayList());
-            model.setPendingDeliveryArrayList((ArrayList<Delivery>) demandArrayList.get(1));
-            model.setEntrepot((Entrepot) demandArrayList.getFirst());
+            ArrayList<Object> deliveryArrayList = XmlExtractor.extractDeliveryDemand(filePath,model.getVertexArrayList());
+            if (deliveryArrayList == null) {
+                System.out.println("The file " + filePath + "is not an XML file or the file is not well formatted");
+                return false;
+            }
+            model.setPendingDeliveryArrayList((ArrayList<Delivery>) deliveryArrayList.get(1));
+            model.setEntrepot((Entrepot) deliveryArrayList.getFirst());
             ArrayList<Segment> tour = model.ObtenirArrayListeSegmentsTSP(model.getPendingDeliveryArrayList());
             for (Segment s : tour) {
                 System.out.println(s);
             }
+            return true;
         }
+        return false;
     }
 
 

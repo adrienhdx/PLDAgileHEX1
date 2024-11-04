@@ -30,6 +30,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
+    private boolean settingsDelivery;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
@@ -61,6 +62,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierMapDropdown = new JComboBox<>(courierModel);
         map = new MapDisplay();
         scrollPanelMap = new JScrollPane(map.getMapViewer());
+        boolean settingsDelivery = false;
         courierList = new JList<>(courierModel);
         courierList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -68,6 +70,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         setSize(600, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        
         // Onglet "Map"
         setupMapPanel();
 
@@ -107,10 +110,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
                 int result = fileChooserDelivery.showOpenDialog(null);  // Ouvre le dialogue pour choisir un fichier
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooserDelivery.getSelectedFile();
-                    // Supprimer le bouton de chargement
-                    deliveryPanel.remove(deliveryButton);
-                    // Configurer le panneau de livraison
-                    showSettingsDelivery(selectedFile);
+                    if (settingsDelivery) {
+                        // Supprimer le bouton de chargement
+                        deliveryPanel.remove(deliveryButton);
+                        // Configurer le panneau de livraison
+
+                        showSettingsDelivery(selectedFile);
+                    }
                 }
             }
         });
@@ -391,13 +397,21 @@ public class Interface extends JFrame implements PropertyChangeListener {
             }
         }
     }
-
+    
     private void updateCourierList(ArrayList<Courier> newCourierList) {
         couriers.clear();
         for (Courier courier : newCourierList) {
             couriers.add(courier.getFirstName()+ " " + courier.getLastName());
         }
         courierList.setListData(couriers);
+    }
+
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
     }
 
     // Getters
@@ -435,6 +449,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JComboBox<String> getCourierManagementComboBox() {
         return courierManagementDropdown;
+    }
+
+    public void setSettingsDelivery(boolean bool) {
+        this.settingsDelivery = bool;
+    }
+
+    public boolean getSettingsDelivery() {
+        return this.settingsDelivery;
     }
 
     public JComboBox<String> getCourierDeliveryComboBox() {
