@@ -21,7 +21,6 @@ public class XmlExtractor {
 
     public static ArrayList<Object> extractDeliveryDemand(String file, ArrayList<Vertex> vertexArrayList) {
         if (!isXMLFile(file)) {
-            System.out.println("The file " + file + " is not an XML file");
             return null;
         }
 
@@ -54,7 +53,6 @@ public class XmlExtractor {
             Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
 
             if (entrepot == null) {
-                System.out.println("The file " + file + " is not well formatted");
                 return null;
             }
 
@@ -84,7 +82,6 @@ public class XmlExtractor {
 
     public static ArrayList<Object> extractMap(String file) {
         if (!isXMLFile(file)) {
-            System.out.println("The file " + file + " is not an XML file");
             return null;
         }
 
@@ -101,7 +98,6 @@ public class XmlExtractor {
             NodeList vertexNodeList = documentMap.getElementsByTagName("noeud");
 
             if (vertexNodeList.getLength() == 0) {
-                System.out.println("The file " + file + " is not well formatted");
                 return null;
             }
 
@@ -127,7 +123,6 @@ public class XmlExtractor {
             ArrayList<Segment> segmentArrayList = new ArrayList<>();
 
             if (segmentNodeList.getLength() == 0) {
-                System.out.println("The file " + file + " is not well formatted");
                 return null;
             }
 

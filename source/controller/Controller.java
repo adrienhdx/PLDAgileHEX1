@@ -68,7 +68,6 @@ public class Controller implements ActionListener,ListSelectionListener {
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
         ArrayList<Object> map = XmlExtractor.extractMap(filePath);
         if (map == null){
-            System.out.println("The file is not an XML file or the file is not well formatted");
             return false;
         }
         ArrayList<Vertex> vertexList = (ArrayList<Vertex>) map.getFirst();
@@ -83,7 +82,6 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (model.getVertexArrayList() != null) {
             ArrayList<Object> deliveryArrayList = XmlExtractor.extractDeliveryDemand(filePath,model.getVertexArrayList());
             if (deliveryArrayList == null) {
-                System.out.println("The file " + filePath + "is not an XML file or the file is not well formatted");
                 return false;
             }
             model.setPendingDeliveryArrayList((ArrayList<Delivery>) deliveryArrayList.get(1));
