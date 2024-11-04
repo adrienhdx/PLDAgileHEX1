@@ -53,14 +53,22 @@ public class Controller implements ActionListener,ListSelectionListener {
     public void loadMap(){
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
         ArrayList<Object> result = XmlExtractor.extractMap(filePath);
-        model.updateMap((ArrayList<Vertex>) result.getFirst(),(ArrayList<Segment>) result.getLast());
+        if (result != null) {
+            model.updateMap((ArrayList<Vertex>) result.getFirst(), (ArrayList<Segment>) result.getLast());
+        } else {
+            model.updateMap(null, null);
+        }
     }
 
     public void loadDeliveries(){
         String filePath = view.getFileChooserDelivery().getSelectedFile().getAbsolutePath();
         if (model.getVertexArrayList() != null) {
             ArrayList<Object> demandArrayList = XmlExtractor.extractDeliveryDemand(filePath,model.getVertexArrayList());
-            model.updateDeliveryList((ArrayList<Delivery>) demandArrayList.getLast(), (Entrepot) demandArrayList.getFirst());
+            if (demandArrayList != null) {
+                model.updateDeliveryList((ArrayList<Delivery>) demandArrayList.getLast(), (Entrepot) demandArrayList.getFirst());
+            } else {
+                model.updateDeliveryList(null, null);
+            }
         }
     }
 
