@@ -189,7 +189,7 @@ public class Model {
         // distance la plus courte entre les deux points
 
 
-        double [][] matrix = new double[taille][taille];
+        double [][] matrix = new double[taille+2][taille+2];
         completeGraph.cost = matrix;
         for (Vertex vertex : Vertex_to_visit) {
             if (newptA && !newptB) {
