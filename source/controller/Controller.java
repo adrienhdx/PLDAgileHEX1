@@ -32,7 +32,7 @@ public class Controller implements ActionListener,ListSelectionListener {
                 view.showMessage("Deliveries loaded successfully");
             } else {
                 view.setSettingsDelivery(false);
-                view.showMessage("Deliveries load failed: file is not an XML file or is not well formatted");
+                view.showMessage("Deliveries load failed: file is not an XML file, is not well formatted or map hasn't been loaded yet");
             };
         }
         if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserMap()) {
