@@ -18,6 +18,7 @@ public class Model {
     private ArrayList<Vertex> Vertex_to_visit;
     private PropertyChangeSupport propertyChangeSupport;
     private Entrepot entrepot;
+    private Map<Long, List<Long>> contraintesPrecedence;
 
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -402,7 +403,7 @@ public class Model {
 
         // obtenir l'ordre d'après ObtenirOrdreSommets()
 
-        long[] ordre = ObtenirOrdreSommets(sommets, precedence);
+        long[] ordre = ObtenirOrdreSommets(sommets, contraintesPrecedence);
 
         System.out.println("Ordre calculé "+Arrays.toString(ordre));
 
