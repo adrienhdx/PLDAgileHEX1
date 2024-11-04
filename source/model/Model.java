@@ -163,6 +163,7 @@ public class Model {
 
     public void addDelivery(Delivery delivery){
         if (Vertex_to_visit == null){
+            creerMatriceAdjacence();
             Vertex_to_visit = new ArrayList<>();
             Vertex_to_visit.add(this.entrepot.getAddress());
             this.entrepot.getAddress().setTSP_num(1);
