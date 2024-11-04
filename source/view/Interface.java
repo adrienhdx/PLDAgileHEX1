@@ -132,13 +132,19 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         deliveryPanel.add(unassignedDeliveryDropdown, gbc);
 
-        // Livraisons attribuées
+        // Choisir un livreur
+        gbc.gridx = 2;
+        deliveryPanel.add(new JLabel("Choose Courier:"), gbc);
+
+        gbc.gridy = 1;
+
+        JScrollPane scrollPane = new JScrollPane(selectedCourierListDeliveryTab);
+        scrollPane.setPreferredSize(new Dimension(200, 100));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         gbc.gridx = 0;
         gbc.gridy = 1;
-        deliveryPanel.add(new JLabel("Assigned Deliveries:"), gbc);
-
-        gbc.gridx = 1;
-        deliveryPanel.add(assignedDeliveryDropdown, gbc);
+        deliveryPanel.add(scrollPane, gbc);
 
         // Bouton pour attribuer une livraison
         gbc.gridx = 0;
@@ -146,27 +152,19 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         deliveryPanel.add(addDeliveryButton, gbc);
 
-        // Bouton pour retirer une livraison
-        gbc.gridx = 1;
-        deliveryPanel.add(removeDeliveryButton, gbc);
-
-        // Choisir un livreur
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        deliveryPanel.add(new JLabel("Choose Courier:"), gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         deliveryPanel.add(courierDeliveryDropdown, gbc);
 
-        // Bouton pour affecter le livreur
-        gbc.gridx = 0;
-        gbc.gridy = 4;
+        // Bouton pour mettre en attente la livraison
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         deliveryPanel.add(assignCourierButton, gbc);
 
         // Bouton pour calculer l'itinéraire
-        gbc.gridx = 1;
-        gbc.gridy = 4;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         deliveryPanel.add(showRoutesButton, gbc);
 
         // Actions des boutons
