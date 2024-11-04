@@ -206,19 +206,19 @@ public class Model {
 
         this.matrice_adjacence = matrice;
 
-        System.out.println("Matrice d'adjacence :");
-        for (int row = 0; row < taille; row++) {
-            for (int col = 0; col < taille; col++) {
-                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
-                if (matrice[row][col] == Integer.MAX_VALUE) {
-                    System.out.print("INF ");
-                } else {
-                    if (matrice[row][col] == -1) continue;
-                    System.out.print(matrice[row][col] + " ");
-                }
-            }
-            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
-        }
+//        System.out.println("Matrice d'adjacence :");
+//        for (int row = 0; row < taille; row++) {
+//            for (int col = 0; col < taille; col++) {
+//                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
+//                if (matrice[row][col] == Integer.MAX_VALUE) {
+//                    System.out.print("INF ");
+//                } else {
+//                    if (matrice[row][col] == -1) continue;
+//                    System.out.print(matrice[row][col] + " ");
+//                }
+//            }
+//            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
+//        }
 
     }
 
@@ -265,23 +265,23 @@ public class Model {
             if (newptA && !newptB) {
                 pickup_pt.setTSP_num(taille+1);
                 matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
-                matrix[vertex.getTSP_num() - 1][taille] = aStar(vertex, pickup_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(pickup_pt, vertex).distance;
                 matrix[taille][taille] = 0;
 
             }
             else if (newptB && newptA) {
                 pickup_pt.setTSP_num(taille+1);
                 delivery_pt.setTSP_num(taille + 2);
-                matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                matrix[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+                matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(pickup_pt, vertex).distance;
                 matrix[taille+1][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                matrix[vertex.getTSP_num() - 1][taille+1] = aStar(vertex, delivery_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille+1] = aStar(delivery_pt, vertex).distance;
             }
 
             else if (newptB ) {
                 delivery_pt.setTSP_num(taille + 1);
                 matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                matrix[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(delivery_pt, vertex).distance;
                 matrix[taille][taille] = 0;
             }
         }
