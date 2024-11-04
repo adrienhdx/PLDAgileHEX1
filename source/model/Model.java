@@ -122,9 +122,6 @@ public class Model {
         }
     }
 
-
-
-
     //Recherche de chemin
     public void creerMatriceAdjacence(){
         // Création de la matrice d'adjacence entre tous les sommets de la carte chargée
@@ -224,6 +221,27 @@ public class Model {
 
         }
 
+        // On ajoute les contraintes de précédence
+        // Si pickup existe déjà dans la map
+        // On ajoute deliveryPt.getTSPNum dans la liste des suivants
+        // Sinon on ajoute simplement pickupPt.getTSPNum dans la map avec deliveryPt.getTSPNum comme suivant
+
+        if (contraintesPrecedence == null) {
+            contraintesPrecedence = new HashMap<>();
+        }
+        // ajouter -1 pour le point de delivery si nouveau
+        if (newptB) contraintesPrecedence.put(delivery_pt.getId(), new ArrayList<>(Arrays.asList((long)-1)));
+
+        if (contraintesPrecedence.containsKey(pickup_pt.getId())) {
+            // vérifier si l'entrée est -1 : si oui supprimer la liste et la recréer avec delivery_pt.getId()
+            if (contraintesPrecedence.get(pickup_pt.getId()).contains((long)-1)) {
+                contraintesPrecedence.put(pickup_pt.getId(), new ArrayList<>(Arrays.asList(delivery_pt.getId())));
+            } else {
+                contraintesPrecedence.get(pickup_pt.getId()).add(delivery_pt.getId());
+            }
+        } else {
+            contraintesPrecedence.put(pickup_pt.getId(), new ArrayList<>(Arrays.asList(delivery_pt.getId())));
+        }
     }
 
     private double heuristique(Vertex v1, Vertex v2) {
@@ -422,12 +440,6 @@ public class Model {
         }
 
         System.out.println("Sommets : " + Arrays.toString(sommets));
-
-        // precedence (TEMPLATE)
-        long[] precedence = new long[Vertex_to_visit.size()];
-        for (int i = 0; i < Vertex_to_visit.size(); i++) {
-            precedence[i] = -1;
-        }
 
         // obtenir l'ordre d'après ObtenirOrdreSommets()
 
