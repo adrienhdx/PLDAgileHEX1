@@ -24,7 +24,6 @@ public class XmlExtractor {
             System.out.println("The file " + file + " is not an XML file");
             return null;
         }
-
         try {
             ArrayList<Object> deliveryDemand = new ArrayList<>();
             ArrayList<Delivery> deliveryArrayList = new ArrayList<>();
@@ -53,33 +52,31 @@ public class XmlExtractor {
 
             Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
 
-            if (entrepot == null) {
-                System.out.println("The file " + file + " is not well formatted");
-                return null;
+            if (entrepot != null) {
+                Long idAddress = Long.valueOf(entrepot.getAttribute("adresse"));
+                Vertex address = vertexIdMap.get(idAddress);
+
+                String departureHourStr = entrepot.getAttribute("heureDepart");
+
+                String[] departureHourStrParts = departureHourStr.split(":");
+                String hours = String.format("%02d", Integer.parseInt(departureHourStrParts[0]));
+                String minutes = String.format("%02d", Integer.parseInt(departureHourStrParts[1]));
+                String seconds = String.format("%02d", Integer.parseInt(departureHourStrParts[2]));
+
+                String normalizedDepartureHourStr = hours + ":" + minutes + ":" + seconds;
+
+                LocalTime departureHour = LocalTime.parse(normalizedDepartureHourStr, DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+                deliveryDemand.add(new Entrepot(address, departureHour));
+            } else {
+                deliveryDemand.add(null);
             }
-
-            Long idAddress = Long.valueOf(entrepot.getAttribute("adresse"));
-            Vertex address = vertexIdMap.get(idAddress);
-
-            String departureHourStr = entrepot.getAttribute("heureDepart");
-
-            String[] departureHourStrParts = departureHourStr.split(":");
-            String hours = String.format("%02d", Integer.parseInt(departureHourStrParts[0]));
-            String minutes = String.format("%02d", Integer.parseInt(departureHourStrParts[1]));
-            String seconds = String.format("%02d", Integer.parseInt(departureHourStrParts[2]));
-
-            String normalizedDepartureHourStr = hours + ":" + minutes + ":" + seconds;
-
-            LocalTime departureHour = LocalTime.parse(normalizedDepartureHourStr, DateTimeFormatter.ofPattern("HH:mm:ss"));
-
-            deliveryDemand.add(new Entrepot(address, departureHour));
             deliveryDemand.add(deliveryArrayList);
-
             return deliveryDemand;
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public static ArrayList<Object> extractMap(String file) {
@@ -87,7 +84,6 @@ public class XmlExtractor {
             System.out.println("The file " + file + " is not an XML file");
             return null;
         }
-
         try {
             // file
             DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
@@ -99,11 +95,6 @@ public class XmlExtractor {
             ArrayList<Object> map = new ArrayList<>();
 
             NodeList vertexNodeList = documentMap.getElementsByTagName("noeud");
-
-            if (vertexNodeList.getLength() == 0) {
-                System.out.println("The file " + file + " is not well formatted");
-                return null;
-            }
 
             for (int i = 0; i < vertexNodeList.getLength(); i++) {
                 Node vertexNode = vertexNodeList.item(i);
@@ -125,11 +116,6 @@ public class XmlExtractor {
             // On récupère tous les tronçons "troncon" correspondant aux segments de la carte
             NodeList segmentNodeList = documentMap.getElementsByTagName("troncon");
             ArrayList<Segment> segmentArrayList = new ArrayList<>();
-
-            if (segmentNodeList.getLength() == 0) {
-                System.out.println("The file " + file + " is not well formatted");
-                return null;
-            }
 
             for (int i = 0; i < segmentNodeList.getLength(); i++) {
                 Node node = segmentNodeList.item(i);
@@ -153,8 +139,8 @@ public class XmlExtractor {
             return map;
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     private static HashMap<Long, Vertex> vertexListToMap(ArrayList<Vertex> vertexArrayList) {

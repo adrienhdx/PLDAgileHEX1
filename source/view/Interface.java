@@ -88,31 +88,18 @@ public class Interface extends JFrame implements PropertyChangeListener {
         tabPan.addTab("Map", mapPanel);
 
         mapButton.addActionListener(e -> {
-            int result = fileChooserMap.showOpenDialog(null);
+            fileChooserMap.showOpenDialog(null);
         });
     }
 
     private void setupDeliveryPanel() {
-        deliveryPanel = new JPanel();  // Utiliser GridLayout pour une meilleure ergonomie
+        deliveryPanel = new JPanel();
         deliveryButton = new JButton("Load Delivery");
-        deliveryPanel.add(deliveryButton);  // Ajout du bouton dans le panel "Delivery"
+        deliveryPanel.add(deliveryButton);
         tabPan.addTab("Delivery", deliveryPanel);
 
-        deliveryButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int result = fileChooserDelivery.showOpenDialog(null);  // Ouvre le dialogue pour choisir un fichier
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooserDelivery.getSelectedFile();
-                    if (settingsDelivery) {
-                        // Supprimer le bouton de chargement
-                        deliveryPanel.remove(deliveryButton);
-                        // Configurer le panneau de livraison
-
-                        showSettingsDelivery(selectedFile);
-                    }
-                }
-            }
+        deliveryButton.addActionListener(e -> {
+            fileChooserDelivery.showOpenDialog(null);
         });
     }
 
@@ -292,12 +279,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
             }
         }
         if (evt.getPropertyName().equals("courierArrayList")) {
-            courierManagementDropdown.removeAllItems();
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
             updateCourierList(courierList);
             JOptionPane.showMessageDialog(this, "Courier list updated");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
+            File selectedFile = fileChooserDelivery.getSelectedFile();
+            deliveryPanel.remove(deliveryButton);
+            showSettingsDelivery(selectedFile);
             unassignedModel.removeAllElements();
             ArrayList<Delivery> deliveryArrayList = (ArrayList<Delivery>) evt.getNewValue();
             for (Delivery delivery : deliveryArrayList) {
@@ -357,10 +346,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return assignCourierButton;
     }
 
-    public JComboBox<String> getCourierManagementComboBox() {
-        return courierManagementDropdown;
-    }
-
     public void setSettingsDelivery(boolean bool) {
         this.settingsDelivery = bool;
     }
@@ -377,6 +362,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return unassignedDeliveryDropdown;
     }
 
-    public JList<String> getCourierList() { return courierList;    }
+    public JList<String> getCourierList() {
+        return courierList;    }
 }
 

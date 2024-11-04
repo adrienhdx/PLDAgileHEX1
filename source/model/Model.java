@@ -146,13 +146,17 @@ public class Model {
 
     public void updateMap(ArrayList<Vertex> vertexList, ArrayList<Segment> segmentList){
         if (segmentList != null && vertexList != null) {
-            segmentArrayList = segmentList;
-            vertexArrayList = vertexList;
-            propertyChangeSupport.firePropertyChange("vertexArrayList", null, vertexArrayList);
-            propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
-            propertyChangeSupport.firePropertyChange("map", null, vertexArrayList.getFirst());
+            if (!vertexList.isEmpty()) {
+                segmentArrayList = segmentList;
+                vertexArrayList = vertexList;
+                propertyChangeSupport.firePropertyChange("vertexArrayList", null, vertexArrayList);
+                propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
+                propertyChangeSupport.firePropertyChange("map", null, vertexArrayList.getFirst());
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "The file doesn't contain any vertex, please select an other file");
+            }
         } else {
-            propertyChangeSupport.firePropertyChange("errorMessage", null, "Wrong file selected");
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
         }
     }
 
@@ -166,7 +170,7 @@ public class Model {
                 propertyChangeSupport.firePropertyChange("errorMessage", null, "Entrepot location missing");
             }
         } else {
-            propertyChangeSupport.firePropertyChange("errorMessage", null, "Wrong file selected");
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
         }
     }
 

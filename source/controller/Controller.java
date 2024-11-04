@@ -50,7 +50,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public boolean loadMap(){
+    public void loadMap(){
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
         ArrayList<Object> result = XmlExtractor.extractMap(filePath);
         model.updateMap((ArrayList<Vertex>) result.getFirst(),(ArrayList<Segment>) result.getLast());
@@ -97,7 +97,7 @@ public class Controller implements ActionListener,ListSelectionListener {
     }
 
     public void deleteCourier(){
-        String courierInfo = (String) view.getCourierManagementComboBox().getSelectedItem();
+        String courierInfo = view.getCourierList().getSelectedValue();
         String firstName = "";
         String lastName = "";
         if (courierInfo != null) {
