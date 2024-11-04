@@ -141,7 +141,10 @@ public class Model {
         for (Segment segment : segmentArrayList){
             int num_ligne = segment.getOrigine().getGlobal_num();
             int num_colonne = segment.getDestination().getGlobal_num();
-            matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
+            if (num_colonne != 0 && num_ligne != 0){
+                matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
+            }
+
         }
 
         this.matrice_adjacence = matrice;
@@ -169,6 +172,7 @@ public class Model {
             this.entrepot.getAddress().setTSP_num(1);
             completeGraph.cost = new double[1][1];
             completeGraph.cost[0][0] = 0;
+            completeGraph.nbVertices ++;
         }
         Vertex pickup_pt = delivery.getPickUpPt();
         Vertex delivery_pt = delivery.getDeliveryPt();
@@ -180,10 +184,12 @@ public class Model {
         if (!Vertex_to_visit.contains(pickup_pt)){
             Vertex_to_visit.add(pickup_pt);
             newptA = true;
+            completeGraph.nbVertices ++;
         }
         if (!Vertex_to_visit.contains(delivery_pt)) {
             Vertex_to_visit.add(delivery_pt);
             newptB = true;
+            completeGraph.nbVertices ++;
         }
 
         //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
@@ -198,6 +204,7 @@ public class Model {
                 completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
                 completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, pickup_pt).distance;
                 completeGraph.cost[taille][taille] = 0;
+
             }
             else if (newptB && newptA) {
                 pickup_pt.setTSP_num(taille+1);
