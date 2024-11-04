@@ -269,24 +269,43 @@ public class Model {
         return Double.POSITIVE_INFINITY;
     }
 
-    public long[] ObtenirOrdreSommets(long[] sommets, long[] precedence) {
-
-        //int[] sommets = {0, 17210, 17385, 19273};
-        // 1->2 and 3->2
-
-        // PRECEDENCE DANS LES DEUX SENS -_-
-
-        //int[] precedence = {-1, 17385, -1, 17385};
-        // converted to -1 2 0 2
+    public long[] ObtenirOrdreSommets(long[] sommets, Map<Long, List<Long>> precedence) {
 
         TSP tsp = new TSP1();
 
-        ArrayList<Long> sommetsArrayList = new ArrayList<>();
+        ArrayList<Long> sommetsList = new ArrayList<>();
         for (long sommet : sommets) {
-            sommetsArrayList.add(sommet);
+            sommetsList.add(sommet);
         }
 
-        int[] precedenceReindexed = new int[precedence.length];
+        // Règles de précédence :
+        // C(j, i) = C(0, j) = C(i, 0) = +inf
+        // Pour chaque entrée dans la hashmap de précédence
+        for (Map.Entry<Long, List<Long>> entry : precedence.entrySet()) {
+            // Si la liste des suivants n'est pas vide
+            int courantIndex = sommetsList.indexOf(entry.getKey());
+            if (courantIndex == -1 || courantIndex == 0) {
+                // Si le sommet courant n'existe pas ou est le dépot
+                continue;
+            }
+            if (!entry.getValue().contains((long)-1)) {
+                // Pour chaque suivant
+                // On obtient l'indice du sommet courant dans la liste des sommets
+                for (long suivant : entry.getValue()) {
+                    // On obtient l'indice du sommet suivant
+                    int suivantIndex = sommetsList.indexOf(suivant);
+                    // On empêche de retourner au dépot
+                    completeGraph.cost[courantIndex][0] = Integer.MAX_VALUE;
+                    // On empêche d'aller du suivant vers le courant
+                    completeGraph.cost[suivantIndex][courantIndex] = Integer.MAX_VALUE;
+                }
+            } else {
+                // On empêche d'aller du dépot vers le sommet courant directement
+                completeGraph.cost[0][courantIndex] = Integer.MAX_VALUE;
+            }
+        }
+
+        /*int[] precedenceReindexed = new int[precedence.length];
 
         for (int i = 0; i < sommets.length; i++) {
             if (precedence[i] == -1) continue;
@@ -307,7 +326,7 @@ public class Model {
             } else {
                 completeGraph.cost[0][i] = Integer.MAX_VALUE;
             }
-        }
+        }*/
 
         long startTime = System.currentTimeMillis();
         tsp.searchSolution(20000, completeGraph);
