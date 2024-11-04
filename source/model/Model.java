@@ -173,9 +173,6 @@ public class Model {
 
 
 
-
-
-
     //Recherche de chemin
     public void creerMatriceAdjacence(){
         // Création de la matrice d'adjacence entre tous les sommets de la carte chargée
@@ -195,7 +192,10 @@ public class Model {
         for (Segment segment : segmentArrayList){
             int num_ligne = segment.getOrigine().getGlobal_num();
             int num_colonne = segment.getDestination().getGlobal_num();
-            matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
+            if (num_colonne != 0 && num_ligne != 0){
+                matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
+            }
+
         }
 
         this.matrice_adjacence = matrice;
@@ -217,36 +217,90 @@ public class Model {
 
     public void addDelivery(Delivery delivery){
         if (Vertex_to_visit == null){
+            creerMatriceAdjacence();
             Vertex_to_visit = new ArrayList<>();
             Vertex_to_visit.add(this.entrepot.getAddress());
             this.entrepot.getAddress().setTSP_num(1);
             completeGraph.cost = new double[1][1];
             completeGraph.cost[0][0] = 0;
+            completeGraph.nbVertices ++;
         }
         Vertex pickup_pt = delivery.getPickUpPt();
         Vertex delivery_pt = delivery.getDeliveryPt();
-        Vertex_to_visit.add(pickup_pt);
-        Vertex_to_visit.add(delivery_pt);
+        int taille = completeGraph.cost.length;
+
+        // Test si les points appartiennent déjà à des commandes précédentes
+        boolean newptA = false;
+        boolean newptB = false;
+        if (!Vertex_to_visit.contains(pickup_pt)){
+            Vertex_to_visit.add(pickup_pt);
+            newptA = true;
+            completeGraph.nbVertices ++;
+        }
+        if (!Vertex_to_visit.contains(delivery_pt)) {
+            Vertex_to_visit.add(delivery_pt);
+            newptB = true;
+            completeGraph.nbVertices ++;
+        }
 
         //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
         // distance la plus courte entre les deux points
-        int taille = completeGraph.cost.length;
-        pickup_pt.setTSP_num(taille+1);
-        delivery_pt.setTSP_num(taille+2);
-        double [][] matrix = new double[taille + 2][taille + 2];
+
+
+        double [][] matrix = new double[taille+2][taille+2];
         completeGraph.cost = matrix;
         for (Vertex vertex : Vertex_to_visit) {
-            completeGraph.cost[taille][vertex.getTSP_num()-1] = aStar(vertex, pickup_pt).distance;
-            completeGraph.cost[taille+1][vertex.getTSP_num()-1] = aStar(vertex, delivery_pt).distance;
-            completeGraph.cost[vertex.getTSP_num()-1][taille] = aStar(vertex, pickup_pt).distance;
-            completeGraph.cost[vertex.getTSP_num()-1][taille+1] = aStar(vertex, delivery_pt).distance;
+            if (newptA && !newptB) {
+                pickup_pt.setTSP_num(taille+1);
+                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
+                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, pickup_pt).distance;
+                completeGraph.cost[taille][taille] = 0;
+
+            }
+            else if (newptB && newptA) {
+                pickup_pt.setTSP_num(taille+1);
+                delivery_pt.setTSP_num(taille + 2);
+                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+                completeGraph.cost[taille+1][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                completeGraph.cost[vertex.getTSP_num() - 1][taille+1] = aStar(vertex, delivery_pt).distance;
+            }
+
+            else if (newptB ) {
+                delivery_pt.setTSP_num(taille + 1);
+                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+            }
         }
 
-        completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt).distance;
-        completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt).distance;
-        completeGraph.cost[taille+1][taille+1] = 0;
-        completeGraph.cost[taille][taille] = 0;
+        if (newptA && newptB) {
+            completeGraph.cost[taille][taille + 1] = aStar(pickup_pt, delivery_pt).distance;
+            completeGraph.cost[taille + 1][taille] = aStar(delivery_pt, pickup_pt).distance;
+            completeGraph.cost[taille + 1][taille + 1] = 0;
 
+        }
+
+        // On ajoute les contraintes de précédence
+        // Si pickup existe déjà dans la map
+        // On ajoute deliveryPt.getTSPNum dans la liste des suivants
+        // Sinon on ajoute simplement pickupPt.getTSPNum dans la map avec deliveryPt.getTSPNum comme suivant
+
+        if (contraintesPrecedence == null) {
+            contraintesPrecedence = new HashMap<>();
+        }
+        // ajouter -1 pour le point de delivery si nouveau
+        if (newptB) contraintesPrecedence.put(delivery_pt.getId(), new ArrayList<>(Arrays.asList((long)-1)));
+
+        if (contraintesPrecedence.containsKey(pickup_pt.getId())) {
+            // vérifier si l'entrée est -1 : si oui supprimer la liste et la recréer avec delivery_pt.getId()
+            if (contraintesPrecedence.get(pickup_pt.getId()).contains((long)-1)) {
+                contraintesPrecedence.put(pickup_pt.getId(), new ArrayList<>(Arrays.asList(delivery_pt.getId())));
+            } else {
+                contraintesPrecedence.get(pickup_pt.getId()).add(delivery_pt.getId());
+            }
+        } else {
+            contraintesPrecedence.put(pickup_pt.getId(), new ArrayList<>(Arrays.asList(delivery_pt.getId())));
+        }
     }
 
     private double heuristique(Vertex v1, Vertex v2) {
@@ -445,12 +499,6 @@ public class Model {
         }
 
         System.out.println("Sommets : " + Arrays.toString(sommets));
-
-        // precedence (TEMPLATE)
-        long[] precedence = new long[Vertex_to_visit.size()];
-        for (int i = 0; i < Vertex_to_visit.size(); i++) {
-            precedence[i] = -1;
-        }
 
         // obtenir l'ordre d'après ObtenirOrdreSommets()
 

@@ -2,11 +2,15 @@ package source.model;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -16,6 +20,11 @@ import java.io.FileInputStream;
 public class XmlExtractor {
 
     public static ArrayList<Object> extractDeliveryDemand(String file, ArrayList<Vertex> vertexArrayList) {
+        if (!isXMLFile(file)) {
+            System.out.println("The file " + file + " is not an XML file");
+            return null;
+        }
+
         try {
             ArrayList<Object> deliveryDemand = new ArrayList<>();
             ArrayList<Delivery> deliveryArrayList = new ArrayList<>();
@@ -44,6 +53,11 @@ public class XmlExtractor {
 
             Element entrepot = (Element) document.getElementsByTagName("entrepot").item(0);
 
+            if (entrepot == null) {
+                System.out.println("The file " + file + " is not well formatted");
+                return null;
+            }
+
             Long idAddress = Long.valueOf(entrepot.getAttribute("adresse"));
             Vertex address = vertexIdMap.get(idAddress);
 
@@ -62,13 +76,18 @@ public class XmlExtractor {
             deliveryDemand.add(deliveryArrayList);
 
             return deliveryDemand;
-        } catch (Exception e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     public static ArrayList<Object> extractMap(String file) {
+        if (!isXMLFile(file)) {
+            System.out.println("The file " + file + " is not an XML file");
+            return null;
+        }
+
         try {
             // file
             DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
@@ -80,6 +99,11 @@ public class XmlExtractor {
             ArrayList<Object> map = new ArrayList<>();
 
             NodeList vertexNodeList = documentMap.getElementsByTagName("noeud");
+
+            if (vertexNodeList.getLength() == 0) {
+                System.out.println("The file " + file + " is not well formatted");
+                return null;
+            }
 
             for (int i = 0; i < vertexNodeList.getLength(); i++) {
                 Node vertexNode = vertexNodeList.item(i);
@@ -102,6 +126,11 @@ public class XmlExtractor {
             NodeList segmentNodeList = documentMap.getElementsByTagName("troncon");
             ArrayList<Segment> segmentArrayList = new ArrayList<>();
 
+            if (segmentNodeList.getLength() == 0) {
+                System.out.println("The file " + file + " is not well formatted");
+                return null;
+            }
+
             for (int i = 0; i < segmentNodeList.getLength(); i++) {
                 Node node = segmentNodeList.item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -122,7 +151,7 @@ public class XmlExtractor {
             }
             map.add(segmentArrayList);
             return map;
-        } catch (Exception e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
         return null;
@@ -135,4 +164,9 @@ public class XmlExtractor {
         }
         return vertexIdMap;
     }
+
+    private static boolean isXMLFile(String file) {
+        return file.endsWith(".xml");
+    }
+
 }

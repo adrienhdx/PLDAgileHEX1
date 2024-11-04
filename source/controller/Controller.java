@@ -6,11 +6,11 @@ import source.view.Interface;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-public class Controller implements ActionListener {
+public class Controller implements ActionListener,ListSelectionListener {
     private final Model model;
     private final Interface view;
 
@@ -34,12 +34,23 @@ public class Controller implements ActionListener {
         if (e.getSource() == view.getAssignCourierButton()) {
             this.assignDeliveryCourier();
         }
-        if(e.getSource() == view.getRemoveCourierButton()){
+        if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
         }
     }
 
-    public void loadMap(){
+    @Override
+    public void valueChanged(ListSelectionEvent e){
+        if (!e.getValueIsAdjusting()) {
+            System.out.println(e);
+            if (e.getSource() == view.getCourierList()){
+                System.out.println(view.getCourierList().getSelectedValue());
+            }
+
+        }
+    }
+
+    public boolean loadMap(){
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
         ArrayList<Object> result = XmlExtractor.extractMap(filePath);
         model.updateMap((ArrayList<Vertex>) result.getFirst(),(ArrayList<Segment>) result.getLast());
