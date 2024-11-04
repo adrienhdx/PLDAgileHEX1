@@ -62,13 +62,13 @@ public class Controller implements ActionListener {
         }
     }
 
-
     public void createCourier(){
         String newCourierFirstName = view.getCourierFieldFirstName().getText().trim();
         String newCourierLastName = view.getCourierFieldLastName().getText().trim();
         String newCourierPhoneNumber = view.getCourierFieldPhoneNumber().getText().trim();
-        if(!newCourierFirstName.equals("") & !newCourierLastName.equals("") & !newCourierPhoneNumber.equals("")){
-            model.addCourier(newCourierFirstName, newCourierLastName, newCourierPhoneNumber);
+        Courier courier = model.createCourier(newCourierFirstName, newCourierLastName, newCourierPhoneNumber);
+        if (courier != null) {
+            model.addCourier(courier);
         }
     }
 
@@ -111,12 +111,15 @@ public class Controller implements ActionListener {
 
     public void deleteCourier(){
         String courierInfo = (String) view.getCourierManagementComboBox().getSelectedItem();
+        String firstName = "";
+        String lastName = "";
         if (courierInfo != null) {
             String[] splitInfo = courierInfo.split(" ");
-            String firstName = splitInfo[0];
-            String lastName = splitInfo[1];
-            model.deleteCourier(firstName, lastName);
+            firstName = splitInfo[0];
+            lastName = splitInfo[1];
         }
+        Courier courier = model.getCourier(firstName, lastName);
+        model.deleteCourier(courier);
     }
 
     public void withdrawDelivery(){}

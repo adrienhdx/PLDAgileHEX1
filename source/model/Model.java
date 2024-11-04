@@ -96,30 +96,48 @@ public class Model {
     }
 
     //Method
-    public void addCourier (String firstName, String lastName, String phoneNumber){
-        for(Courier courier : courierArrayList){
-            if(courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
-                return;
+
+    public Courier createCourier (String firstName, String lastName, String phoneNumber){
+        if(!firstName.isEmpty() & !lastName.isEmpty() & !phoneNumber.isEmpty()) {
+            for (Courier courier : courierArrayList) {
+                if (courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                    propertyChangeSupport.firePropertyChange("errorMessage", null, "This courier already exists");
+                    return null;
+                }
             }
+            return new Courier(firstName, lastName, phoneNumber);
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "Please fill in all fields");
+            return null;
         }
-        ArrayList<Courier> oldCourierArrayList = new ArrayList<>();
-        courierArrayList.add(new Courier(lastName,firstName,phoneNumber));
-        propertyChangeSupport.firePropertyChange("addCourierArrayList", oldCourierArrayList, courierArrayList);
     }
 
-    public void deleteCourier(String firstName, String lastName){
-        ArrayList<Courier> oldCourierArrayList = (ArrayList<Courier>) courierArrayList; // faire copy en profondeur
-        int index = Integer.MAX_VALUE;
-        for(int i = 0; i < courierArrayList.size(); i++){
-            if(courierArrayList.get(i).getFirstName().equals(firstName) && courierArrayList.get(i).getLastName().equals(lastName)) {
-                index = i;
+    public void addCourier (Courier courier){
+        courierArrayList.add(courier);
+        propertyChangeSupport.firePropertyChange("courierArrayList", null, courierArrayList);
+    }
+
+    public Courier getCourier(String firstName, String lastName) {
+        for (Courier courier : courierArrayList){
+            if (courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                return courier;
             }
         }
-        if(index != Integer.MAX_VALUE){
-            courierArrayList.remove(index);
-            propertyChangeSupport.firePropertyChange("deleteCourierArrayList", null, courierArrayList);
+        return null;
+    }
+
+    public void deleteCourier(Courier courier){
+        if (courier != null) {
+            courierArrayList.remove(courier);
+            propertyChangeSupport.firePropertyChange("courierArrayList", null, courierArrayList);
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
         }
     }
+
+
+
+
 
 
 

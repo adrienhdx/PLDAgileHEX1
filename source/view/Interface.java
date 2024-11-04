@@ -265,18 +265,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.NONE;
         managementPanel.add(addCourierButton, gbc);
 
-        addCourierButton.addActionListener(e ->{
-            if(!courierFieldFirstName.getText().trim().equals("") && !courierFieldLastName.getText().trim().equals("") && !courierFieldPhoneNumber.getText().trim().equals("")) {
-                courierFieldFirstName.setText("");
-                courierFieldLastName.setText("");
-                courierFieldPhoneNumber.setText("");
-                JOptionPane.showMessageDialog(null, "Courier added");
-            }
-            else{
-                JOptionPane.showMessageDialog(null, "Please fill in all fields");
-            }
-        });
-
         // Bouton pour supprimer le livreur sélectionné
         removeCourierButton = new JButton("Remove courier");
         gbc.gridy = 2;
@@ -287,6 +275,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("errorMessage")) {
+            JOptionPane.showMessageDialog(this, evt.getNewValue());
+        }
         if (evt.getPropertyName().equals("vertexArrayList")) {
             mapPanel.removeAll();
             ArrayList<Vertex> vertexArrayList = (ArrayList<Vertex>) evt.getNewValue();
@@ -306,14 +297,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
                 }
             }
         }
-        if (evt.getPropertyName().equals("addCourierArrayList")) {
-            ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
-            updateCourierList(courierList);
-        }
-        if (evt.getPropertyName().equals("deleteCourierArrayList")) {
+        if (evt.getPropertyName().equals("courierArrayList")) {
             courierManagementDropdown.removeAllItems();
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
             updateCourierList(courierList);
+            JOptionPane.showMessageDialog(this, "Courier list updated");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
             ArrayList<Delivery> deliveryArrayList = (ArrayList<Delivery>) evt.getNewValue();
