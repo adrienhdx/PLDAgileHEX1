@@ -9,8 +9,6 @@ import source.model.Vertex;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -30,7 +28,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
-    private boolean settingsDelivery;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
@@ -56,7 +53,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierMapDropdown = new JComboBox<>(courierModel);
         map = new MapDisplay();
         scrollPanelMap = new JScrollPane(map.getMapViewer());
-        boolean settingsDelivery = false;
         courierList = new JList<>(courierModel);
         courierList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -344,14 +340,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JButton getAssignCourierButton(){
         return assignCourierButton;
-    }
-
-    public void setSettingsDelivery(boolean bool) {
-        this.settingsDelivery = bool;
-    }
-
-    public boolean getSettingsDelivery() {
-        return this.settingsDelivery;
     }
 
     public JComboBox<String> getCourierDeliveryComboBox() {
