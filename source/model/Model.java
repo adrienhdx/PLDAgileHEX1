@@ -174,27 +174,55 @@ public class Model {
         }
         Vertex pickup_pt = delivery.getPickUpPt();
         Vertex delivery_pt = delivery.getDeliveryPt();
-        Vertex_to_visit.add(pickup_pt);
-        Vertex_to_visit.add(delivery_pt);
+        int taille = completeGraph.cost.length;
+
+        // Test si les points appartiennent déjà à des commandes précédentes
+        boolean newptA = false;
+        boolean newptB = false;
+        if (!Vertex_to_visit.contains(pickup_pt)){
+            Vertex_to_visit.add(pickup_pt);
+            newptA = true;
+        }
+        if (!Vertex_to_visit.contains(delivery_pt)) {
+            Vertex_to_visit.add(delivery_pt);
+            newptB = true;
+        }
 
         //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
         // distance la plus courte entre les deux points
-        int taille = completeGraph.cost.length;
-        pickup_pt.setTSP_num(taille+1);
-        delivery_pt.setTSP_num(taille+2);
-        double [][] matrix = new double[taille + 2][taille + 2];
+
+
+        double [][] matrix = new double[taille][taille];
         completeGraph.cost = matrix;
         for (Vertex vertex : Vertex_to_visit) {
-            completeGraph.cost[taille][vertex.getTSP_num()-1] = aStar(vertex, pickup_pt).distance;
-            completeGraph.cost[taille+1][vertex.getTSP_num()-1] = aStar(vertex, delivery_pt).distance;
-            completeGraph.cost[vertex.getTSP_num()-1][taille] = aStar(vertex, pickup_pt).distance;
-            completeGraph.cost[vertex.getTSP_num()-1][taille+1] = aStar(vertex, delivery_pt).distance;
+            if (newptA && !newptB) {
+                pickup_pt.setTSP_num(taille+1);
+                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
+                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, pickup_pt).distance;
+                completeGraph.cost[taille][taille] = 0;
+            }
+            else if (newptB && newptA) {
+                pickup_pt.setTSP_num(taille+1);
+                delivery_pt.setTSP_num(taille + 2);
+                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+                completeGraph.cost[taille+1][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                completeGraph.cost[vertex.getTSP_num() - 1][taille+1] = aStar(vertex, delivery_pt).distance;
+            }
+
+            else if (newptB ) {
+                delivery_pt.setTSP_num(taille + 1);
+                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+            }
         }
 
-        completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt).distance;
-        completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt).distance;
-        completeGraph.cost[taille+1][taille+1] = 0;
-        completeGraph.cost[taille][taille] = 0;
+        if (newptA && newptB) {
+            completeGraph.cost[taille][taille + 1] = aStar(pickup_pt, delivery_pt).distance;
+            completeGraph.cost[taille + 1][taille] = aStar(delivery_pt, pickup_pt).distance;
+            completeGraph.cost[taille + 1][taille + 1] = 0;
+
+        }
 
     }
 
