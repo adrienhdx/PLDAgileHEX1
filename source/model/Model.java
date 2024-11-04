@@ -18,6 +18,7 @@ public class Model {
     private ArrayList<Vertex> Vertex_to_visit;
     private PropertyChangeSupport propertyChangeSupport;
     private Entrepot entrepot;
+    private Map<Long, List<Long>> contraintesPrecedence;
 
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -182,10 +183,10 @@ public class Model {
     }
 
     public void addDelivery(Delivery delivery){
-        //ajout entrepot en dur
-        if (Vertex_to_visit.size() == 0){
-            Vertex_to_visit.add(vertexArrayList.get(256));
-            vertexArrayList.get(256).setTSP_num(1);
+        if (Vertex_to_visit == null){
+            Vertex_to_visit = new ArrayList<>();
+            Vertex_to_visit.add(this.entrepot.getAddress());
+            this.entrepot.getAddress().setTSP_num(1);
             completeGraph.cost = new double[1][1];
             completeGraph.cost[0][0] = 0;
         }
@@ -193,17 +194,6 @@ public class Model {
         Vertex delivery_pt = delivery.getDeliveryPt();
         Vertex_to_visit.add(pickup_pt);
         Vertex_to_visit.add(delivery_pt);
-        // Dans le cas où on ajoute la première commande
-
-//        if (completeGraph.cost == null){
-//            pickup_pt.setTSP_num(2);
-//            delivery_pt.setTSP_num(3);
-//            completeGraph.cost = new double[3][3];
-//            completeGraph.cost[1][2] = aStar(pickup_pt, delivery_pt);
-//            completeGraph.cost[2][1] = aStar(delivery_pt, pickup_pt);
-//            completeGraph.cost[1][1] = 0;
-//            completeGraph.cost[2][2] = 0;
-//        }
 
         //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
         // distance la plus courte entre les deux points
@@ -213,14 +203,14 @@ public class Model {
         double [][] matrix = new double[taille + 2][taille + 2];
         completeGraph.cost = matrix;
         for (Vertex vertex : Vertex_to_visit) {
-            completeGraph.cost[taille][vertex.getTSP_num()-1] = aStar(vertex, pickup_pt);
-            completeGraph.cost[taille+1][vertex.getTSP_num()-1] = aStar(vertex, delivery_pt);
-            completeGraph.cost[vertex.getTSP_num()-1][taille] = aStar(vertex, pickup_pt);
-            completeGraph.cost[vertex.getTSP_num()-1][taille+1] = aStar(vertex, delivery_pt);
+            completeGraph.cost[taille][vertex.getTSP_num()-1] = aStar(vertex, pickup_pt).distance;
+            completeGraph.cost[taille+1][vertex.getTSP_num()-1] = aStar(vertex, delivery_pt).distance;
+            completeGraph.cost[vertex.getTSP_num()-1][taille] = aStar(vertex, pickup_pt).distance;
+            completeGraph.cost[vertex.getTSP_num()-1][taille+1] = aStar(vertex, delivery_pt).distance;
         }
 
-        completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt);
-        completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt);
+        completeGraph.cost[taille][taille+1] = aStar(pickup_pt, delivery_pt).distance;
+        completeGraph.cost[taille+1][taille] = aStar(delivery_pt, pickup_pt).distance;
         completeGraph.cost[taille+1][taille+1] = 0;
         completeGraph.cost[taille][taille] = 0;
 
@@ -231,13 +221,33 @@ public class Model {
         return Math.sqrt(Math.pow(v1.getLatitude() - v2.getLatitude(), 2) + Math.pow(v1.getLongitude() - v2.getLongitude(), 2));
     }
 
-    public double aStar(Vertex start, Vertex goal) {
+    private ArrayList<Vertex> reconstructPath(Map<Vertex, Vertex> cameFrom, Vertex current) {
+        ArrayList<Vertex> path = new ArrayList<>();
+        while (current != null) {
+            path.add(0, current); // Insère au début du chemin
+            current = cameFrom.get(current);
+        }
+        return path;
+    }
+
+    public class astarResult {
+        public final double distance;
+        public final ArrayList<Vertex> path;
+
+        public astarResult(double distance, ArrayList<Vertex> path) {
+            this.distance = distance;
+            this.path = path;
+        }
+    }
+
+    public astarResult aStar(Vertex start, Vertex goal) {
         // renvoie la distance entre les deux sommets entrés en paramètres
         int n = vertexArrayList.size(); // Nombre de sommets
 
         // Ensembles pour les scores des chemins trouvés
         Map<Vertex, Double> gScore = new HashMap<>();  // Coût de départ au sommet
         Map<Vertex, Double> fScore = new HashMap<>();  // Coût total estimé (g + h)
+        Map<Vertex, Vertex> cameFrom = new HashMap<>();
 
         // Ensemble des sommets à visiter (min-heap sur les coûts)
         PriorityQueue<Vertex> openSet = new PriorityQueue<>(Comparator.comparingDouble(v -> fScore.get(v)));
@@ -260,7 +270,7 @@ public class Model {
 
             // Si nous avons atteint l'objectif, retourner la distance
             if (current.equals(goal)) {
-                return gScore.get(current);  // La distance minimale
+                return new astarResult(gScore.get(current),reconstructPath(cameFrom, current));  // La distance minimale
             }
 
             // Parcourir les voisins (nœuds adjacents)
@@ -271,6 +281,7 @@ public class Model {
 
                     if (tentativeGScore < gScore.get(neighbor)) {
                         // Meilleur chemin trouvé vers ce voisin
+                        cameFrom.put(neighbor, current);
                         gScore.put(neighbor, tentativeGScore);
                         fScore.put(neighbor, gScore.get(neighbor) + heuristique(neighbor, goal));
 
@@ -284,27 +295,65 @@ public class Model {
         }
 
         // Si pas de chemin, on retourne la valeur maximum
-        return Double.POSITIVE_INFINITY;
+        return new astarResult(Double.POSITIVE_INFINITY, new ArrayList<>());
     }
 
-    public long[] ObtenirOrdreSommets(long[] sommets, long[] precedence) {
+    public ArrayList<Segment> reconstruireRouteReel(ArrayList<Segment> routeBirdFly) {
+        ArrayList<Vertex> sommetsAVisiter = new ArrayList<>();
+        for (Segment segment : routeBirdFly) {
+            Vertex ptA = segment.getOrigine();
+            Vertex ptB = segment.getDestination();
+            ArrayList<Vertex> chemin = aStar(ptA, ptB).path;
+            for (Vertex v : chemin) {
+                sommetsAVisiter.add(v);
+            }
 
-        //int[] sommets = {0, 17210, 17385, 19273};
-        // 1->2 and 3->2
+        }
+        ArrayList<Segment> reelRoute = new ArrayList<>();
+        for (int i = 0; i < sommetsAVisiter.size(); i++) {
+            Segment seg = new Segment(sommetsAVisiter.get(i), sommetsAVisiter.get(i+1));
+            reelRoute.add(seg);
+        }
+        return reelRoute;
+    }
 
-        // PRECEDENCE DANS LES DEUX SENS -_-
-
-        //int[] precedence = {-1, 17385, -1, 17385};
-        // converted to -1 2 0 2
+    public long[] ObtenirOrdreSommets(long[] sommets, Map<Long, List<Long>> precedence) {
 
         TSP tsp = new TSP1();
 
-        ArrayList<Long> sommetsArrayList = new ArrayList<>();
+        ArrayList<Long> sommetsList = new ArrayList<>();
         for (long sommet : sommets) {
-            sommetsArrayList.add(sommet);
+            sommetsList.add(sommet);
         }
 
-        int[] precedenceReindexed = new int[precedence.length];
+        // Règles de précédence :
+        // C(j, i) = C(0, j) = C(i, 0) = +inf
+        // Pour chaque entrée dans la hashmap de précédence
+        for (Map.Entry<Long, List<Long>> entry : precedence.entrySet()) {
+            // Si la liste des suivants n'est pas vide
+            int courantIndex = sommetsList.indexOf(entry.getKey());
+            if (courantIndex == -1 || courantIndex == 0) {
+                // Si le sommet courant n'existe pas ou est le dépot
+                continue;
+            }
+            if (!entry.getValue().contains((long)-1)) {
+                // Pour chaque suivant
+                // On obtient l'indice du sommet courant dans la liste des sommets
+                for (long suivant : entry.getValue()) {
+                    // On obtient l'indice du sommet suivant
+                    int suivantIndex = sommetsList.indexOf(suivant);
+                    // On empêche de retourner au dépot
+                    completeGraph.cost[courantIndex][0] = Integer.MAX_VALUE;
+                    // On empêche d'aller du suivant vers le courant
+                    completeGraph.cost[suivantIndex][courantIndex] = Integer.MAX_VALUE;
+                }
+            } else {
+                // On empêche d'aller du dépot vers le sommet courant directement
+                completeGraph.cost[0][courantIndex] = Integer.MAX_VALUE;
+            }
+        }
+
+        /*int[] precedenceReindexed = new int[precedence.length];
 
         for (int i = 0; i < sommets.length; i++) {
             if (precedence[i] == -1) continue;
@@ -325,7 +374,7 @@ public class Model {
             } else {
                 completeGraph.cost[0][i] = Integer.MAX_VALUE;
             }
-        }
+        }*/
 
         long startTime = System.currentTimeMillis();
         tsp.searchSolution(20000, completeGraph);
@@ -372,7 +421,7 @@ public class Model {
 
         // obtenir l'ordre d'après ObtenirOrdreSommets()
 
-        long[] ordre = ObtenirOrdreSommets(sommets, precedence);
+        long[] ordre = ObtenirOrdreSommets(sommets, contraintesPrecedence);
 
         System.out.println("Ordre calculé "+Arrays.toString(ordre));
 
@@ -389,8 +438,8 @@ public class Model {
         for (Segment seg : segments) {
             System.out.println(seg);
         }
-
-        return segments;
+        ArrayList<Segment> vraisSegments = reconstruireRouteReel(segments);
+        return vraisSegments;
     }
 
 
