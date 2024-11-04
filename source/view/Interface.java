@@ -410,10 +410,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         JOptionPane.showMessageDialog(this, message);
     }
 
-    public void showMessage(String message) {
-        JOptionPane.showMessageDialog(this, message);
-    }
-
     // Getters
     public JFileChooser getFileChooserDelivery() {
         return fileChooserDelivery;
