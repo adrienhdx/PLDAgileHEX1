@@ -24,6 +24,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JComboBox<String> unassignedDeliveryDropdown, assignedDeliveryDropdown, courierManagementDropdown, courierDeliveryDropdown;
     private DefaultComboBoxModel<String> unassignedModel, assignedModel, courierModel;
     private Vector<String> couriers, attributedDeliveries;
+    private JList<String> courierList, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
@@ -35,6 +36,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         addCourierButton.addActionListener(controller);
         assignCourierButton.addActionListener(controller);
         removeCourierButton.addActionListener(controller);
+        courierList.addListSelectionListener(controller);
     }
 
     public Interface() {
@@ -57,6 +59,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         showRoutesButton = new JButton("Compute Route");
         map = new MapDisplay();
         scrollPanelMap = new JScrollPane(map.getMapViewer());
+        courierList = new JList<>(courierModel);
+        courierList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setTitle("App Delivery Services");
         setSize(600, 300);
@@ -223,9 +227,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.anchor = GridBagConstraints.WEST;
         managementPanel.add(new JLabel("Couriers :"), gbc);
 
+        JScrollPane scrollPane = new JScrollPane(courierList);
+        scrollPane.setPreferredSize(new Dimension(200, 100));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        managementPanel.add(courierManagementDropdown, gbc);
+        managementPanel.add(scrollPane, gbc);
 
         // Champ de texte pour ajouter un nouveau livreur
         courierFieldFirstName = new JTextField(15);
@@ -265,17 +273,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.NONE;
         managementPanel.add(addCourierButton, gbc);
 
-        addCourierButton.addActionListener(e ->{
-            if(!courierFieldFirstName.getText().trim().equals("") && !courierFieldLastName.getText().trim().equals("") && !courierFieldPhoneNumber.getText().trim().equals("")) {
-                courierFieldFirstName.setText("");
-                courierFieldLastName.setText("");
-                courierFieldPhoneNumber.setText("");
-                JOptionPane.showMessageDialog(null, "Courier added");
-            }
-            else{
-                JOptionPane.showMessageDialog(null, "Please fill in all fields");
-            }
-        });
 
         // Bouton pour supprimer le livreur sélectionné
         removeCourierButton = new JButton("Remove courier");
@@ -283,6 +280,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         managementPanel.add(removeCourierButton, gbc);
 
         tabPan.addTab("Courier Management", managementPanel);
+
     }
 
     @Override
@@ -324,11 +322,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
     }
 
-    private void updateCourierList(ArrayList<Courier> courierList) {
+    private void updateCourierList(ArrayList<Courier> newCourierList) {
         couriers.clear();
-        for (Courier courier : courierList) {
+        for (Courier courier : newCourierList) {
             couriers.add(courier.getFirstName()+ " " + courier.getLastName());
         }
+        courierList.setListData(couriers);
     }
 
     // Getters
@@ -376,5 +375,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return attributedDeliveries;
     }
 
+    public JList<String> getCourierList() { return courierList;    }
 }
 
