@@ -54,6 +54,7 @@ public class MapDisplay {
             ZoomMouseWheelListenerCursor zoomWheelListener = new ZoomMouseWheelListenerCursor(mapViewer);
             mapViewer.addMouseWheelListener(zoomWheelListener);
             mapViewer.addMouseMotionListener(dragListener);
+            mapViewer.addMouseListener(dragListener);
             mapViewer.setFocusable(true);
             mapViewer.requestFocusInWindow();
         }catch (Exception e) {
