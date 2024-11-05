@@ -128,7 +128,9 @@ public class Model {
         if (courier != null) {
             if (delivery != null) {
                 courier.getRoute().getDeliveries().add(delivery);
-                if (true) { //fonction compute route qui marche
+                ArrayList<Segment> routeComputed = this.ObtenirArrayListeSegmentsTSP(courier.getRoute().getDeliveries());
+                if (!routeComputed.isEmpty()) { //fonction compute route qui marche
+                    courier.getRoute().setSegments(routeComputed);
                     pendingDeliveryArrayList.remove(delivery);
                     assignedDeliveryArrayList.add(delivery);
                     delivery.setState(DeliveryState.ASSIGNED);
@@ -151,7 +153,6 @@ public class Model {
             if (!vertexList.isEmpty()) {
                 segmentArrayList = segmentList;
                 vertexArrayList = vertexList;
-                propertyChangeSupport.firePropertyChange("vertexArrayList", null, vertexArrayList);
                 propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
                 propertyChangeSupport.firePropertyChange("map", null, vertexArrayList.getFirst());
             } else {
@@ -176,8 +177,26 @@ public class Model {
         }
     }
 
+    public void getCourierSegmentList(Courier courier){
+        if (courier != null) {
+            if (!courier.getRoute().getSegments().isEmpty()) {
+                segmentArrayList = courier.getRoute().getSegments();
+                ArrayList<Vertex> vertexToDisplay = new ArrayList<>();
+                vertexToDisplay.add(entrepot.getAddress());
+                for (Delivery delivery : courier.getRoute().getDeliveries()) {
+                    vertexToDisplay.add(delivery.getPickUpPt());
+                    vertexToDisplay.add(delivery.getDeliveryPt());
+                }
+                propertyChangeSupport.firePropertyChange("displaySegments", null, segmentArrayList);
+                propertyChangeSupport.firePropertyChange("displayVertices", null, vertexToDisplay);
 
-
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "No route is associated with this courier : you must assign him at least one delivery");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
+        }
+    }
 
     //Recherche de chemin
     public void creerMatriceAdjacence(){
