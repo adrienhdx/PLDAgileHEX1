@@ -200,6 +200,8 @@ public class Model {
             Integer num_colonne = vertexToGlobalNum.get(segment.getDestination().getId());
             if (num_colonne != 0 && num_ligne != 0){
                 matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
+                // NOTE pour test erreur décommenter la ligne suivante et commenter celle au-dessus
+                //matrice[num_ligne-1][num_colonne-1] = Integer.MAX_VALUE;
             }
 
         }
@@ -295,19 +297,19 @@ public class Model {
         }
         completeGraph.cost = matrix;
         //print cost matrix
-        System.out.println("Matrice de coût après ajout de la livraison :");
-        for (int row = 0; row < completeGraph.nbVertices; row++) {
-            for (int col = 0; col < completeGraph.nbVertices; col++) {
-                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
-                if (completeGraph.cost[row][col] == Integer.MAX_VALUE) {
-                    System.out.print("INF ");
-                } else {
-                    if (completeGraph.cost[row][col] == -1) continue;
-                    System.out.print(completeGraph.cost[row][col] + " ");
-                }
-            }
-            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
-        }
+//        System.out.println("Matrice de coût après ajout de la livraison :");
+//        for (int row = 0; row < completeGraph.nbVertices; row++) {
+//            for (int col = 0; col < completeGraph.nbVertices; col++) {
+//                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
+//                if (completeGraph.cost[row][col] == Integer.MAX_VALUE) {
+//                    System.out.print("INF ");
+//                } else {
+//                    if (completeGraph.cost[row][col] == -1) continue;
+//                    System.out.print(completeGraph.cost[row][col] + " ");
+//                }
+//            }
+//            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
+//        }
 
         // On ajoute les contraintes de précédence
         // Si pickup existe déjà dans la map
@@ -495,6 +497,10 @@ public class Model {
         long startTime = System.currentTimeMillis();
         tsp.searchSolution(20000, completeGraph);
 
+        if (tsp.getSolutionCost() == Integer.MAX_VALUE) {
+            System.out.println("TSP : No solution found");
+            return null;
+        }
         System.out.print("TSP : Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms");
 
@@ -532,6 +538,10 @@ public class Model {
         // obtenir l'ordre d'après ObtenirOrdreSommets()
 
         long[] ordre = ObtenirOrdreSommets(sommets, contraintesPrecedence);
+        if (ordre == null) {
+            System.out.println("TSP : Pas de trajet possible avec cette nouvelle commande");
+            return null;
+        }
 
         System.out.println("Ordre calculé "+Arrays.toString(ordre));
 
