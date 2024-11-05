@@ -129,7 +129,7 @@ public class Model {
             if (delivery != null) {
                 courier.getRoute().getDeliveries().add(delivery);
                 ArrayList<Segment> routeComputed = this.ObtenirArrayListeSegmentsTSP(courier.getRoute().getDeliveries());
-                if (!routeComputed.isEmpty()) { //fonction compute route qui marche
+                if (routeComputed != null) {
                     courier.getRoute().setSegments(routeComputed);
                     pendingDeliveryArrayList.remove(delivery);
                     assignedDeliveryArrayList.add(delivery);
