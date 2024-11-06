@@ -250,10 +250,14 @@ public class Model {
     }
 
     public void addDelivery(Delivery delivery){
+        // Ajout des points d'une livraison à la liste des points a livrer
+        // Ajout de l'entrepot si ce n'est pas déjà fait dans la liste des sommets à visiter
         if (Vertex_to_visit == null){
+            // On crée la première fois la matrice d'adjacence représentant tous les segments du fichier xml pour faire le astar après
             creerMatriceAdjacence();
             Vertex_to_visit = new ArrayList<>();
             Vertex_to_visit.add(this.entrepot.getAddress());
+            // On cherche à numéroter les sommets avec TSPnum pour avoir leur numéro dans la matrice
             this.entrepot.getAddress().setTSP_num(1);
             completeGraph.cost = new double[1][1];
             completeGraph.cost[0][0] = 0;
@@ -263,7 +267,7 @@ public class Model {
         Vertex delivery_pt = delivery.getDeliveryPt();
         int taille = completeGraph.cost.length;
 
-        // Test si les points appartiennent déjà à des commandes précédentes
+        // Test si les points appartiennent déjà à des commandes précédentes (et sont donc déjà présent dans la matrice)
         boolean newptA = false;
         boolean newptB = false;
         if (!Vertex_to_visit.contains(pickup_pt)){
@@ -277,8 +281,8 @@ public class Model {
             completeGraph.nbVertices ++;
         }
 
-        //On ajoute les deux nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
-        // distance la plus courte entre les deux points
+        //On ajoute les  nouveaux noeuds a la matrice et on calcule donc toutes les nouvelles "cases" avec la
+        // distance la plus courte entre les points
 
 
         double [][] matrix = new double[taille+2][taille+2];
@@ -365,6 +369,7 @@ public class Model {
     }
 
     private ArrayList<Vertex> reconstructPath(Map<Vertex, Vertex> cameFrom, Vertex current) {
+        // Reconstruit le chemin à partir de la map cameFrom en récupérant à chaque fois le point précédent
         ArrayList<Vertex> path = new ArrayList<>();
         while (current != null) {
             path.add(0, current); // Insère au début du chemin
@@ -442,6 +447,7 @@ public class Model {
     }
 
     public ArrayList<Segment> reconstruireRouteReel(ArrayList<Segment> routeBirdFly) {
+        // Reconstruit la route réelle en ajoutant tous les sommets intermédiaires au chemin
         ArrayList<Vertex> sommetsAVisiter = new ArrayList<>();
         for (Segment segment : routeBirdFly) {
             Vertex ptA = segment.getOrigine();
