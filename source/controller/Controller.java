@@ -8,6 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Controller implements ActionListener,ListSelectionListener {
@@ -40,6 +43,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierMapComboBox()) {
             this.getCourierSegmentList();
+        }
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportDelivery()) {
+            this.exportPendingDelivery();
         }
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierDeliveryComboBox()){
             this.getCourierDeliveries();
@@ -137,6 +143,16 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.getCourierSegmentList(courier);
     }
 
+    public void exportPendingDelivery() {
+        try {
+            FileWriter fileWriter = new FileWriter(view.getFileExportDelivery().getSelectedFile().getAbsolutePath());
+            fileWriter.write(XmlExtractor.exportPendingDelivery(model.getPendingDeliveryArrayList()));
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void getCourierDeliveries() {
         String courierInfo = (String) view.getCourierDeliveryComboBox().getSelectedItem();
         String firstName = "";
@@ -146,7 +162,7 @@ public class Controller implements ActionListener,ListSelectionListener {
             firstName = splitInfo[0];
             lastName = splitInfo[1];
             Courier courier = model.getCourier(firstName, lastName);
-            model.getCourierDeliveries(courier);
+            //model.getCourierDeliveries(courier);
         }
     }
 
