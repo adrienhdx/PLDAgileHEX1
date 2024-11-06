@@ -50,9 +50,6 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierDeliveryComboBox()){
             this.getCourierDeliveries();
         }
-        if (e.getSource() == view.getExportRoutesButton()) {
-            //this.exportRoutes();
-        }
     }
 
     @Override

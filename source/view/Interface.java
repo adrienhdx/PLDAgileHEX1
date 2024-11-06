@@ -42,7 +42,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierList.addListSelectionListener(controller);
         courierMapDropdown.addActionListener(controller);
         courierDeliveryDropdown.addActionListener(controller);
-        exportRoutes.addActionListener(controller);
     }
 
     public Interface() {
