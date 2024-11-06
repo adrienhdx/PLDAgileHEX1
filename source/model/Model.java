@@ -12,7 +12,6 @@ public class Model {
     private ArrayList<Courier> courierArrayList;
     private PropertyChangeSupport propertyChangeSupport;
     private SolveurTSP solveur;
-    private Entrepot entrepot;
 
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -28,7 +27,6 @@ public class Model {
 
     public ArrayList<Vertex> getVertexArrayList() { return solveur.getVertexList(); }
 
-    //Method
     public Courier createCourier (String firstName, String lastName, String phoneNumber){
         if(!firstName.isEmpty() & !lastName.isEmpty() & !phoneNumber.isEmpty()) {
             for (Courier courier : courierArrayList) {
