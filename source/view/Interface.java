@@ -12,6 +12,8 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -27,11 +29,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
+    private JFileChooser fileExportDelivery;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
         fileChooserMap.addActionListener(controller);
+        fileExportDelivery.addActionListener(controller);
         addCourierButton.addActionListener(controller);
         assignCourierButton.addActionListener(controller);
         removeCourierButton.addActionListener(controller);
@@ -47,6 +51,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         fileChooserDelivery.setCurrentDirectory(new File("."));
         fileChooserMap = new JFileChooser();
         fileChooserMap.setCurrentDirectory(new File("."));
+        fileExportDelivery = new JFileChooser();
+        fileExportDelivery.setCurrentDirectory(new File("."));
         unassignedModel = new DefaultComboBoxModel<>();
         courierModel = new DefaultComboBoxModel<>(couriers);
         courierMapModel = new DefaultComboBoxModel<>(couriers);
@@ -250,6 +256,18 @@ public class Interface extends JFrame implements PropertyChangeListener {
             exportRoutes = new JButton("Export Routes");
             exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+            exportRoutes.addActionListener(e -> {
+                LocalDate actualDate = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                fileExportDelivery.setSelectedFile(new File("pendingDelivery-" + actualDate.format(formatter) + ".xml"));
+                if (fileExportDelivery.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportDelivery.getSelectedFile().getAbsolutePath());
+                } else {
+                    JOptionPane.showMessageDialog(null, "File has not been saved.");
+                };
+
+            });
+
             importRoutes = new JButton("Import Routes");
             importRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -349,6 +367,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return fileChooserMap;
     }
 
+    public JFileChooser getFileExportDelivery() { return fileExportDelivery; }
+
     public JTextField getCourierFieldFirstName() {
         return courierFieldFirstName;
     }
@@ -371,6 +391,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JButton getAssignCourierButton(){
         return assignCourierButton;
+    }
+
+    public JButton getExportRoutesButton(){
+        return exportRoutes;
     }
 
     public JComboBox<String> getCourierDeliveryComboBox() {

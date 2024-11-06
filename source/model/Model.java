@@ -201,4 +201,6 @@ public class Model {
             propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
         }
     }
+
+    public ArrayList<Delivery> getPendingDeliveryArrayList() { return pendingDeliveryArrayList; }
 }
