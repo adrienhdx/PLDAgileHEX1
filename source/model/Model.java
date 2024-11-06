@@ -177,19 +177,48 @@ public class Model {
         }
     }
 
+    private String isDeliveryPoint(Courier courier, Vertex vertex) {
+        if (courier != null && vertex != null) {
+            for (Delivery delivery : courier.getRoute().getDeliveries()) {
+                if (delivery.getPickUpPt() == vertex) {
+                    return "PICK_UP";
+                } else if (delivery.getDeliveryPt() == vertex) {
+                    return "DELIVERY";
+                }
+            }
+            return null;
+        }
+        return null;
+    }
+
     public void getCourierSegmentList(Courier courier){
         if (courier != null) {
             if (!courier.getRoute().getSegments().isEmpty()) {
                 segmentArrayList = courier.getRoute().getSegments();
-                ArrayList<Vertex> vertexToDisplay = new ArrayList<>();
-                vertexToDisplay.add(entrepot.getAddress());
-                for (Delivery delivery : courier.getRoute().getDeliveries()) {
-                    vertexToDisplay.add(delivery.getPickUpPt());
-                    vertexToDisplay.add(delivery.getDeliveryPt());
+                ArrayList<Vector> vertexOrderTypeToDisplay = new ArrayList<>();
+                ArrayList<Vertex> vertexDisplayed = new ArrayList<>();
+                for (Segment segment : segmentArrayList) {
+                    Vertex origin = segment.getOrigine();
+                    Vertex destination = segment.getDestination();
+                    String originType = this.isDeliveryPoint(courier, origin);
+                    String destinationType = this.isDeliveryPoint(courier, destination);
+                    if (originType != null && !vertexDisplayed.contains(origin)) {
+                        Vector vector = new Vector();
+                        vector.add(origin);
+                        vertexDisplayed.add(origin);
+                        vector.add(originType);
+                        vertexOrderTypeToDisplay.add(vector);
+                    } else if (destinationType != null && !vertexDisplayed.contains(destination)) {
+                        Vector vector = new Vector();
+                        vector.add(destination);
+                        vertexDisplayed.add(destination);
+                        vector.add(destinationType);
+                        vertexOrderTypeToDisplay.add(vector);
+                    }
                 }
+                propertyChangeSupport.firePropertyChange("displayVertices", null, vertexOrderTypeToDisplay);
                 propertyChangeSupport.firePropertyChange("displaySegments", null, segmentArrayList);
-                propertyChangeSupport.firePropertyChange("displayVertices", null, vertexToDisplay);
-
+                propertyChangeSupport.firePropertyChange("displayEntrepot", null, entrepot.getAddress());
             } else {
                 propertyChangeSupport.firePropertyChange("errorMessage", null, "No route is associated with this courier : you must assign him at least one delivery");
             }
