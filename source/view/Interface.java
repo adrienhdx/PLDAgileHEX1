@@ -38,6 +38,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierList.addListSelectionListener(controller);
         courierMapDropdown.addActionListener(controller);
         courierDeliveryDropdown.addActionListener(controller);
+        exportRoutes.addActionListener(controller);
     }
 
     public Interface() {
@@ -363,6 +364,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JButton getAssignCourierButton(){
         return assignCourierButton;
+    }
+
+    public JButton getExportRoutesButton(){
+        return exportRoutes;
     }
 
     public JComboBox<String> getCourierDeliveryComboBox() {
