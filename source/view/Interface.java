@@ -216,11 +216,54 @@ public class Interface extends JFrame implements PropertyChangeListener {
     }
 
     private void setupCourierManagementPanel() {
-        JPanel managementPanel = new JPanel(new GridBagLayout());  // Utilisation de GridBagLayout pour une disposition flexible et esthétique
+        JPanel mainManagementPanel = new JPanel(new BorderLayout());
+
+        // Configuration de infoPanel
+        //JPanel infoPanel = new JPanel();
+        // Configuration de infoPanel
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        infoPanel.setBorder(BorderFactory.createTitledBorder("Selected Courier Informations"));
+
+        // Labels et ComboBox
+        JLabel firstNameOfSelectedCourier = new JLabel("First Name: ");
+        JLabel lastNameOfSelectedCourier = new JLabel("Last Name: ");
+        JLabel phoneNumberOfSelectedCourier = new JLabel("Phone Number: ");
+        JLabel listOfDeliveries = new JLabel("List of Deliveries: ");
+
+        JComboBox<String> deliveryOfCourier = new JComboBox<>(new String[]{"Livraison 1", "Livraison 2", "Livraison 3"});
+        deliveryOfCourier.setPreferredSize(new Dimension(150, 25));
+
+        // Configuration des contraintes de GridBagLayout pour un alignement vertical centré
+        GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.anchor = GridBagConstraints.CENTER;  // Centrer horizontalement
+        gbc1.insets = new Insets(10, 0, 10, 0);   // Espacement entre les éléments
+        gbc1.gridx = 0;
+        gbc1.fill = GridBagConstraints.HORIZONTAL;
+
+        // Ajouter les composants avec un espacement vertical uniforme
+        gbc1.gridy = 0;
+        infoPanel.add(firstNameOfSelectedCourier, gbc1);
+
+        gbc1.gridy = 1;
+        infoPanel.add(lastNameOfSelectedCourier, gbc1);
+
+        gbc1.gridy = 2;
+        infoPanel.add(phoneNumberOfSelectedCourier, gbc1);
+
+        gbc1.gridy = 3;
+        infoPanel.add(listOfDeliveries, gbc1);
+
+        gbc1.gridy = 4;
+        infoPanel.add(deliveryOfCourier, gbc1);
+
+        // Configuration de managementPanel
+        JPanel managementPanel = new JPanel(new GridBagLayout());
+        managementPanel.setBorder(BorderFactory.createTitledBorder("Management Panel"));
+
+        //Organisation de la managementPanel
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);  // Espacement entre les composants
 
-        // Liste déroulante des livreurs existants
         // Utilisation d'un modèle dynamique pour faciliter les modifications
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -280,7 +323,19 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridy = 2;
         managementPanel.add(removeCourierButton, gbc);
 
-        tabPan.addTab("Courier Management", managementPanel);
+        // Division de mainManagementPanel en deux avec un JSplitPane
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, managementPanel, infoPanel);
+        splitPane.setResizeWeight(0.5); // Division égale
+        splitPane.setDividerSize(5); // Largeur du séparateur
+
+        // Ajout de splitPane dans mainManagementPanel
+        mainManagementPanel.add(splitPane, BorderLayout.CENTER);
+
+        /*ajout des deux panel dans le mainManagementPanel
+        mainManagementPanel.add(managementPanel);
+        mainManagementPanel.add(infoPanel);*/
+
+        tabPan.addTab("Courier Management", mainManagementPanel);
 
     }
 
@@ -335,26 +390,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
             // Ajout de controlMapPanel et scrollPanelMap dans mainPanelMap
             mainPanelMap.add(controlMapPanel, BorderLayout.EAST);
             mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);
-
-            /*controlMapPanel = new JPanel(new GridLayout(0,1,100,100));
-            mainPanelMap = new JPanel(new BorderLayout());
-
-            JLabel select = new JLabel("Select a Courier :");
-
-            JButton selectCourier = new JButton("Select Courier");
-            JButton exportRoutes = new JButton("Export Routes");
-            JButton importRoutes = new JButton("Import Routes");
-
-            controlMapPanel.add(select);
-            controlMapPanel.add(courierMapDropdown);
-            controlMapPanel.add(selectCourier);
-            controlMapPanel.add(exportRoutes);
-            controlMapPanel.add(importRoutes);
-
-            mainPanelMap.add(controlMapPanel, BorderLayout.EAST);
-            mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);*/
-
-
             tabPan.setComponentAt(0,mainPanelMap);
 
             //pour afficher les intersections sur la carte
