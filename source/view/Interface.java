@@ -288,10 +288,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
             mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);
             tabPan.setComponentAt(0,mainPanelMap);
         }
+        if (evt.getPropertyName().equals("displayEntrepot")) {
+            Vertex entrepotAddress = (Vertex) evt.getNewValue();
+            map.displayVertex(entrepotAddress);
+        }
         if (evt.getPropertyName().equals("displayVertices")) {
-            ArrayList<Vertex> vertexArrayList = (ArrayList<Vertex>) evt.getNewValue();
-            for(Vertex vertex : vertexArrayList){
-                map.displayVertex(vertex);
+            ArrayList<Vector> vertexVectorArrayList = (ArrayList<Vector>) evt.getNewValue();
+            for (Vector vector : vertexVectorArrayList) {
+                map.displayVertex((Vertex) vector.getFirst());
             }
         }
         if (evt.getPropertyName().equals("displaySegments")) {
