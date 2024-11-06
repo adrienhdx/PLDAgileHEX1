@@ -19,6 +19,7 @@ public class Model {
     private PropertyChangeSupport propertyChangeSupport;
     private Entrepot entrepot;
     private Map<Long, List<Long>> contraintesPrecedence;
+    private Map<Long, Integer> vertexToGlobalNum;
 
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -27,6 +28,7 @@ public class Model {
         this.pendingDeliveryArrayList = new ArrayList<>();
         this.assignedDeliveryArrayList = new ArrayList<>();
         this.postponedDeliveryArrayList = new ArrayList<>();
+        this.vertexToGlobalNum = new HashMap<>();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener ArrayListener){
@@ -44,45 +46,22 @@ public class Model {
     public void setMap(Graph map) { this.map = map; }
 
     public ArrayList<Delivery> getAssignedDeliveryArrayList() { return assignedDeliveryArrayList; }
-    public void setAssignedDeliveryArrayList(ArrayList<Delivery> assignedDeliveryArrayList) {
-        this.assignedDeliveryArrayList = assignedDeliveryArrayList;
-        propertyChangeSupport.firePropertyChange("assignedDeliveryArrayList", null, assignedDeliveryArrayList);
-    }
+
 
     public ArrayList<Delivery> getPostponedDeliveryArrayList() { return postponedDeliveryArrayList; }
-    public void setPostponedDeliveryArrayList(ArrayList<Delivery> postponedDeliveryArrayList) {
-        this.postponedDeliveryArrayList = postponedDeliveryArrayList;
-        propertyChangeSupport.firePropertyChange("postponedDeliveryArrayList",null,postponedDeliveryArrayList);
-    }
+
 
     public ArrayList<Delivery> getPendingDeliveryArrayList() { return pendingDeliveryArrayList; }
-    public void setPendingDeliveryArrayList(ArrayList<Delivery> pendingDeliveryArrayList) {
-        this.pendingDeliveryArrayList = pendingDeliveryArrayList;
-        propertyChangeSupport.firePropertyChange("pendingDeliveryArrayList", null, pendingDeliveryArrayList);
-    }
 
     public ArrayList<Courier> getCourierArrayList() { return courierArrayList; }
-    public void setCourierArrayList(ArrayList<Courier> courierArrayList) {
-        this.courierArrayList = courierArrayList;
-        propertyChangeSupport.firePropertyChange("setCourierArrayList", null, courierArrayList);
-    }
 
     public ArrayList<Segment> getSegmentArrayList() { return segmentArrayList; }
-    public void setSegmentArrayList(ArrayList<Segment> segmentArrayList) {
-        this.segmentArrayList = segmentArrayList;
-        propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
-    }
-
-    public ArrayList<Vertex> getVertexArrayList() { return (ArrayList<Vertex>) vertexArrayList; }
-    public void setVertexArrayList(ArrayList<Vertex> vertexArrayList) {
-        this.vertexArrayList = vertexArrayList;
-        propertyChangeSupport.firePropertyChange("vertexArrayList",null,vertexArrayList);
-    }
-
     public CompleteGraph getCompleteGraph() { return completeGraph; }
     public void setCompleteGraph(CompleteGraph completeGraph) { this.completeGraph = completeGraph; }
 
     public ArrayList<Vertex> getVertex_to_visit() { return Vertex_to_visit; }
+
+    public ArrayList<Vertex> getVertexArrayList() { return vertexArrayList; }
 
     public void setVertex_to_visit(ArrayList<Vertex> vertex_to_visit) {
         Vertex_to_visit = vertex_to_visit;
@@ -97,28 +76,125 @@ public class Model {
     }
 
     //Method
-    public void addCourier (String firstName, String lastName, String phoneNumber){
-        for(Courier courier : courierArrayList){
-            if(courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
-                return;
+
+    public Courier createCourier (String firstName, String lastName, String phoneNumber){
+        if(!firstName.isEmpty() & !lastName.isEmpty() & !phoneNumber.isEmpty()) {
+            for (Courier courier : courierArrayList) {
+                if (courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                    propertyChangeSupport.firePropertyChange("errorMessage", null, "This courier already exists");
+                    return null;
+                }
             }
+            return new Courier(firstName, lastName, phoneNumber);
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "Please fill in all fields");
+            return null;
         }
-        ArrayList<Courier> oldCourierArrayList = new ArrayList<>();
-        courierArrayList.add(new Courier(lastName,firstName,phoneNumber));
-        propertyChangeSupport.firePropertyChange("addCourierArrayList", oldCourierArrayList, courierArrayList);
     }
 
-    public void deleteCourier(String firstName, String lastName){
-        ArrayList<Courier> oldCourierArrayList = (ArrayList<Courier>) courierArrayList; // faire copy en profondeur
-        int index = Integer.MAX_VALUE;
-        for(int i = 0; i < courierArrayList.size(); i++){
-            if(courierArrayList.get(i).getFirstName().equals(firstName) && courierArrayList.get(i).getLastName().equals(lastName)) {
-                index = i;
+    public void addCourier (Courier courier){
+        courierArrayList.add(courier);
+        propertyChangeSupport.firePropertyChange("courierArrayList", null, courierArrayList);
+    }
+
+    public Courier getCourier(String firstName, String lastName) {
+        for (Courier courier : courierArrayList){
+            if (courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                return courier;
             }
         }
-        if(index != Integer.MAX_VALUE){
-            courierArrayList.remove(index);
-            propertyChangeSupport.firePropertyChange("deleteCourierArrayList", null, courierArrayList);
+        return null;
+    }
+
+    public Delivery getPendingDelivery(Long pickUpPtStr, Long deliveryPtStr) {
+        for (Delivery delivery : pendingDeliveryArrayList){
+            if (delivery.getPickUpPt().getId().equals(pickUpPtStr) && delivery.getDeliveryPt().getId().equals(deliveryPtStr)) {
+                return delivery;
+            }
+        }
+        return null;
+    }
+
+    public void deleteCourier(Courier courier){
+        if (courier != null) {
+            courierArrayList.remove(courier);
+            propertyChangeSupport.firePropertyChange("courierArrayList", null, courierArrayList);
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
+        }
+    }
+
+    public void assignDelivery(Courier courier, Delivery delivery){
+        if (courier != null) {
+            if (delivery != null) {
+                courier.getRoute().getDeliveries().add(delivery);
+                ArrayList<Segment> routeComputed = this.ObtenirArrayListeSegmentsTSP(courier.getRoute().getDeliveries());
+                if (routeComputed != null) {
+                    courier.getRoute().setSegments(routeComputed);
+                    pendingDeliveryArrayList.remove(delivery);
+                    assignedDeliveryArrayList.add(delivery);
+                    delivery.setState(DeliveryState.ASSIGNED);
+                    propertyChangeSupport.firePropertyChange("courierRouteDeliveries", null, courier.getRoute().getDeliveries());
+                    propertyChangeSupport.firePropertyChange("pendingDeliveryRemoved", null, delivery);
+                } else {
+                    courier.getRoute().getDeliveries().remove(delivery);
+                    propertyChangeSupport.firePropertyChange("errorMessage", null, "No route found : the delivery can't be assigned to this courier");
+                }
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "No delivery selected");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
+        }
+    }
+
+    public void updateMap(ArrayList<Vertex> vertexList, ArrayList<Segment> segmentList){
+        if (segmentList != null && vertexList != null) {
+            if (!vertexList.isEmpty()) {
+                segmentArrayList = segmentList;
+                vertexArrayList = vertexList;
+                propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
+                propertyChangeSupport.firePropertyChange("map", null, vertexArrayList.getFirst());
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "The file doesn't contain any vertex, please select an other file");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
+        }
+    }
+
+    public void updateDeliveryList(ArrayList<Delivery> deliveryList, Entrepot entrepot){
+        if (deliveryList != null) {
+            if (entrepot != null){
+                pendingDeliveryArrayList = deliveryList;
+                propertyChangeSupport.firePropertyChange("pendingDeliveryArrayList", null, pendingDeliveryArrayList);
+                this.entrepot = entrepot;
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "Entrepot location missing");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
+        }
+    }
+
+    public void getCourierSegmentList(Courier courier){
+        if (courier != null) {
+            if (!courier.getRoute().getSegments().isEmpty()) {
+                segmentArrayList = courier.getRoute().getSegments();
+                ArrayList<Vertex> vertexToDisplay = new ArrayList<>();
+                vertexToDisplay.add(entrepot.getAddress());
+                for (Delivery delivery : courier.getRoute().getDeliveries()) {
+                    vertexToDisplay.add(delivery.getPickUpPt());
+                    vertexToDisplay.add(delivery.getDeliveryPt());
+                }
+                propertyChangeSupport.firePropertyChange("displaySegments", null, segmentArrayList);
+                propertyChangeSupport.firePropertyChange("displayVertices", null, vertexToDisplay);
+
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "No route is associated with this courier : you must assign him at least one delivery");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
         }
     }
 
@@ -130,8 +206,8 @@ public class Model {
         double [][] matrice = new double[taille][taille];
         int i = 1;
         // On numérote chaque sommet afin de pouvoir les identifier dans la matrice (leur ID n'est pas pratique)
-        for (Vertex Vertex : vertexArrayList){
-            Vertex.setGlobal_num(i);
+        for (Vertex vertex : vertexArrayList){
+            vertexToGlobalNum.put(vertex.getId(), i);
             for (int j=0; j<taille; j++){
                 matrice[i-1][j] = -1;
             }
@@ -139,10 +215,12 @@ public class Model {
         }
         // On remplit les longueurs entre deux sommets en récupérant leur numéro
         for (Segment segment : segmentArrayList){
-            int num_ligne = segment.getOrigine().getGlobal_num();
-            int num_colonne = segment.getDestination().getGlobal_num();
+            Integer num_ligne = vertexToGlobalNum.get(segment.getOrigine().getId());
+            Integer num_colonne = vertexToGlobalNum.get(segment.getDestination().getId());
             if (num_colonne != 0 && num_ligne != 0){
                 matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
+                // NOTE pour test erreur décommenter la ligne suivante et commenter celle au-dessus
+                //matrice[num_ligne-1][num_colonne-1] = Integer.MAX_VALUE;
             }
 
         }
@@ -156,6 +234,7 @@ public class Model {
 //                if (matrice[row][col] == Integer.MAX_VALUE) {
 //                    System.out.print("INF ");
 //                } else {
+//                    if (matrice[row][col] == -1) continue;
 //                    System.out.print(matrice[row][col] + " ");
 //                }
 //            }
@@ -197,37 +276,59 @@ public class Model {
 
 
         double [][] matrix = new double[taille+2][taille+2];
-        completeGraph.cost = matrix;
+        for (int i = 0; i < taille; i++) {
+            for (int j = 0; j < taille; j++) {
+                matrix[i][j] = completeGraph.cost[i][j];
+            }
+        }
+
         for (Vertex vertex : Vertex_to_visit) {
             if (newptA && !newptB) {
                 pickup_pt.setTSP_num(taille+1);
-                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
-                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, pickup_pt).distance;
-                completeGraph.cost[taille][taille] = 0;
+                matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(pickup_pt, vertex).distance;
+                matrix[taille][taille] = 0;
 
             }
             else if (newptB && newptA) {
                 pickup_pt.setTSP_num(taille+1);
                 delivery_pt.setTSP_num(taille + 2);
-                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
-                completeGraph.cost[taille+1][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                completeGraph.cost[vertex.getTSP_num() - 1][taille+1] = aStar(vertex, delivery_pt).distance;
+                matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, pickup_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(pickup_pt, vertex).distance;
+                matrix[taille+1][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille+1] = aStar(delivery_pt, vertex).distance;
             }
 
             else if (newptB ) {
                 delivery_pt.setTSP_num(taille + 1);
-                completeGraph.cost[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
-                completeGraph.cost[vertex.getTSP_num() - 1][taille] = aStar(vertex, delivery_pt).distance;
+                matrix[taille][vertex.getTSP_num() - 1] = aStar(vertex, delivery_pt).distance;
+                matrix[vertex.getTSP_num() - 1][taille] = aStar(delivery_pt, vertex).distance;
+                matrix[taille][taille] = 0;
             }
         }
 
         if (newptA && newptB) {
-            completeGraph.cost[taille][taille + 1] = aStar(pickup_pt, delivery_pt).distance;
-            completeGraph.cost[taille + 1][taille] = aStar(delivery_pt, pickup_pt).distance;
-            completeGraph.cost[taille + 1][taille + 1] = 0;
+            matrix[taille][taille + 1] = aStar(pickup_pt, delivery_pt).distance;
+            matrix[taille + 1][taille] = aStar(delivery_pt, pickup_pt).distance;
+            matrix[taille + 1][taille + 1] = 0;
+            matrix[taille][taille] = 0;
 
         }
+        completeGraph.cost = matrix;
+        //print cost matrix
+//        System.out.println("Matrice de coût après ajout de la livraison :");
+//        for (int row = 0; row < completeGraph.nbVertices; row++) {
+//            for (int col = 0; col < completeGraph.nbVertices; col++) {
+//                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
+//                if (completeGraph.cost[row][col] == Integer.MAX_VALUE) {
+//                    System.out.print("INF ");
+//                } else {
+//                    if (completeGraph.cost[row][col] == -1) continue;
+//                    System.out.print(completeGraph.cost[row][col] + " ");
+//                }
+//            }
+//            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
+//        }
 
         // On ajoute les contraintes de précédence
         // Si pickup existe déjà dans la map
@@ -311,9 +412,9 @@ public class Model {
 
             // Parcourir les voisins (nœuds adjacents)
             for (int i = 0; i < n; i++) {
-                if (this.matrice_adjacence[current.getGlobal_num() - 1][i] > 0) {  // Si l'arête existe
+                if (this.matrice_adjacence[vertexToGlobalNum.get(current.getId()) - 1][i] > 0) {  // Si l'arête existe
                     Vertex neighbor = vertexArrayList.get(i);
-                    double tentativeGScore = gScore.get(current) + this.matrice_adjacence[current.getGlobal_num() - 1][i];
+                    double tentativeGScore = gScore.get(current) + this.matrice_adjacence[vertexToGlobalNum.get(current.getId()) - 1][i];
 
                     if (tentativeGScore < gScore.get(neighbor)) {
                         // Meilleur chemin trouvé vers ce voisin
@@ -346,7 +447,7 @@ public class Model {
 
         }
         ArrayList<Segment> reelRoute = new ArrayList<>();
-        for (int i = 0; i < sommetsAVisiter.size(); i++) {
+        for (int i = 0; i < sommetsAVisiter.size()-1; i++) {
             Segment seg = new Segment(sommetsAVisiter.get(i), sommetsAVisiter.get(i+1));
             reelRoute.add(seg);
         }
@@ -415,6 +516,10 @@ public class Model {
         long startTime = System.currentTimeMillis();
         tsp.searchSolution(20000, completeGraph);
 
+        if (tsp.getSolutionCost() == Integer.MAX_VALUE) {
+            System.out.println("TSP : No solution found");
+            return null;
+        }
         System.out.print("TSP : Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms");
 
@@ -452,6 +557,10 @@ public class Model {
         // obtenir l'ordre d'après ObtenirOrdreSommets()
 
         long[] ordre = ObtenirOrdreSommets(sommets, contraintesPrecedence);
+        if (ordre == null) {
+            System.out.println("TSP : Pas de trajet possible avec cette nouvelle commande");
+            return null;
+        }
 
         System.out.println("Ordre calculé "+Arrays.toString(ordre));
 
@@ -459,7 +568,13 @@ public class Model {
         ArrayList<Segment> segments = new ArrayList<>();
         for (int i = 1; i < ordre.length; i++) {
             Vertex origine = dictionnaire.get(ordre[i-1]);
+            if (origine == null) {
+                origine = entrepot.getAddress();
+            }
             Vertex destination = dictionnaire.get(ordre[i]);
+            if (destination == null) {
+                destination = entrepot.getAddress();
+            }
             Segment seg = new Segment(origine, destination);
             segments.add(seg);
         }
