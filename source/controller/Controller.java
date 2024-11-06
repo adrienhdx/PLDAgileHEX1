@@ -37,6 +37,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
         }
+        if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierMapComboBox()) {
+            this.getCourierSegmentList();
+        }
     }
 
     @Override
@@ -115,6 +118,19 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
         Courier courier = model.getCourier(firstName, lastName);
         model.deleteCourier(courier);
+    }
+
+    public void getCourierSegmentList(){
+        String courierInfo = (String) view.getCourierMapComboBox().getSelectedItem();
+        String firstName = "";
+        String lastName = "";
+        if (courierInfo != null) {
+            String[] splitInfo = courierInfo.split(" ");
+            firstName = splitInfo[0];
+            lastName = splitInfo[1];
+        }
+        Courier courier = model.getCourier(firstName, lastName);
+        model.getCourierSegmentList(courier);
     }
 
     public void withdrawDelivery(){}

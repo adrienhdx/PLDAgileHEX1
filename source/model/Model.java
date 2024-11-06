@@ -128,7 +128,9 @@ public class Model {
         if (courier != null) {
             if (delivery != null) {
                 courier.getRoute().getDeliveries().add(delivery);
-                if (true) { //fonction compute route qui marche
+                ArrayList<Segment> routeComputed = this.ObtenirArrayListeSegmentsTSP(courier.getRoute().getDeliveries());
+                if (routeComputed != null) {
+                    courier.getRoute().setSegments(routeComputed);
                     pendingDeliveryArrayList.remove(delivery);
                     assignedDeliveryArrayList.add(delivery);
                     delivery.setState(DeliveryState.ASSIGNED);
@@ -151,7 +153,6 @@ public class Model {
             if (!vertexList.isEmpty()) {
                 segmentArrayList = segmentList;
                 vertexArrayList = vertexList;
-                propertyChangeSupport.firePropertyChange("vertexArrayList", null, vertexArrayList);
                 propertyChangeSupport.firePropertyChange("segmentArrayList", null, segmentArrayList);
                 propertyChangeSupport.firePropertyChange("map", null, vertexArrayList.getFirst());
             } else {
@@ -176,8 +177,26 @@ public class Model {
         }
     }
 
+    public void getCourierSegmentList(Courier courier){
+        if (courier != null) {
+            if (!courier.getRoute().getSegments().isEmpty()) {
+                segmentArrayList = courier.getRoute().getSegments();
+                ArrayList<Vertex> vertexToDisplay = new ArrayList<>();
+                vertexToDisplay.add(entrepot.getAddress());
+                for (Delivery delivery : courier.getRoute().getDeliveries()) {
+                    vertexToDisplay.add(delivery.getPickUpPt());
+                    vertexToDisplay.add(delivery.getDeliveryPt());
+                }
+                propertyChangeSupport.firePropertyChange("displaySegments", null, segmentArrayList);
+                propertyChangeSupport.firePropertyChange("displayVertices", null, vertexToDisplay);
 
-
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "No route is associated with this courier : you must assign him at least one delivery");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
+        }
+    }
 
     //Recherche de chemin
     public void creerMatriceAdjacence(){
@@ -200,6 +219,8 @@ public class Model {
             Integer num_colonne = vertexToGlobalNum.get(segment.getDestination().getId());
             if (num_colonne != 0 && num_ligne != 0){
                 matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
+                // NOTE pour test erreur décommenter la ligne suivante et commenter celle au-dessus
+                //matrice[num_ligne-1][num_colonne-1] = Integer.MAX_VALUE;
             }
 
         }
@@ -295,19 +316,19 @@ public class Model {
         }
         completeGraph.cost = matrix;
         //print cost matrix
-        System.out.println("Matrice de coût après ajout de la livraison :");
-        for (int row = 0; row < completeGraph.nbVertices; row++) {
-            for (int col = 0; col < completeGraph.nbVertices; col++) {
-                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
-                if (completeGraph.cost[row][col] == Integer.MAX_VALUE) {
-                    System.out.print("INF ");
-                } else {
-                    if (completeGraph.cost[row][col] == -1) continue;
-                    System.out.print(completeGraph.cost[row][col] + " ");
-                }
-            }
-            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
-        }
+//        System.out.println("Matrice de coût après ajout de la livraison :");
+//        for (int row = 0; row < completeGraph.nbVertices; row++) {
+//            for (int col = 0; col < completeGraph.nbVertices; col++) {
+//                // Affiche MAX_VALUE sous forme de "INF" pour mieux visualiser
+//                if (completeGraph.cost[row][col] == Integer.MAX_VALUE) {
+//                    System.out.print("INF ");
+//                } else {
+//                    if (completeGraph.cost[row][col] == -1) continue;
+//                    System.out.print(completeGraph.cost[row][col] + " ");
+//                }
+//            }
+//            System.out.println(); // Retour à la ligne après chaque ligne de la matrice
+//        }
 
         // On ajoute les contraintes de précédence
         // Si pickup existe déjà dans la map
@@ -495,6 +516,10 @@ public class Model {
         long startTime = System.currentTimeMillis();
         tsp.searchSolution(20000, completeGraph);
 
+        if (tsp.getSolutionCost() == Integer.MAX_VALUE) {
+            System.out.println("TSP : No solution found");
+            return null;
+        }
         System.out.print("TSP : Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms");
 
@@ -532,6 +557,10 @@ public class Model {
         // obtenir l'ordre d'après ObtenirOrdreSommets()
 
         long[] ordre = ObtenirOrdreSommets(sommets, contraintesPrecedence);
+        if (ordre == null) {
+            System.out.println("TSP : Pas de trajet possible avec cette nouvelle commande");
+            return null;
+        }
 
         System.out.println("Ordre calculé "+Arrays.toString(ordre));
 
