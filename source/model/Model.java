@@ -198,6 +198,10 @@ public class Model {
         }
     }
 
+    public void getCourierInfo(Courier courier){
+        propertyChangeSupport.firePropertyChange("courierInfo", null, courier);
+    }
+
     //Recherche de chemin
     public void creerMatriceAdjacence(){
         // Création de la matrice d'adjacence entre tous les sommets de la carte chargée

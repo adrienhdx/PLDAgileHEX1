@@ -30,6 +30,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
+    private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
@@ -136,20 +137,17 @@ public class Interface extends JFrame implements PropertyChangeListener {
         deliveryPanel.repaint();  // Redessine le panel
     }
 
-
     private void setupCourierManagementPanel() {
         JPanel mainManagementPanel = new JPanel(new BorderLayout());
 
-        // Configuration de infoPanel
-        //JPanel infoPanel = new JPanel();
         // Configuration de infoPanel
         JPanel infoPanel = new JPanel(new GridBagLayout());
         infoPanel.setBorder(BorderFactory.createTitledBorder("Selected Courier Informations"));
 
         // Labels et ComboBox
-        JLabel firstNameOfSelectedCourier = new JLabel("First Name: ");
-        JLabel lastNameOfSelectedCourier = new JLabel("Last Name: ");
-        JLabel phoneNumberOfSelectedCourier = new JLabel("Phone Number: ");
+        firstNameOfSelectedCourier = new JLabel("First Name: ");
+        lastNameOfSelectedCourier = new JLabel("Last Name: ");
+        phoneNumberOfSelectedCourier = new JLabel("Phone Number: ");
         JLabel listOfDeliveries = new JLabel("List of Deliveries: ");
 
         JComboBox<String> deliveryOfCourier = new JComboBox<>(new String[]{"Livraison 1", "Livraison 2", "Livraison 3"});
@@ -182,15 +180,95 @@ public class Interface extends JFrame implements PropertyChangeListener {
         JPanel managementPanel = new JPanel(new GridBagLayout());
         managementPanel.setBorder(BorderFactory.createTitledBorder("Management Panel"));
 
-        //Organisation de la managementPanel
+        // Organisation de la managementPanel
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);  // Espacement entre les composants
+        gbc.insets = new Insets(5, 5, 5, 5);  // Réduction de l'espacement entre les composants pour rapprocher les zones de texte
+        gbc.anchor = GridBagConstraints.WEST;  // Alignement des composants à gauche
 
         // Utilisation d'un modèle dynamique pour faciliter les modifications
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.WEST;
+        JLabel listActualCourier = new JLabel("Actual Courier List :");
+        listActualCourier.setFont(new Font("Georgia", Font.BOLD, 16));  // Mettre le texte en gras et plus grand
+        managementPanel.add(listActualCourier, gbc);
+
+        // JScrollPane pour afficher la liste des livreurs
+        JScrollPane scrollPane = new JScrollPane(courierList);
+        scrollPane.setPreferredSize(new Dimension(200, 100));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1; // Le JScrollPane occupe une colonne
+        managementPanel.add(scrollPane, gbc);
+
+        // Bouton "Remove Courier" à droite de la liste
+        removeCourierButton = new JButton("Remove courier");
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;  // Le bouton occupe une seule colonne
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Le bouton remplit la hauteur disponible
+        managementPanel.add(removeCourierButton, gbc);
+
+        // Ajouter le "New Courier Info" avant les champs de saisie
+        JLabel newCourierInfoLabel = new JLabel("New Courier Info :");
+        newCourierInfoLabel.setFont(new Font("Georgia", Font.BOLD, 16));  // Mettre le texte en gras et plus grand
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;  // Il occupe toute la largeur disponible
+        gbc.anchor = GridBagConstraints.CENTER;
+        managementPanel.add(newCourierInfoLabel, gbc);
+
+        // Champ de texte pour "First Name"
+        courierFieldFirstName = new JTextField(15);
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        managementPanel.add(new JLabel("First Name :"), gbc);
+
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        managementPanel.add(courierFieldFirstName, gbc);
+
+        // Champ de texte pour "Last Name"
+        courierFieldLastName = new JTextField(15);
+        gbc.gridy = 5;
+        gbc.gridx = 0;
+        managementPanel.add(new JLabel("Last Name :"), gbc);
+
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        managementPanel.add(courierFieldLastName, gbc);
+
+        // Champ de texte pour "Phone number"
+        courierFieldPhoneNumber = new JTextField(15);
+        gbc.gridy = 6;
+        gbc.gridx = 0;
+        managementPanel.add(new JLabel("Phone number :"), gbc);
+
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        managementPanel.add(courierFieldPhoneNumber, gbc);
+
+        // Section des boutons
+        // Bouton pour ajouter un nouveau livreur
+        addCourierButton = new JButton("Add Courier");
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        //gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        managementPanel.add(addCourierButton, gbc);
+
+
+        /*GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);  // Espacement entre les composants
+        gbc.anchor = GridBagConstraints.WEST;  // Alignement des composants à gauche
+
+        // Utilisation d'un modèle dynamique pour faciliter les modifications
+        // Section des couriers
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
         managementPanel.add(new JLabel("Couriers :"), gbc);
 
         JScrollPane scrollPane = new JScrollPane(courierList);
@@ -199,9 +277,18 @@ public class Interface extends JFrame implements PropertyChangeListener {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 2;
         managementPanel.add(scrollPane, gbc);
 
-        // Champ de texte pour ajouter un nouveau livreur
+        // Ajouter le "New Courier Info" avant les champs de saisie
+        JLabel newCourierInfoLabel = new JLabel("New Courier Info");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;  // Il occupe toute la largeur disponible
+        gbc.anchor = GridBagConstraints.CENTER;
+        managementPanel.add(newCourierInfoLabel, gbc);
+
+        // Champ de texte pour "First Name"
         courierFieldFirstName = new JTextField(15);
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -211,26 +298,27 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldFirstName, gbc);
 
+        // Champ de texte pour "Last Name"
         courierFieldLastName = new JTextField(15);
         gbc.gridy = 4;
         gbc.gridx = 0;
-        gbc.gridwidth = 1;
         managementPanel.add(new JLabel("Last Name :"), gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldLastName, gbc);
 
+        // Champ de texte pour "Phone number"
         courierFieldPhoneNumber = new JTextField(15);
         gbc.gridy = 5;
         gbc.gridx = 0;
-        gbc.gridwidth = 1;
         managementPanel.add(new JLabel("Phone number :"), gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldPhoneNumber, gbc);
 
+        // Section des boutons
         // Bouton pour ajouter un nouveau livreur
         addCourierButton = new JButton("Add Courier");
         gbc.gridx = 0;
@@ -239,11 +327,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.NONE;
         managementPanel.add(addCourierButton, gbc);
 
-
         // Bouton pour supprimer le livreur sélectionné
         removeCourierButton = new JButton("Remove courier");
-        gbc.gridy = 2;
-        managementPanel.add(removeCourierButton, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        managementPanel.add(removeCourierButton, gbc);*/
 
         // Division de mainManagementPanel en deux avec un JSplitPane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, managementPanel, infoPanel);
@@ -252,10 +340,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         // Ajout de splitPane dans mainManagementPanel
         mainManagementPanel.add(splitPane, BorderLayout.CENTER);
-
-        /*ajout des deux panel dans le mainManagementPanel
-        mainManagementPanel.add(managementPanel);
-        mainManagementPanel.add(infoPanel);*/
 
         tabPan.addTab("Courier Management", mainManagementPanel);
 
@@ -332,6 +416,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
             updateCourierList(courierList);
             JOptionPane.showMessageDialog(this, "Courier list updated");
+            courierFieldFirstName.setText("");
+            courierFieldLastName.setText("");
+            courierFieldPhoneNumber.setText("");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
             File selectedFile = fileChooserDelivery.getSelectedFile();
@@ -348,6 +435,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
             Delivery delivery = (Delivery) evt.getNewValue();
             String deliveryString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
             unassignedModel.removeElement(deliveryString);
+        }
+
+        if(evt.getPropertyName().equals("courierInfo")){
+            Courier courier = (Courier) evt.getNewValue();
+            System.out.println("Ca fonctionne");
+            firstNameOfSelectedCourier.setText("First Name : " + courier.getFirstName());
+            lastNameOfSelectedCourier.setText("Last Name : " + courier.getLastName());
+            phoneNumberOfSelectedCourier.setText("Phone Number : " + courier.getPhoneNum());
         }
     }
 
