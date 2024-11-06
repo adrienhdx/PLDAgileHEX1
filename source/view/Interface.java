@@ -290,12 +290,16 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
         if (evt.getPropertyName().equals("displayEntrepot")) {
             Vertex entrepotAddress = (Vertex) evt.getNewValue();
-            map.displayVertex(entrepotAddress);
+            map.displayVertex(entrepotAddress, "Warehouse", Color.red);
         }
         if (evt.getPropertyName().equals("displayVertices")) {
             ArrayList<Vector> vertexVectorArrayList = (ArrayList<Vector>) evt.getNewValue();
             for (Vector vector : vertexVectorArrayList) {
-                map.displayVertex((Vertex) vector.getFirst());
+                if (vector.get(1).equals("PICK_UP")) {
+                    map.displayVertex((Vertex) vector.getFirst(), Integer.toString(vertexVectorArrayList.indexOf(vector)),Color.cyan);
+                } else {
+                    map.displayVertex((Vertex) vector.getFirst(), Integer.toString(vertexVectorArrayList.indexOf(vector)),Color.orange);
+                }
             }
         }
         if (evt.getPropertyName().equals("displaySegments")) {
