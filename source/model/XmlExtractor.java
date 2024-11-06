@@ -154,4 +154,14 @@ public class XmlExtractor {
         return file.endsWith(".xml");
     }
 
+    public static String exportPendingDelivery(ArrayList<Delivery> pendingDeliveries){
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
+        xml += "<demandeDeLivraisons>\n";
+        for (Delivery delivery : pendingDeliveries) {
+            xml += "<livraison adresseEnlevement=\"" + delivery.getPickUpPt().getId() + "\" adresseLivraison=\"" + delivery.getDeliveryPt().getId() + "\" dureeEnlevement=\"" + delivery.getPickUpTime() + "\" dureeLivraison=\"" + delivery.getDeliveryTime() + "\"/>\n";
+        }
+        xml += "</demandeDeLivraisons>";
+        return xml;
+    }
+
 }
