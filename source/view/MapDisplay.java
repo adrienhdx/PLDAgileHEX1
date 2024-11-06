@@ -7,15 +7,12 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.OSMTileFactoryInfo;
+
 import source.model.Segment;
 import source.model.Vertex;
-
+import source.view.mapTools.*;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.*;
 import java.util.List;
 
@@ -49,7 +46,7 @@ public class MapDisplay {
 
     private void initListenersMap(){
         try {
-            //Ajout du zoom et du drag de la carte avec écouteurs sur la souris
+            //Ajout du zoom et du pan de la carte avec écouteurs sur la souris
             PanMouseInputListener dragListener = new PanMouseInputListener(mapViewer);
             ZoomMouseWheelListenerCursor zoomWheelListener = new ZoomMouseWheelListenerCursor(mapViewer);
             mapViewer.addMouseWheelListener(zoomWheelListener);
@@ -62,11 +59,24 @@ public class MapDisplay {
         }
     }
 
+    public void displayVertex (Vertex vertex, String label, Color color){
+        try{
+            GeoPosition geoCoord = new GeoPosition(vertex.getLatitude(), vertex.getLongitude());
+            CustomWaypoint waypoint = new CustomWaypoint(label,color,geoCoord);
+            WaypointPainter<CustomWaypoint> waypointPainter = new WaypointPainter<>();
+            waypointPainter.setWaypoints(Collections.singleton(waypoint));
+            waypointPainter.setRenderer(new FancyWaypointRenderer());
+            painters.add(waypointPainter);
+            mainPainter.addPainter(waypointPainter);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
     public void displayVertex (Vertex vertex){
         try{
             GeoPosition geoCoord = new GeoPosition(vertex.getLatitude(), vertex.getLongitude());
             DefaultWaypoint waypoint = new DefaultWaypoint(geoCoord);
-            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
+            WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(Collections.singleton(waypoint));
             painters.add(waypointPainter);
             mainPainter.addPainter(waypointPainter);
