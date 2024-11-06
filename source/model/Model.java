@@ -198,6 +198,12 @@ public class Model {
         }
     }
 
+    public void getCourierDeliveries(Courier courier){
+        if(courier != null){
+            propertyChangeSupport.firePropertyChange("deliveryListDeliveryTab", null, courier.getRoute().getDeliveries());
+        }
+    }
+
     //Recherche de chemin
     public void creerMatriceAdjacence(){
         // Création de la matrice d'adjacence entre tous les sommets de la carte chargée

@@ -22,7 +22,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes;
     private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown;
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel;
-    private Vector<String> couriers;
+    private Vector<String> couriers, selectedCourierVectorDeliveryTab;
     private JList<String> courierList, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
@@ -37,10 +37,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
         removeCourierButton.addActionListener(controller);
         courierList.addListSelectionListener(controller);
         courierMapDropdown.addActionListener(controller);
+        courierDeliveryDropdown.addActionListener(controller);
     }
 
     public Interface() {
         couriers = new Vector<>();
+        selectedCourierVectorDeliveryTab = new Vector<>();
         fileChooserDelivery = new JFileChooser();
         fileChooserDelivery.setCurrentDirectory(new File("."));
         fileChooserMap = new JFileChooser();
@@ -57,6 +59,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         scrollPanelMap = new JScrollPane(map.getMapViewer());
         courierList = new JList<>(courierModel);
         courierList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        selectedCourierListDeliveryTab = new JList<>();
+        selectedCourierListDeliveryTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setTitle("App Delivery Services");
         setSize(600, 300);
@@ -106,7 +110,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         deliveryPanel.remove(deliveryButton);
         deliveryPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(10, 1, 10, 1 );
 
         // Livraisons non attribuées
         gbc.gridx = 0;
@@ -119,11 +123,23 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         // Choisir un livreur
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 2;
         deliveryPanel.add(new JLabel("Choose Courier:"), gbc);
 
         gbc.gridx = 1;
+
         deliveryPanel.add(courierDeliveryDropdown, gbc);
+
+        // Liste des livraisons du courier
+        JScrollPane scrollPaneDelivery = new JScrollPane(selectedCourierListDeliveryTab);
+        scrollPaneDelivery.setPreferredSize(new Dimension(200, 100));
+        scrollPaneDelivery.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPaneDelivery.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        deliveryPanel.add(scrollPaneDelivery, gbc);
+
 
         // Bouton pour affecter le livreur
         gbc.gridx = 0;
@@ -292,6 +308,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
             String deliveryString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
             unassignedModel.removeElement(deliveryString);
         }
+        if (evt.getPropertyName().equals("deliveryListDeliveryTab")){
+            ArrayList<Delivery>  deliveryList = (ArrayList<Delivery>) evt.getNewValue();
+            updateDeliveryList(deliveryList);
+        }
     }
 
     private void updateCourierList(ArrayList<Courier> newCourierList) {
@@ -302,6 +322,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
             couriers.add(courier.getFirstName()+ " " + courier.getLastName());
         }
         courierList.setListData(couriers);
+    }
+
+    private void updateDeliveryList(ArrayList<Delivery> newDeliveryList) {
+        selectedCourierVectorDeliveryTab.clear();
+        for (Delivery delivery : newDeliveryList) {
+            selectedCourierVectorDeliveryTab.add(delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId());
+        }
+        selectedCourierListDeliveryTab.setListData(selectedCourierVectorDeliveryTab);
     }
 
     // Getters

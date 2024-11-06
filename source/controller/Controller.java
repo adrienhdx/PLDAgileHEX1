@@ -33,12 +33,16 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
         if (e.getSource() == view.getAssignCourierButton()) {
             this.assignDeliveryCourier();
+            this.getCourierDeliveries();
         }
         if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
         }
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierMapComboBox()) {
             this.getCourierSegmentList();
+        }
+        if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierDeliveryComboBox()){
+            this.getCourierDeliveries();
         }
     }
 
@@ -131,6 +135,19 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
         Courier courier = model.getCourier(firstName, lastName);
         model.getCourierSegmentList(courier);
+    }
+
+    public void getCourierDeliveries() {
+        String courierInfo = (String) view.getCourierDeliveryComboBox().getSelectedItem();
+        String firstName = "";
+        String lastName = "";
+        if (courierInfo != null) {
+            String[] splitInfo = courierInfo.split(" ");
+            firstName = splitInfo[0];
+            lastName = splitInfo[1];
+            Courier courier = model.getCourier(firstName, lastName);
+            model.getCourierDeliveries(courier);
+        }
     }
 
     public void withdrawDelivery(){}
