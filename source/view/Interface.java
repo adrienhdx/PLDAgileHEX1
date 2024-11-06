@@ -225,9 +225,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         if (evt.getPropertyName().equals("errorMessage")) {
             JOptionPane.showMessageDialog(this, evt.getNewValue());
         }
-        if (evt.getPropertyName().equals("courierRouteDeliveries")) {
-            //maj de la liste des livraisons du livreur
-        }
         if (evt.getPropertyName().equals("map")) {
             mapPanel.removeAll();
             map.setCentre((Vertex) evt.getNewValue());
@@ -290,6 +287,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
         if (evt.getPropertyName().equals("courierArrayList")) {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
             updateCourierList(courierList);
+            courierFieldFirstName.setText("");
+            courierFieldLastName.setText("");
+            courierFieldPhoneNumber.setText("");
             JOptionPane.showMessageDialog(this, "Courier list updated");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
