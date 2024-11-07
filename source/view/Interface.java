@@ -26,7 +26,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes, waitingListButton, exportWaitingListButton;
     private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown, waitingListDropdown;
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel, waitingListModel;
-    private Vector<String> couriers, selectedCourierVectorCourierTab, selectedCourierVectorDeliveryTab, selectedCourierVectorDeliveryTab;
+    private Vector<String> couriers, selectedCourierVectorCourierTab, selectedCourierVectorDeliveryTab;
     private JList<String> courierList,courierListMapTab, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
     private MapDisplay map, mapDelivery;
     private JFileChooser fileChooserDelivery;
@@ -135,7 +135,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         });
     }
 
-    private void showSettingsDelivery(File file){
+    private void showSettingsDelivery(){
         deliveryPanel.removeAll();
 
         mapDelivery.setCentre(mapDefault);
