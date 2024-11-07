@@ -14,6 +14,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -24,30 +26,36 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes;
     private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown;
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel;
-    private Vector<String> couriers;
+    private Vector<String> couriers, selectedCourierVectorDeliveryTab;
     private JList<String> courierList, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
+    private JFileChooser fileExportDelivery;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
     private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
         fileChooserMap.addActionListener(controller);
+        fileExportDelivery.addActionListener(controller);
         addCourierButton.addActionListener(controller);
         assignCourierButton.addActionListener(controller);
         removeCourierButton.addActionListener(controller);
         courierList.addListSelectionListener(controller);
         courierMapDropdown.addActionListener(controller);
+        courierDeliveryDropdown.addActionListener(controller);
     }
 
     public Interface() {
         couriers = new Vector<>();
+        selectedCourierVectorDeliveryTab = new Vector<>();
         fileChooserDelivery = new JFileChooser();
         fileChooserDelivery.setCurrentDirectory(new File("."));
         fileChooserMap = new JFileChooser();
         fileChooserMap.setCurrentDirectory(new File("."));
+        fileExportDelivery = new JFileChooser();
+        fileExportDelivery.setCurrentDirectory(new File("."));
         unassignedModel = new DefaultComboBoxModel<>();
         courierModel = new DefaultComboBoxModel<>(couriers);
         courierMapModel = new DefaultComboBoxModel<>(couriers);
@@ -60,6 +68,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         scrollPanelMap = new JScrollPane(map.getMapViewer());
         courierList = new JList<>(courierModel);
         courierList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        selectedCourierListDeliveryTab = new JList<>();
+        selectedCourierListDeliveryTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setTitle("App Delivery Services");
         setSize(600, 300);
@@ -108,7 +118,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         deliveryPanel.remove(deliveryButton);
         deliveryPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(10, 1, 10, 1 );
 
         // Livraisons non attribuées
         gbc.gridx = 0;
@@ -121,11 +131,22 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         // Choisir un livreur
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 2;
         deliveryPanel.add(new JLabel("Choose Courier:"), gbc);
 
         gbc.gridx = 1;
         deliveryPanel.add(courierDeliveryDropdown, gbc);
+
+        // Liste des livraisons du courier
+        JScrollPane scrollPaneDelivery = new JScrollPane(selectedCourierListDeliveryTab);
+        scrollPaneDelivery.setPreferredSize(new Dimension(200, 100));
+        scrollPaneDelivery.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPaneDelivery.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        deliveryPanel.add(scrollPaneDelivery, gbc);
+
 
         // Bouton pour affecter le livreur
         gbc.gridx = 0;
@@ -262,13 +283,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         /*GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);  // Espacement entre les composants
-        gbc.anchor = GridBagConstraints.WEST;  // Alignement des composants à gauche
 
+        // Liste déroulante des livreurs existants
         // Utilisation d'un modèle dynamique pour faciliter les modifications
-        // Section des couriers
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
         managementPanel.add(new JLabel("Couriers :"), gbc);
 
         JScrollPane scrollPane = new JScrollPane(courierList);
@@ -277,18 +298,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 2;
         managementPanel.add(scrollPane, gbc);
 
-        // Ajouter le "New Courier Info" avant les champs de saisie
-        JLabel newCourierInfoLabel = new JLabel("New Courier Info");
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;  // Il occupe toute la largeur disponible
-        gbc.anchor = GridBagConstraints.CENTER;
-        managementPanel.add(newCourierInfoLabel, gbc);
-
-        // Champ de texte pour "First Name"
+        // Champ de texte pour ajouter un nouveau livreur
         courierFieldFirstName = new JTextField(15);
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -298,27 +310,26 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldFirstName, gbc);
 
-        // Champ de texte pour "Last Name"
         courierFieldLastName = new JTextField(15);
         gbc.gridy = 4;
         gbc.gridx = 0;
+        gbc.gridwidth = 1;
         managementPanel.add(new JLabel("Last Name :"), gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldLastName, gbc);
 
-        // Champ de texte pour "Phone number"
         courierFieldPhoneNumber = new JTextField(15);
         gbc.gridy = 5;
         gbc.gridx = 0;
+        gbc.gridwidth = 1;
         managementPanel.add(new JLabel("Phone number :"), gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldPhoneNumber, gbc);
 
-        // Section des boutons
         // Bouton pour ajouter un nouveau livreur
         addCourierButton = new JButton("Add Courier");
         gbc.gridx = 0;
@@ -326,6 +337,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE;
         managementPanel.add(addCourierButton, gbc);
+
 
         // Bouton pour supprimer le livreur sélectionné
         removeCourierButton = new JButton("Remove courier");
@@ -349,9 +361,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("errorMessage")) {
             JOptionPane.showMessageDialog(this, evt.getNewValue());
-        }
-        if (evt.getPropertyName().equals("courierRouteDeliveries")) {
-            //maj de la liste des livraisons du livreur
         }
         if (evt.getPropertyName().equals("map")) {
             mapPanel.removeAll();
@@ -378,6 +387,18 @@ public class Interface extends JFrame implements PropertyChangeListener {
             exportRoutes = new JButton("Export Routes");
             exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+            exportRoutes.addActionListener(e -> {
+                LocalDate actualDate = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                fileExportDelivery.setSelectedFile(new File("pendingDelivery-" + actualDate.format(formatter) + ".xml"));
+                if (fileExportDelivery.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportDelivery.getSelectedFile().getAbsolutePath());
+                } else {
+                    JOptionPane.showMessageDialog(null, "File has not been saved.");
+                };
+
+            });
+
             importRoutes = new JButton("Import Routes");
             importRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -398,10 +419,18 @@ public class Interface extends JFrame implements PropertyChangeListener {
             mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);
             tabPan.setComponentAt(0,mainPanelMap);
         }
+        if (evt.getPropertyName().equals("displayEntrepot")) {
+            Vertex entrepotAddress = (Vertex) evt.getNewValue();
+            map.displayVertex(entrepotAddress, "Warehouse", Color.red);
+        }
         if (evt.getPropertyName().equals("displayVertices")) {
-            ArrayList<Vertex> vertexArrayList = (ArrayList<Vertex>) evt.getNewValue();
-            for(Vertex vertex : vertexArrayList){
-                map.displayVertex(vertex);
+            ArrayList<Vector> vertexVectorArrayList = (ArrayList<Vector>) evt.getNewValue();
+            for (Vector vector : vertexVectorArrayList) {
+                if (vector.get(1).equals("PICK_UP")) {
+                    map.displayVertex((Vertex) vector.getFirst(), Integer.toString(vertexVectorArrayList.indexOf(vector)),Color.cyan);
+                } else {
+                    map.displayVertex((Vertex) vector.getFirst(), Integer.toString(vertexVectorArrayList.indexOf(vector)),Color.orange);
+                }
             }
         }
         if (evt.getPropertyName().equals("displaySegments")) {
@@ -415,10 +444,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
         if (evt.getPropertyName().equals("courierArrayList")) {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
             updateCourierList(courierList);
-            JOptionPane.showMessageDialog(this, "Courier list updated");
             courierFieldFirstName.setText("");
             courierFieldLastName.setText("");
             courierFieldPhoneNumber.setText("");
+            JOptionPane.showMessageDialog(this, "Courier list updated");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
             File selectedFile = fileChooserDelivery.getSelectedFile();
@@ -435,6 +464,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
             Delivery delivery = (Delivery) evt.getNewValue();
             String deliveryString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
             unassignedModel.removeElement(deliveryString);
+        }
+        if (evt.getPropertyName().equals("deliveryListDeliveryTab")){
+            ArrayList<Delivery>  deliveryList = (ArrayList<Delivery>) evt.getNewValue();
+            updateDeliveryList(deliveryList);
         }
 
         if(evt.getPropertyName().equals("courierInfo")){
@@ -456,6 +489,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierList.setListData(couriers);
     }
 
+    private void updateDeliveryList(ArrayList<Delivery> newDeliveryList) {
+        selectedCourierVectorDeliveryTab.clear();
+        for (Delivery delivery : newDeliveryList) {
+            selectedCourierVectorDeliveryTab.add(delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId());
+        }
+        selectedCourierListDeliveryTab.setListData(selectedCourierVectorDeliveryTab);
+    }
+
     // Getters
     public JFileChooser getFileChooserDelivery() {
         return fileChooserDelivery;
@@ -464,6 +505,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public JFileChooser getFileChooserMap() {
         return fileChooserMap;
     }
+
+    public JFileChooser getFileExportDelivery() { return fileExportDelivery; }
 
     public JTextField getCourierFieldFirstName() {
         return courierFieldFirstName;
@@ -487,6 +530,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JButton getAssignCourierButton(){
         return assignCourierButton;
+    }
+
+    public JButton getExportRoutesButton(){
+        return exportRoutes;
     }
 
     public JComboBox<String> getCourierDeliveryComboBox() {

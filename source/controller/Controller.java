@@ -9,6 +9,9 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Controller implements ActionListener,ListSelectionListener {
@@ -34,6 +37,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
         if (e.getSource() == view.getAssignCourierButton()) {
             this.assignDeliveryCourier();
+            this.getCourierDeliveries();
         }
         if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
@@ -41,12 +45,17 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierMapComboBox()) {
             this.getCourierSegmentList();
         }
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportDelivery()) {
+            this.exportPendingDelivery();
+        }
+        if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierDeliveryComboBox()){
+            this.getCourierDeliveries();
+        }
     }
 
     @Override
     public void valueChanged(ListSelectionEvent e){
         if (!e.getValueIsAdjusting()) {
-            //System.out.println(e);
             if (e.getSource() == view.getCourierList()){
                 String selectedCourier = view.getCourierList().getSelectedValue();
                 System.out.println(view.getCourierList().getSelectedValue());
@@ -134,6 +143,29 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
         Courier courier = model.getCourier(firstName, lastName);
         model.getCourierSegmentList(courier);
+    }
+
+    public void exportPendingDelivery() {
+        try {
+            FileWriter fileWriter = new FileWriter(view.getFileExportDelivery().getSelectedFile().getAbsolutePath());
+            fileWriter.write(XmlExtractor.exportPendingDelivery(model.getPendingDeliveryArrayList()));
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getCourierDeliveries() {
+        String courierInfo = (String) view.getCourierDeliveryComboBox().getSelectedItem();
+        String firstName = "";
+        String lastName = "";
+        if (courierInfo != null) {
+            String[] splitInfo = courierInfo.split(" ");
+            firstName = splitInfo[0];
+            lastName = splitInfo[1];
+            Courier courier = model.getCourier(firstName, lastName);
+            //model.getCourierDeliveries(courier);
+        }
     }
 
     public void withdrawDelivery(){}
