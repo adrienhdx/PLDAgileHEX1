@@ -481,6 +481,15 @@ public class Interface extends JFrame implements PropertyChangeListener {
             lastNameOfSelectedCourier.setText("Last Name : " + courier.getLastName());
             phoneNumberOfSelectedCourier.setText("Phone Number : " + courier.getPhoneNum());
         }
+        if(evt.getPropertyName().equals("updateWaitingList")){
+            ArrayList<Delivery>  deliveryWaitingList = (ArrayList<Delivery>) evt.getNewValue();
+            waitingListModel.removeAllElements();
+            for (Delivery delivery : deliveryWaitingList) {
+                String deliveryWaitingString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
+                waitingListModel.addElement(deliveryWaitingString);
+                unassignedModel.removeElement(deliveryWaitingString);
+            }
+        }
     }
 
     private void updateCourierList(ArrayList<Courier> newCourierList) {
@@ -508,6 +517,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
         selectedCourierListCourierTab.setListData(selectedCourierVectorCourierTab);
     }
+
 
     // Getters
     public JFileChooser getFileChooserDelivery() {
@@ -563,6 +573,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public JList<String> getCourierMapList() {
         return courierListMapTab;
     }
+
+    public JButton getWaitingListButton() {return waitingListButton;}
 
 }
 

@@ -48,6 +48,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierDeliveryComboBox()){
             this.getCourierDeliveries();
         }
+        if(e.getSource() == view.getWaitingListButton()){
+            this.addDeliveryInWaitingList();
+        }
     }
 
     @Override
@@ -189,5 +192,16 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.getCourierDeliveriesCourierTab(selectedCourier);
     }
 
+    public void addDeliveryInWaitingList() {
+        String selectedDelirery = (String) view.getPendingDeliveryComboBox().getSelectedItem();
+        Long pickUpPtStr = null;
+        Long deliveryPtStr = null;
+        int index = selectedDelirery.indexOf('-');
+        deliveryPtStr = Long.parseLong(selectedDelirery.substring(index + 1));
+        pickUpPtStr = Long.parseLong(selectedDelirery.substring(0, index));
+        Delivery deliveryWaitingList = model.getPendingDelivery(pickUpPtStr, deliveryPtStr);
+        model.updateWaitingList(deliveryWaitingList);
+    }
 }
+
 

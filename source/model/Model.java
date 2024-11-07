@@ -9,6 +9,7 @@ public class Model {
     private ArrayList<Delivery> assignedDeliveryArrayList;
     private ArrayList<Delivery> postponedDeliveryArrayList;
     private ArrayList<Delivery> pendingDeliveryArrayList;
+    private ArrayList<Delivery> waitingDeliveryArrayList;
     private ArrayList<Courier> courierArrayList;
     private PropertyChangeSupport propertyChangeSupport;
     private SolveurTSP solveur;
@@ -22,7 +23,8 @@ public class Model {
         this.pendingDeliveryArrayList = new ArrayList<>();
         this.assignedDeliveryArrayList = new ArrayList<>();
         this.postponedDeliveryArrayList = new ArrayList<>();
-    }
+        this.waitingDeliveryArrayList = new ArrayList<>();
+   }
 
     public void addPropertyChangeListener(PropertyChangeListener ArrayListener){
         propertyChangeSupport.addPropertyChangeListener(ArrayListener);
@@ -233,4 +235,14 @@ public class Model {
     }
 
     public ArrayList<Delivery> getPendingDeliveryArrayList() { return pendingDeliveryArrayList; }
+
+    public void updateWaitingList(Delivery delivery){
+        if (delivery != null) {
+            waitingDeliveryArrayList.add(delivery);
+            propertyChangeSupport.firePropertyChange("updateWaitingList", null,waitingDeliveryArrayList);
+        }
+    }
 }
+
+
+
