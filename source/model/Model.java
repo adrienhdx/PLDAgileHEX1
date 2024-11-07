@@ -142,9 +142,15 @@ public class Model {
         return null;
     }
 
-    public void getCourierDeliveries(Courier courier){
+    public void getCourierDeliveriesDeliveryTab(Courier courier){
         if (courier != null) {
             propertyChangeSupport.firePropertyChange("deliveryListDeliveryTab", null, courier.getRoute().getDeliveries());
+        }
+    }
+
+    public void getCourierDeliveriesCourierTab(Courier courier){
+        if (courier != null) {
+            propertyChangeSupport.firePropertyChange("deliveryListCourierTab", null, courier.getRoute().getDeliveries());
         }
     }
 
