@@ -281,6 +281,9 @@ public class SolveurTSP {
         }
         ArrayList<Segment> reelRoute = new ArrayList<>();
         for (int i = 0; i < sommetsAVisiter.size()-1; i++) {
+            if (sommetsAVisiter.get(i).equals(sommetsAVisiter.get(i+1))) {
+                continue;
+            }
             Segment seg = new Segment(sommetsAVisiter.get(i), sommetsAVisiter.get(i+1));
             reelRoute.add(seg);
         }
