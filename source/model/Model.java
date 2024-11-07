@@ -283,7 +283,7 @@ public class Model {
         propertyChangeSupport.firePropertyChange("courierInfo", null, courier);
     }
 
-    public ArrayList<Delivery> getPendingDeliveryArrayList() { return pendingDeliveryArrayList; }
+    public ArrayList<Delivery> getWaitingArrayList() { return waitingDeliveryArrayList; }
 
     public void updateWaitingList(Delivery delivery){
         if (delivery != null) {

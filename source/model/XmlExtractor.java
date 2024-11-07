@@ -154,7 +154,7 @@ public class XmlExtractor {
         return file.endsWith(".xml");
     }
 
-    public static String exportPendingDelivery(ArrayList<Delivery> pendingDeliveries){
+    public static String exportWaitingList(ArrayList<Delivery> pendingDeliveries){
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
         xml += "<demandeDeLivraisons>\n";
         for (Delivery delivery : pendingDeliveries) {

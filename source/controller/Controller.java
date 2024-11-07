@@ -41,8 +41,8 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
         }
-        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportDelivery()) {
-            this.exportPendingDelivery();
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportWaitingList()) {
+            this.exportWaitingArrayList();
         }
         if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportRoutes()) {
             this.exportRoutes();
@@ -155,10 +155,10 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void exportPendingDelivery() {
+    public void exportWaitingArrayList() {
         try {
-            FileWriter fileWriter = new FileWriter(view.getFileExportDelivery().getSelectedFile().getAbsolutePath());
-            fileWriter.write(XmlExtractor.exportPendingDelivery(model.getPendingDeliveryArrayList()));
+            FileWriter fileWriter = new FileWriter(view.getFileExportWaitingList().getSelectedFile().getAbsolutePath());
+            fileWriter.write(XmlExtractor.exportWaitingList(model.getWaitingArrayList()));
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -180,27 +180,30 @@ public class Controller implements ActionListener,ListSelectionListener {
 
     public void exportRoutes() {
         try {
-            ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
-            String firstName = "";
-            String lastName = "";
-            Courier courier = null;
+            ArrayList<String> couriersInfo;
+            FileWriter fileWriter = new FileWriter(view.getFileExportRoutes().getSelectedFile().getAbsolutePath());
             ArrayList<Vertex> vertices = new ArrayList<>();
             ArrayList<Segment> segments = new ArrayList<>();
-            for (String courierInfo : couriersInfo) {
-                if (courierInfo != null) {
-                    String[] splitInfo = courierInfo.split(" ");
-                    firstName = splitInfo[0];
-                    lastName = splitInfo[1];
-                    courier = model.getCourier(firstName, lastName);
-                }
-                for (Vertex vertex : model.getCourierVertexArrayList(courier)) {
-                    vertices.add(vertex);
-                }
-                for (Segment segment : model.getCourierSegmentArrayList(courier)) {
-                    segments.add(segment);
+            if (!view.getCourierMapList().getSelectedValuesList().isEmpty()) {
+                couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+                String firstName = "";
+                String lastName = "";
+                Courier courier = null;
+                for (String courierInfo : couriersInfo) {
+                    if (courierInfo != null) {
+                        String[] splitInfo = courierInfo.split(" ");
+                        firstName = splitInfo[0];
+                        lastName = splitInfo[1];
+                        courier = model.getCourier(firstName, lastName);
+                    }
+                    for (Vertex vertex : model.getCourierVertexArrayList(courier)) {
+                        vertices.add(vertex);
+                    }
+                    for (Segment segment : model.getCourierSegmentArrayList(courier)) {
+                        segments.add(segment);
+                    }
                 }
             }
-            FileWriter fileWriter = new FileWriter(view.getFileExportRoutes().getSelectedFile().getAbsolutePath());
             fileWriter.write(XmlExtractor.exportRoutes(vertices, segments));
             fileWriter.close();
         } catch (IOException e) {

@@ -23,7 +23,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
     private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap, mainPanelDeliveries, controlDeliveriesPanel;
     private JScrollPane scrollPanelMap, scrollPanelDeliveriesMap;
-    private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes, waitingListButton, exportWaitingListButton, exportPendingDeliveries;
+    private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes, waitingListButton, exportWaitingListButton;
     private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown, waitingListDropdown;
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel, waitingListModel;
     private Vector<String> couriers,selectedCourierVectorCourierTab,  selectedCourierVectorDeliveryTab;
@@ -31,7 +31,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private MapDisplay map, mapDelivery;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
-    private JFileChooser fileExportDelivery;
+    private JFileChooser fileExportWaitingList;
     private JFileChooser fileExportRoutes;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
     private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier, mapLoadingBeforeDelivery;
@@ -40,13 +40,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
         fileChooserMap.addActionListener(controller);
-        fileExportDelivery.addActionListener(controller);
+        fileExportWaitingList.addActionListener(controller);
         fileExportRoutes.addActionListener(controller);
         addCourierButton.addActionListener(controller);
         assignCourierButton.addActionListener(controller);
-        waitingListButton.addActionListener(controller); //A IMPLEMENTER !!!!!!!
-        exportWaitingListButton.addActionListener(controller); //A IMPLEMENTER !!!!!
-
+        waitingListButton.addActionListener(controller);
+        exportWaitingListButton.addActionListener(controller);
         removeCourierButton.addActionListener(controller);
         courierList.addListSelectionListener(controller);
         courierListMapTab.addListSelectionListener(controller);
@@ -63,8 +62,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         fileChooserDelivery.setCurrentDirectory(new File("./resources"));
         fileChooserMap = new JFileChooser();
         fileChooserMap.setCurrentDirectory(new File("./resources"));
-        fileExportDelivery = new JFileChooser();
-        fileExportDelivery.setCurrentDirectory(new File("."));
+        fileExportWaitingList = new JFileChooser();
+        fileExportWaitingList.setCurrentDirectory(new File("."));
         fileExportRoutes = new JFileChooser();
         fileExportRoutes.setCurrentDirectory(new File("."));
         unassignedModel = new DefaultComboBoxModel<>();
@@ -212,6 +211,17 @@ public class Interface extends JFrame implements PropertyChangeListener {
         controlDeliveriesPanel.add(exportWaitingListButton, gbc);
 
         controlDeliveriesPanel.setBorder(BorderFactory.createTitledBorder("Management Deliveries Panel"));
+
+        exportWaitingListButton.addActionListener(e -> {
+            LocalDate actualDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            fileExportWaitingList.setSelectedFile(new File("waitingList-" + actualDate.format(formatter) + ".xml"));
+            if (fileExportWaitingList.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportWaitingList.getSelectedFile().getAbsolutePath());
+            } else {
+                JOptionPane.showMessageDialog(null, "File has not been saved.");
+            };
+        });
 
         // Ajout de controlMapPanel et scrollPanelDeliveries dans mainPanelMap
         mainPanelDeliveries.add(controlDeliveriesPanel, BorderLayout.EAST);
@@ -411,7 +421,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
                 }
             });
 
-            exportPendingDeliveries = new JButton("Export Pending Deliveries");
+            /*exportPendingDeliveries = new JButton("Export Pending Deliveries");
             exportPendingDeliveries.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             exportPendingDeliveries.addActionListener(e -> {
@@ -423,7 +433,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
                 } else {
                     JOptionPane.showMessageDialog(null, "File has not been saved.");
                 };
-            });
+            });*/
 
             exportRoutes = new JButton("Export Routes");
             exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -447,8 +457,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
             controlMapPanel.add(select);
             controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
             controlMapPanel.add(scrollPaneCouriers);
-            controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
-            controlMapPanel.add(exportPendingDeliveries);
             controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
             controlMapPanel.add(exportRoutes);
             controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
@@ -572,7 +580,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return fileChooserMap;
     }
 
-    public JFileChooser getFileExportDelivery() { return fileExportDelivery; }
+    public JFileChooser getFileExportWaitingList() { return fileExportWaitingList; }
 
     public JFileChooser getFileExportRoutes() { return fileExportRoutes; }
 
