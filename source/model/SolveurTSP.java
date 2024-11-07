@@ -281,6 +281,9 @@ public class SolveurTSP {
         }
         ArrayList<Segment> reelRoute = new ArrayList<>();
         for (int i = 0; i < sommetsAVisiter.size()-1; i++) {
+            if (sommetsAVisiter.get(i).equals(sommetsAVisiter.get(i+1))) {
+                continue;
+            }
             Segment seg = new Segment(sommetsAVisiter.get(i), sommetsAVisiter.get(i+1));
             reelRoute.add(seg);
         }
@@ -339,6 +342,19 @@ public class SolveurTSP {
             ordre[i] = sommets[tsp.getSolution(i)];
         }
 
+        // afficher la matrice de coûts
+        System.out.println();
+        for (int i = 0; i < completeGraph.cost.length; i++) {
+            for (int j = 0; j < completeGraph.cost[i].length; j++) {
+                if (completeGraph.cost[i][j] == Integer.MAX_VALUE) {
+                    System.out.print("inf ");
+                    continue;
+                }
+                System.out.print(completeGraph.cost[i][j] + " ");
+            }
+            System.out.println();
+        }
+
         ordre[sommets.length] = 0;
 
         return ordre;
@@ -346,6 +362,11 @@ public class SolveurTSP {
 
     public ArrayList<Segment> ObtenirArrayListeSegmentsTSP(ArrayList<Delivery> deliveries) {
         // décomposer deliveries en un int[] de sommets et un int[] de précédence
+
+        // reset matrice
+        completeGraph = new CompleteGraph();
+        Vertex_to_visit = null;
+        contraintesPrecedence = null;
 
         for (Delivery delivery : deliveries) {
             addDelivery(delivery); // ici chaque vertex est ajoutée dans vertex_to_visit

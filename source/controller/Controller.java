@@ -164,7 +164,7 @@ public class Controller implements ActionListener,ListSelectionListener {
             firstName = splitInfo[0];
             lastName = splitInfo[1];
             Courier courier = model.getCourier(firstName, lastName);
-            //model.getCourierDeliveries(courier);
+            model.getCourierDeliveries(courier);
         }
     }
 
