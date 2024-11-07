@@ -213,7 +213,6 @@ public class Model {
                         //}
                     }
                 }
-                propertyChangeSupport.firePropertyChange("resetMap", null, null);
                 propertyChangeSupport.firePropertyChange("displayVertices", null, vertexOrderTypeToDisplay);
                 propertyChangeSupport.firePropertyChange("displaySegments", null, courier.getRoute().getSegments());
                 propertyChangeSupport.firePropertyChange("displayEntrepot", null, solveur.getEntrepot().getAddress());
@@ -223,6 +222,10 @@ public class Model {
         } else {
             propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
         }
+    }
+
+    public void resetMap(){
+        propertyChangeSupport.firePropertyChange("resetMap", null, null);
     }
 
     public void getCourierInfo(Courier courier){

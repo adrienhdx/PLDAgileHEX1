@@ -24,7 +24,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap ;
     private JScrollPane scrollPanelMap;
     private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes;
-    private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown;
+    private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown;
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel;
     private Vector<String> couriers,selectedCourierVectorCourierTab,  selectedCourierVectorDeliveryTab;
     private JList<String> courierList, courierListMapTab, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
@@ -43,7 +43,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         assignCourierButton.addActionListener(controller);
         removeCourierButton.addActionListener(controller);
         courierList.addListSelectionListener(controller);
-        courierMapDropdown.addActionListener(controller);
+        courierListMapTab.addListSelectionListener(controller);
         courierDeliveryDropdown.addActionListener(controller);
     }
 
@@ -64,7 +64,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         unassignedDeliveryDropdown = new JComboBox<>(unassignedModel);
         courierDeliveryDropdown = new JComboBox<>(courierDeliveryModel);
         assignCourierButton = new JButton("Assign the delivery to this courier");
-        courierMapDropdown = new JComboBox<>(courierMapModel);
         map = new MapDisplay();
         scrollPanelMap = new JScrollPane(map.getMapViewer());
         courierList = new JList<>(courierModel);
@@ -439,7 +438,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     private void updateCourierList(ArrayList<Courier> newCourierList) {
         couriers.clear();
-        courierMapDropdown.removeAllItems();
         courierDeliveryDropdown.removeAllItems();
         for (Courier courier : newCourierList) {
             couriers.add(courier.getFirstName()+ " " + courier.getLastName());
@@ -512,10 +510,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
     }
 
     public JList<String> getCourierList() {
-        return courierList;    }
-
-    public JComboBox<String> getCourierMapComboBox(){
-        return courierMapDropdown;
+        return courierList;
     }
+
+    public JList<String> getCourierMapList() {
+        return courierListMapTab;
+    }
+
 }
 
