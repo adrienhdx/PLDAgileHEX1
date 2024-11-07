@@ -14,7 +14,7 @@ public class Model {
     private SolveurTSP solveur;
 
     private final double VITESSE_COURIER_KMH = 15.0;
-    private final double DUREE_JOURNEE_MIN = 50.0;
+    private final double DUREE_JOURNEE_MIN = 420.0;
 
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
