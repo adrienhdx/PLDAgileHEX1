@@ -394,7 +394,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
             if (!segmentArrayList.isEmpty()){
                 for(Segment segment : segmentArrayList){
-                    map.displaySegment(segment);
+                    map.displaySegment(segment,Color.blue);
                 }
             }
         }

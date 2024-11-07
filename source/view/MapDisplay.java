@@ -85,13 +85,13 @@ public class MapDisplay {
         }
     }
 
-    public void displaySegment (Segment segment) {
+    public void displaySegment (Segment segment, Color color) {
         try {
             if (segment != null) {
                 GeoPosition origin = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
                 GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
                 List<GeoPosition> track = Arrays.asList(origin, destination);
-                RoutePainter routePainter = new RoutePainter(track);
+                RoutePainter routePainter = new RoutePainter(track,color);
                 painters.add(routePainter);
                 mainPainter.addPainter(routePainter);
             }
