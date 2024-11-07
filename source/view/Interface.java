@@ -21,7 +21,7 @@ import java.awt.event.MouseEvent;
 
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
-    private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap ;
+    private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap, courierInfoPanel;
     private JScrollPane scrollPanelMap;
     private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes;
     private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown;
@@ -34,6 +34,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JFileChooser fileExportDelivery;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
     private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier, mapLoadingBeforeDelivery;
+    private JSplitPane splitPaneCourier;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
@@ -171,9 +172,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private void setupCourierManagementPanel() {
         JPanel mainManagementPanel = new JPanel(new BorderLayout());
 
-        // Configuration de infoPanel
-        JPanel infoPanel = new JPanel(new GridBagLayout());
-        infoPanel.setBorder(BorderFactory.createTitledBorder("Selected Courier Informations"));
+        // Configuration de courierInfoPanel
+        courierInfoPanel = new JPanel(new GridBagLayout());
+        courierInfoPanel.setVisible(false);
+        courierInfoPanel.setBorder(BorderFactory.createTitledBorder("Selected Courier Informations"));
 
         // Labels et ComboBox
         firstNameOfSelectedCourier = new JLabel("First Name: ");
@@ -196,19 +198,19 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         // Ajouter les composants avec un espacement vertical uniforme
         gbc1.gridy = 0;
-        infoPanel.add(firstNameOfSelectedCourier, gbc1);
+        courierInfoPanel.add(firstNameOfSelectedCourier, gbc1);
 
         gbc1.gridy = 1;
-        infoPanel.add(lastNameOfSelectedCourier, gbc1);
+        courierInfoPanel.add(lastNameOfSelectedCourier, gbc1);
 
         gbc1.gridy = 2;
-        infoPanel.add(phoneNumberOfSelectedCourier, gbc1);
+        courierInfoPanel.add(phoneNumberOfSelectedCourier, gbc1);
 
         gbc1.gridy = 3;
-        infoPanel.add(listOfDeliveries, gbc1);
+        courierInfoPanel.add(listOfDeliveries, gbc1);
 
         gbc1.gridy = 4;
-        infoPanel.add(scrollPaneDelivery, gbc1);
+        courierInfoPanel.add(scrollPaneDelivery, gbc1);
 
         // Configuration de managementPanel
         JPanel managementPanel = new JPanel(new GridBagLayout());
@@ -294,15 +296,76 @@ public class Interface extends JFrame implements PropertyChangeListener {
         managementPanel.add(addCourierButton, gbc);
 
         // Division de mainManagementPanel en deux avec un JSplitPane
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, managementPanel, infoPanel);
-        splitPane.setResizeWeight(0.5); // Division égale
-        splitPane.setDividerSize(5); // Largeur du séparateur
+        splitPaneCourier = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, managementPanel, courierInfoPanel);
+        splitPaneCourier.setResizeWeight(0.5); // Division égale
+        splitPaneCourier.setDividerSize(5); // Largeur du séparateur
 
         // Ajout de splitPane dans mainManagementPanel
-        mainManagementPanel.add(splitPane, BorderLayout.CENTER);
+        mainManagementPanel.add(splitPaneCourier, BorderLayout.CENTER);
 
         tabPan.addTab("Courier Management", mainManagementPanel);
 
+    }
+
+    private void setupMapManagementPanel(){
+        deliveryButton.setEnabled(true);
+        deliveryPanel.remove(mapLoadingBeforeDelivery);
+        mapPanel.removeAll();
+        // Initialisation du panneau principal
+        mainPanelMap = new JPanel(new BorderLayout());
+
+        // Panneau de contrôle amélioré
+        controlMapPanel = new JPanel();
+        controlMapPanel.setLayout(new BoxLayout(controlMapPanel, BoxLayout.Y_AXIS));
+        controlMapPanel.setBorder(new EmptyBorder(15, 15, 15, 15)); // Ajouter des marges internes
+
+        // Espacement entre les composants
+        int componentSpacing = 15;
+
+        // Création des composants
+        JLabel select = new JLabel("Select a Courier:");
+        select.setFont(new Font("Arial", Font.BOLD, 14)); // Font plus visible
+        select.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JScrollPane scrollPaneCouriers = new JScrollPane(courierListMapTab);
+        scrollPaneCouriers.setPreferredSize(new Dimension(200, 200));
+        scrollPaneCouriers.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPaneCouriers.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPaneCouriers.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        exportRoutes = new JButton("Export Routes");
+        exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        exportRoutes.addActionListener(e -> {
+            LocalDate actualDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            fileExportDelivery.setSelectedFile(new File("pendingDelivery-" + actualDate.format(formatter) + ".xml"));
+            if (fileExportDelivery.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportDelivery.getSelectedFile().getAbsolutePath());
+            } else {
+                JOptionPane.showMessageDialog(null, "File has not been saved.");
+            };
+        });
+
+        importRoutes = new JButton("Import Routes");
+        importRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Ajout des composants avec des espaces entre eux
+        controlMapPanel.add(select);
+        controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+        controlMapPanel.add(scrollPaneCouriers);
+        controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+        controlMapPanel.add(exportRoutes);
+        controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+        controlMapPanel.add(importRoutes);
+
+        // Ajouter une bordure pour encadrer visuellement le panneau
+        controlMapPanel.setBorder(BorderFactory.createTitledBorder("Control Panel"));
+
+        // Ajout de controlMapPanel et scrollPanelMap dans mainPanelMap
+        mainPanelMap.add(controlMapPanel, BorderLayout.EAST);
+        mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);
+        tabPan.setComponentAt(0,mainPanelMap);
     }
 
     @Override
@@ -311,66 +374,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
             JOptionPane.showMessageDialog(this, evt.getNewValue());
         }
         if (evt.getPropertyName().equals("map")) {
-            deliveryButton.setEnabled(true);
-            deliveryPanel.remove(mapLoadingBeforeDelivery);
-            mapPanel.removeAll();
             map.setCentre((Vertex) evt.getNewValue());
-            // Initialisation du panneau principal
-            mainPanelMap = new JPanel(new BorderLayout());
-
-            // Panneau de contrôle amélioré
-            controlMapPanel = new JPanel();
-            controlMapPanel.setLayout(new BoxLayout(controlMapPanel, BoxLayout.Y_AXIS));
-            controlMapPanel.setBorder(new EmptyBorder(15, 15, 15, 15)); // Ajouter des marges internes
-
-            // Espacement entre les composants
-            int componentSpacing = 15;
-
-            // Création des composants
-            JLabel select = new JLabel("Select a Courier:");
-            select.setFont(new Font("Arial", Font.BOLD, 14)); // Font plus visible
-            select.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            JScrollPane scrollPaneCouriers = new JScrollPane(courierListMapTab);
-            scrollPaneCouriers.setPreferredSize(new Dimension(200, 200));
-            scrollPaneCouriers.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-            scrollPaneCouriers.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            scrollPaneCouriers.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            exportRoutes = new JButton("Export Routes");
-            exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            exportRoutes.addActionListener(e -> {
-                LocalDate actualDate = LocalDate.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-                fileExportDelivery.setSelectedFile(new File("pendingDelivery-" + actualDate.format(formatter) + ".xml"));
-                if (fileExportDelivery.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportDelivery.getSelectedFile().getAbsolutePath());
-                } else {
-                    JOptionPane.showMessageDialog(null, "File has not been saved.");
-                };
-
-            });
-
-            importRoutes = new JButton("Import Routes");
-            importRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            // Ajout des composants avec des espaces entre eux
-            controlMapPanel.add(select);
-            controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
-            controlMapPanel.add(scrollPaneCouriers);
-            controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
-            controlMapPanel.add(exportRoutes);
-            controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
-            controlMapPanel.add(importRoutes);
-
-            // Ajouter une bordure pour encadrer visuellement le panneau
-            controlMapPanel.setBorder(BorderFactory.createTitledBorder("Control Panel"));
-
-            // Ajout de controlMapPanel et scrollPanelMap dans mainPanelMap
-            mainPanelMap.add(controlMapPanel, BorderLayout.EAST);
-            mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);
-            tabPan.setComponentAt(0,mainPanelMap);
+            this.setupMapManagementPanel();
         }
         if (evt.getPropertyName().equals("displayEntrepot")) {
             Vertex entrepotAddress = (Vertex) evt.getNewValue();
@@ -399,6 +404,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
         if (evt.getPropertyName().equals("courierArrayList")) {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
+            courierInfoPanel.setVisible(!courierList.isEmpty());
+            splitPaneCourier.setDividerLocation(0.7);
             updateCourierList(courierList);
             courierFieldFirstName.setText("");
             courierFieldLastName.setText("");
