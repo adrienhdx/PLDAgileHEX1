@@ -135,18 +135,21 @@ public class Controller implements ActionListener,ListSelectionListener {
     }
 
     public void getCourierSegmentList(){
-        ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
         model.resetMap();
-        for (String courierInfo : couriersInfo) {
-            String firstName = "";
-            String lastName = "";
-            if (courierInfo != null) {
-                String[] splitInfo = courierInfo.split(" ");
-                firstName = splitInfo[0];
-                lastName = splitInfo[1];
+        if(!view.getCourierMapList().getSelectedValuesList().isEmpty()) {
+            ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+            model.resetMap();
+            for (String courierInfo : couriersInfo) {
+                String firstName = "";
+                String lastName = "";
+                if (courierInfo != null) {
+                    String[] splitInfo = courierInfo.split(" ");
+                    firstName = splitInfo[0];
+                    lastName = splitInfo[1];
+                }
+                Courier courier = model.getCourier(firstName, lastName);
+                model.getCourierSegmentList(courier);
             }
-            Courier courier = model.getCourier(firstName, lastName);
-            model.getCourierSegmentList(courier);
         }
     }
 

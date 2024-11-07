@@ -57,9 +57,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
         selectedCourierVectorDeliveryTab = new Vector<>();
         selectedCourierVectorCourierTab = new Vector<>();
         fileChooserDelivery = new JFileChooser();
-        fileChooserDelivery.setCurrentDirectory(new File("."));
+        fileChooserDelivery.setCurrentDirectory(new File("./resources"));
         fileChooserMap = new JFileChooser();
-        fileChooserMap.setCurrentDirectory(new File("."));
+        fileChooserMap.setCurrentDirectory(new File("./resources"));
         fileExportDelivery = new JFileChooser();
         fileExportDelivery.setCurrentDirectory(new File("."));
         unassignedModel = new DefaultComboBoxModel<>();
@@ -383,6 +383,28 @@ public class Interface extends JFrame implements PropertyChangeListener {
             scrollPaneCouriers.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
             scrollPaneCouriers.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPaneCouriers.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // Disable automatic selection on single click by using a custom ListSelectionModel.
+            courierListMapTab.setSelectionModel(new DefaultListSelectionModel() {
+                @Override
+                public void setSelectionInterval(int index0, int index1) {
+                    // Override to do nothing on single-click, selection is handled in the MouseListener
+                }
+            });
+
+            courierListMapTab.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    int index = courierListMapTab.locationToIndex(e.getPoint());
+                    if (index != -1) {  // Check if click is within an item
+                        if (courierListMapTab.isSelectedIndex(index)) {
+                            courierListMapTab.removeSelectionInterval(index, index);  // Deselect item if selected
+                        } else {
+                            courierListMapTab.addSelectionInterval(index, index);    // Select item if not selected
+                        }
+                    }
+                }
+            });
 
             exportRoutes = new JButton("Export Routes");
             exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);

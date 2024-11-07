@@ -17,14 +17,6 @@ public class SolveurTSP {
     private Map<Long, List<Long>> contraintesPrecedence;
     private Map<Long, Integer> vertexToGlobalNum;
 
-    public SolveurTSP(ArrayList<Segment> segmentArrayList, ArrayList<Vertex> vertexArrayList, Entrepot entrepot) {
-        this.segmentArrayList = segmentArrayList;
-        this.vertexArrayList = vertexArrayList;
-        this.entrepot = entrepot;
-        this.vertexToGlobalNum = new HashMap<>();
-        this.completeGraph = new CompleteGraph();
-    }
-
     public SolveurTSP() {
         this.vertexArrayList = new ArrayList<>();
         this.segmentArrayList = new ArrayList<>();
