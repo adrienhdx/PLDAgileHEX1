@@ -26,7 +26,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes, waitingListButton, exportWaitingListButton;
     private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown, waitingListDropdown;
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel, waitingListModel;
-    private Vector<String> couriers, selectedCourierVectorDeliveryTab, selectedCourierVectorCourierTab;
+    private Vector<String> couriers, selectedCourierVectorCourierTab, selectedCourierVectorDeliveryTab, selectedCourierVectorDeliveryTab;
     private JList<String> courierList,courierListMapTab, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
     private MapDisplay map, mapDelivery;
     private JFileChooser fileChooserDelivery;
@@ -47,7 +47,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         removeCourierButton.addActionListener(controller);
         courierList.addListSelectionListener(controller);
-        courierMapDropdown.addActionListener(controller);
+        courierListMapTab.addListSelectionListener(controller);
         courierDeliveryDropdown.addActionListener(controller);
         waitingListDropdown.addActionListener(controller);
     }
@@ -96,7 +96,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         // Onglet "Delivery"
         setupDeliveryPanel();
-
 
         // Onglet "Gestion des Courriers"
         setupCourierManagementPanel();
@@ -486,7 +485,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     private void updateCourierList(ArrayList<Courier> newCourierList) {
         couriers.clear();
-        courierMapDropdown.removeAllItems();
         courierDeliveryDropdown.removeAllItems();
         for (Courier courier : newCourierList) {
             couriers.add(courier.getFirstName()+ " " + courier.getLastName());
@@ -559,10 +557,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
     }
 
     public JList<String> getCourierList() {
-        return courierList;    }
-
-    public JComboBox<String> getCourierMapComboBox(){
-        return courierMapDropdown;
+        return courierList;
     }
+
+    public JList<String> getCourierMapList() {
+        return courierListMapTab;
+    }
+
 }
 
