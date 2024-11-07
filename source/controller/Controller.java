@@ -6,6 +6,7 @@ import source.view.Interface;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.io.File;
@@ -55,9 +56,10 @@ public class Controller implements ActionListener,ListSelectionListener {
     @Override
     public void valueChanged(ListSelectionEvent e){
         if (!e.getValueIsAdjusting()) {
-            System.out.println(e);
             if (e.getSource() == view.getCourierList()){
+                String selectedCourier = view.getCourierList().getSelectedValue();
                 System.out.println(view.getCourierList().getSelectedValue());
+                this.getCourierInfo(selectedCourier);
             }
 
         }
@@ -162,10 +164,28 @@ public class Controller implements ActionListener,ListSelectionListener {
             firstName = splitInfo[0];
             lastName = splitInfo[1];
             Courier courier = model.getCourier(firstName, lastName);
-            //model.getCourierDeliveries(courier);
+            model.getCourierDeliveriesDeliveryTab(courier);
         }
     }
 
     public void withdrawDelivery(){}
 
+    public void getCourierInfo(String courierSelected){
+        Courier selectedCourier;
+        int rang = -1;
+        String firstNameSelected = "";
+        String lastNameSelected = "";
+        String[] parts = courierSelected.split(" ");
+        if (parts.length == 2) {
+            firstNameSelected = parts[0];
+            lastNameSelected = parts[1];
+        } else {
+            System.out.println("Format de chaîne incorrect");
+        }
+        selectedCourier = model.getCourier(firstNameSelected, lastNameSelected);
+        model.getCourierInfo(selectedCourier);
+        model.getCourierDeliveriesCourierTab(selectedCourier);
+    }
+
 }
+
