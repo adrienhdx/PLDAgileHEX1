@@ -59,13 +59,13 @@ public class MapDisplay {
         }
     }
 
-    public void displayVertex (Vertex vertex, String label, Color color){
+    public void displayVertex (Vertex vertex, String label, Color color, boolean entrepot){
         try{
             GeoPosition geoCoord = new GeoPosition(vertex.getLatitude(), vertex.getLongitude());
             CustomWaypoint waypoint = new CustomWaypoint(label,color,geoCoord);
             WaypointPainter<CustomWaypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(Collections.singleton(waypoint));
-            waypointPainter.setRenderer(new FancyWaypointRenderer());
+            waypointPainter.setRenderer(new FancyWaypointRenderer(entrepot));
             painters.add(waypointPainter);
             mainPainter.addPainter(waypointPainter);
         } catch (Exception e) {
@@ -85,17 +85,28 @@ public class MapDisplay {
         }
     }
 
-    public void displaySegment (Segment segment) {
+    public void displaySegment (Segment segment, Color color) {
         try {
             if (segment != null) {
                 GeoPosition origin = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
                 GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
                 List<GeoPosition> track = Arrays.asList(origin, destination);
-                RoutePainter routePainter = new RoutePainter(track);
+                RoutePainter routePainter = new RoutePainter(track,color);
                 painters.add(routePainter);
                 mainPainter.addPainter(routePainter);
             }
         } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void hideAll(){
+        try{
+            for(Painter<JXMapViewer> p : mainPainter.getPainters()){
+                mainPainter.removePainter(p);
+            }
+            mapViewer.revalidate();
+        }catch (Exception e) {
             System.out.println(e);
         }
     }
