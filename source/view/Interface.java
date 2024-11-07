@@ -370,6 +370,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
             Vertex entrepotAddress = (Vertex) evt.getNewValue();
             map.displayVertex(entrepotAddress, "Warehouse", Color.red);
         }
+        if (evt.getPropertyName().equals("resetMap")) {
+            map.hideAll();
+        }
         if (evt.getPropertyName().equals("displayVertices")) {
             ArrayList<Vector> vertexVectorArrayList = (ArrayList<Vector>) evt.getNewValue();
             for (Vector vector : vertexVectorArrayList) {

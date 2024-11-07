@@ -14,7 +14,7 @@ public class Model {
     private SolveurTSP solveur;
 
     private final double VITESSE_COURIER_KMH = 15.0;
-    private final double DUREE_JOURNEE_MIN = 50.0;
+    private final double DUREE_JOURNEE_MIN = 420.0;
 
     public Model(){
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -82,7 +82,6 @@ public class Model {
             if (delivery != null) {
                 courier.getRoute().getDeliveries().add(delivery);
                 ArrayList<Segment> routeComputed = solveur.ObtenirArrayListeSegmentsTSP(courier.getRoute().getDeliveries());
-
                 // CALCUL TEMPS
                 double distanceRoute = solveur.getLongueurSolutionCourante();
                 double tempsRoute = 0;
@@ -214,6 +213,7 @@ public class Model {
                         //}
                     }
                 }
+                propertyChangeSupport.firePropertyChange("resetMap", null, null);
                 propertyChangeSupport.firePropertyChange("displayVertices", null, vertexOrderTypeToDisplay);
                 propertyChangeSupport.firePropertyChange("displaySegments", null, courier.getRoute().getSegments());
                 propertyChangeSupport.firePropertyChange("displayEntrepot", null, solveur.getEntrepot().getAddress());

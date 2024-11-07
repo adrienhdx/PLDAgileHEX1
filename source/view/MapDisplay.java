@@ -102,10 +102,10 @@ public class MapDisplay {
 
     public void hideAll(){
         try{
-            mainPainter.setVisible(false);
             for(Painter<JXMapViewer> p : mainPainter.getPainters()){
                 mainPainter.removePainter(p);
             }
+            mapViewer.revalidate();
         }catch (Exception e) {
             System.out.println(e);
         }
