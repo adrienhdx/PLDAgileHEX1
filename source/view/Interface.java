@@ -16,6 +16,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
@@ -25,7 +27,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown;
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel;
     private Vector<String> couriers,selectedCourierVectorCourierTab,  selectedCourierVectorDeliveryTab;
-    private JList<String> courierList, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
+    private JList<String> courierList, courierListMapTab, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
     private MapDisplay map;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
@@ -71,6 +73,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         selectedCourierListDeliveryTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         selectedCourierListCourierTab = new JList<>();
         selectedCourierListCourierTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        courierListMapTab = new JList<>(couriers);
+        courierListMapTab.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         setTitle("App Delivery Services");
         setSize(600, 300);
@@ -320,8 +324,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
             select.setFont(new Font("Arial", Font.BOLD, 14)); // Font plus visible
             select.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            courierMapDropdown.setMaximumSize(new Dimension(Integer.MAX_VALUE, courierMapDropdown.getPreferredSize().height));
-            courierMapDropdown.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JScrollPane scrollPaneCouriers = new JScrollPane(courierListMapTab);
+            scrollPaneCouriers.setPreferredSize(new Dimension(200, 200));
+            scrollPaneCouriers.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            scrollPaneCouriers.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollPaneCouriers.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             exportRoutes = new JButton("Export Routes");
             exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -344,7 +351,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
             // Ajout des composants avec des espaces entre eux
             controlMapPanel.add(select);
             controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
-            controlMapPanel.add(courierMapDropdown);
+            controlMapPanel.add(scrollPaneCouriers);
             controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
             controlMapPanel.add(exportRoutes);
             controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
@@ -428,6 +435,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
             couriers.add(courier.getFirstName()+ " " + courier.getLastName());
         }
         courierList.setListData(couriers);
+        courierListMapTab.setListData(couriers);
     }
 
     private void updateDeliveryListDeliveryTab(ArrayList<Delivery> newDeliveryList) {
