@@ -100,6 +100,17 @@ public class MapDisplay {
         }
     }
 
+    public void hideAll(){
+        try{
+            for(Painter<JXMapViewer> p : mainPainter.getPainters()){
+                mainPainter.removePainter(p);
+            }
+            mapViewer.revalidate();
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
     public JXMapViewer getMapViewer() {
         return mapViewer;
     }

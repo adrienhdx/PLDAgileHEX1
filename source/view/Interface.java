@@ -33,7 +33,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JFileChooser fileChooserMap;
     private JFileChooser fileExportDelivery;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
-    private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier;
+    private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier, mapLoadingBeforeDelivery;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
@@ -86,7 +86,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         // Onglet "Delivery"
         setupDeliveryPanel();
 
-
         // Onglet "Gestion des Courriers"
         setupCourierManagementPanel();
 
@@ -108,9 +107,17 @@ public class Interface extends JFrame implements PropertyChangeListener {
     }
 
     private void setupDeliveryPanel() {
+
         deliveryPanel = new JPanel();
+        deliveryPanel.setLayout(new BoxLayout(deliveryPanel, BoxLayout.Y_AXIS));
+        mapLoadingBeforeDelivery = new JLabel("You must load a map before loading deliveries.");
+        mapLoadingBeforeDelivery.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+        mapLoadingBeforeDelivery.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         deliveryButton = new JButton("Load Delivery");
+        deliveryButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        deliveryButton.setEnabled(false);
         deliveryPanel.add(deliveryButton);
+        deliveryPanel.add(mapLoadingBeforeDelivery);
         tabPan.addTab("Delivery", deliveryPanel);
 
         deliveryButton.addActionListener(e -> {
@@ -118,9 +125,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
         });
     }
 
-    private void showSettingsDelivery(File file){
+    private void showSettingsDelivery(){
         // Supprimer le bouton de chargement
-        deliveryPanel.remove(deliveryButton);
+        //deliveryPanel.remove(deliveryButton);
         deliveryPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 1, 10, 1 );
@@ -158,7 +165,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridy = 4;
         deliveryPanel.add(assignCourierButton, gbc);
 
-        //tabPan.addTab("Delivery", deliveryPanel);
         deliveryPanel.revalidate();  // Met à jour le layout
         deliveryPanel.repaint();  // Redessine le panel
     }
@@ -306,6 +312,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
             JOptionPane.showMessageDialog(this, evt.getNewValue());
         }
         if (evt.getPropertyName().equals("map")) {
+            deliveryButton.setEnabled(true);
+            deliveryPanel.remove(mapLoadingBeforeDelivery);
             mapPanel.removeAll();
             map.setCentre((Vertex) evt.getNewValue());
             // Initialisation du panneau principal
@@ -369,6 +377,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
             Vertex entrepotAddress = (Vertex) evt.getNewValue();
             map.displayVertex(entrepotAddress, "Warehouse", Color.red);
         }
+        if (evt.getPropertyName().equals("resetMap")) {
+            map.hideAll();
+        }
         if (evt.getPropertyName().equals("displayVertices")) {
             ArrayList<Vector> vertexVectorArrayList = (ArrayList<Vector>) evt.getNewValue();
             for (Vector vector : vertexVectorArrayList) {
@@ -396,9 +407,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
             JOptionPane.showMessageDialog(this, "Courier list updated");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
-            File selectedFile = fileChooserDelivery.getSelectedFile();
             deliveryPanel.remove(deliveryButton);
-            showSettingsDelivery(selectedFile);
+            showSettingsDelivery();
             unassignedModel.removeAllElements();
             ArrayList<Delivery> deliveryArrayList = (ArrayList<Delivery>) evt.getNewValue();
             for (Delivery delivery : deliveryArrayList) {
