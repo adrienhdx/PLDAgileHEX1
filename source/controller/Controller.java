@@ -42,9 +42,6 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
         }
-        if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierMapComboBox()) {
-            this.getCourierSegmentList();
-        }
         if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportDelivery()) {
             this.exportPendingDelivery();
         }
@@ -61,7 +58,9 @@ public class Controller implements ActionListener,ListSelectionListener {
                 System.out.println(view.getCourierList().getSelectedValue());
                 this.getCourierInfo(selectedCourier);
             }
-
+            if (e.getSource() == view.getCourierMapList()) {
+                this.getCourierSegmentList();
+            }
         }
     }
 
@@ -133,16 +132,19 @@ public class Controller implements ActionListener,ListSelectionListener {
     }
 
     public void getCourierSegmentList(){
-        String courierInfo = (String) view.getCourierMapComboBox().getSelectedItem();
-        String firstName = "";
-        String lastName = "";
-        if (courierInfo != null) {
-            String[] splitInfo = courierInfo.split(" ");
-            firstName = splitInfo[0];
-            lastName = splitInfo[1];
+        ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+        model.resetMap();
+        for (String courierInfo : couriersInfo) {
+            String firstName = "";
+            String lastName = "";
+            if (courierInfo != null) {
+                String[] splitInfo = courierInfo.split(" ");
+                firstName = splitInfo[0];
+                lastName = splitInfo[1];
+            }
+            Courier courier = model.getCourier(firstName, lastName);
+            model.getCourierSegmentList(courier);
         }
-        Courier courier = model.getCourier(firstName, lastName);
-        model.getCourierSegmentList(courier);
     }
 
     public void exportPendingDelivery() {
