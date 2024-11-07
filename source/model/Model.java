@@ -219,5 +219,9 @@ public class Model {
         }
     }
 
+    public void getCourierInfo(Courier courier){
+        propertyChangeSupport.firePropertyChange("courierInfo", null, courier);
+    }
+
     public ArrayList<Delivery> getPendingDeliveryArrayList() { return pendingDeliveryArrayList; }
 }
