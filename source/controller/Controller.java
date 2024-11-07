@@ -164,7 +164,7 @@ public class Controller implements ActionListener,ListSelectionListener {
             firstName = splitInfo[0];
             lastName = splitInfo[1];
             Courier courier = model.getCourier(firstName, lastName);
-            model.getCourierDeliveries(courier);
+            model.getCourierDeliveriesDeliveryTab(courier);
         }
     }
 
@@ -184,10 +184,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
         selectedCourier = model.getCourier(firstNameSelected, lastNameSelected);
         model.getCourierInfo(selectedCourier);
-        //Afficher les résultats
-            System.out.println("Prénom : " + selectedCourier.getFirstName());
-            System.out.println("Nom : " + selectedCourier.getLastName());
-            System.out.println("Num : " + selectedCourier.getPhoneNum());
+        model.getCourierDeliveriesCourierTab(selectedCourier);
     }
 
 }
