@@ -22,6 +22,7 @@ import org.jxmapviewer.viewer.WaypointRenderer;
  */
 public class FancyWaypointRenderer implements WaypointRenderer<CustomWaypoint>
 {
+    private boolean entrepot;
     private static final Log log = LogFactory.getLog(FancyWaypointRenderer.class);
 
     private final Map<Color, BufferedImage> map = new HashMap<Color, BufferedImage>();
@@ -33,10 +34,13 @@ public class FancyWaypointRenderer implements WaypointRenderer<CustomWaypoint>
     /**
      * Uses a default waypoint image
      */
-    public FancyWaypointRenderer()
+    public FancyWaypointRenderer(boolean entrepot)
     {
+        this.entrepot = entrepot;
         URL resource = getClass().getResource("waypoint_white.png");
-
+        if (entrepot){
+            resource = getClass().getResource("entrepot_white.png");
+        }
         try
         {
             origImage = ImageIO.read(resource);

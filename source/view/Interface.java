@@ -375,7 +375,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
         if (evt.getPropertyName().equals("displayEntrepot")) {
             Vertex entrepotAddress = (Vertex) evt.getNewValue();
-            map.displayVertex(entrepotAddress, "Warehouse", Color.red);
+            map.displayVertex(entrepotAddress, "Warehouse", Color.red,true);
         }
         if (evt.getPropertyName().equals("resetMap")) {
             map.hideAll();
@@ -384,9 +384,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
             ArrayList<Vector> vertexVectorArrayList = (ArrayList<Vector>) evt.getNewValue();
             for (Vector vector : vertexVectorArrayList) {
                 if (vector.get(1).equals("PICK_UP")) {
-                    map.displayVertex((Vertex) vector.getFirst(), Integer.toString(vertexVectorArrayList.indexOf(vector)+1),Color.cyan);
+                    map.displayVertex((Vertex) vector.getFirst(), Integer.toString(vertexVectorArrayList.indexOf(vector)+1),Color.cyan,false);
                 } else {
-                    map.displayVertex((Vertex) vector.getFirst(), Integer.toString(vertexVectorArrayList.indexOf(vector)+1),Color.orange);
+                    map.displayVertex((Vertex) vector.getFirst(), Integer.toString(vertexVectorArrayList.indexOf(vector)+1),Color.orange,false);
                 }
             }
         }
