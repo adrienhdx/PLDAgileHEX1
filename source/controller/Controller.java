@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,6 +43,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
         if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportDelivery()) {
             this.exportPendingDelivery();
+        }
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportRoutes()) {
+            this.exportRoutes();
         }
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierDeliveryComboBox()){
             this.getCourierDeliveries();
@@ -173,6 +175,36 @@ public class Controller implements ActionListener,ListSelectionListener {
             lastName = splitInfo[1];
             Courier courier = model.getCourier(firstName, lastName);
             model.getCourierDeliveriesDeliveryTab(courier);
+        }
+    }
+
+    public void exportRoutes() {
+        try {
+            ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+            String firstName = "";
+            String lastName = "";
+            Courier courier = null;
+            ArrayList<Vertex> vertices = new ArrayList<>();
+            ArrayList<Segment> segments = new ArrayList<>();
+            for (String courierInfo : couriersInfo) {
+                if (courierInfo != null) {
+                    String[] splitInfo = courierInfo.split(" ");
+                    firstName = splitInfo[0];
+                    lastName = splitInfo[1];
+                    courier = model.getCourier(firstName, lastName);
+                }
+                for (Vertex vertex : model.getCourierVertexArrayList(courier)) {
+                    vertices.add(vertex);
+                }
+                for (Segment segment : model.getCourierSegmentArrayList(courier)) {
+                    segments.add(segment);
+                }
+            }
+            FileWriter fileWriter = new FileWriter(view.getFileExportRoutes().getSelectedFile().getAbsolutePath());
+            fileWriter.write(XmlExtractor.exportRoutes(vertices, segments));
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

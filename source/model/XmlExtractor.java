@@ -164,4 +164,17 @@ public class XmlExtractor {
         return xml;
     }
 
+    public static String exportRoutes(ArrayList<Vertex> vertices, ArrayList<Segment> segments) {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
+        xml += "<reseau>\n";
+        for (Vertex vertex : vertices) {
+            xml += "<noeud id=\"" + vertex.getId() + "\" latitude=\"" + vertex.getLatitude() + "\" longitude=\"" + vertex.getLongitude() + "\"/>\n";
+        }
+        for (Segment segment : segments) {
+            xml += "<troncon destination=\"" + segment.getDestination().getId() + "\" longueur=\"" + segment.getLongueur() + "\" nomRue=\"" + segment.getNomRue() + "\" origine=\"" + segment.getOrigine().getId() + "\"/>\n";
+        }
+        xml += "</reseau>";
+        return xml;
+    }
+
 }

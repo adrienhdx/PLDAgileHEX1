@@ -184,6 +184,55 @@ public class Model {
         return null;
     }
 
+    public Vertex getEntrepotAddress(Courier courier) {
+        if (courier != null) {
+            return solveur.getEntrepot().getAddress();
+        }
+        return null;
+    }
+
+    public ArrayList<Vertex> getCourierVertexArrayList(Courier courier) {
+        if (courier!= null) {
+            if (!courier.getRoute().getSegments().isEmpty()) {
+                ArrayList<Vertex> courierVertex = new ArrayList<>();
+                courierVertex.add(solveur.getEntrepot().getAddress());
+                for (Segment segment : courier.getRoute().getSegments()) {
+                    Vertex origin = segment.getOrigine();
+                    Vertex destination = segment.getDestination();
+                    String originType = this.isDeliveryPoint(courier, origin);
+                    String destinationType = this.isDeliveryPoint(courier, destination);
+                    if (originType != null && !courierVertex.contains(origin)) {
+                        courierVertex.add(origin);
+                    }
+                    if (destinationType != null && !courierVertex.contains(destination)) {
+                        courierVertex.add(destination);
+                    }
+                }
+                return courierVertex;
+            }
+            return null;
+        }
+        return null;
+    }
+
+    public ArrayList<Segment> getCourierSegmentArrayList(Courier courier) {
+        if (courier != null) {
+            if (!courier.getRoute().getSegments().isEmpty()) {
+                ArrayList<Segment> courierSegments = new ArrayList<>();
+                for (Segment segment : courier.getRoute().getSegments()) {
+                    for (Segment solveurSegment : solveur.getSegmentList()) {
+                        if (solveurSegment.getOrigine() == segment.getOrigine() && solveurSegment.getDestination() == segment.getDestination()) {
+                            courierSegments.add(solveurSegment);
+                        }
+                    }
+                }
+                return courierSegments;
+            }
+            return null;
+        }
+        return null;
+    }
+
     public void getCourierSegmentList(Courier courier){
         if (courier != null) {
             if (!courier.getRoute().getSegments().isEmpty()) {
