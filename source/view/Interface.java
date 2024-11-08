@@ -9,13 +9,15 @@ import source.model.Vertex;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Vector;
+import java.util.*;
+import java.util.List;
 
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
@@ -34,6 +36,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
     private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier, mapLoadingBeforeDelivery;
     private Vertex mapDefault ;
+    private List<Color> availableColors;
+    private Map<String, Color> routeColors;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
@@ -88,6 +92,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
         selectedCourierListCourierTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         courierListMapTab = new JList<>(couriers);
         courierListMapTab.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        availableColors = new ArrayList<>(Arrays.asList(
+                Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA,
+                Color.ORANGE, new Color(150, 131, 236), new Color(20, 148, 20),
+                new Color(255, 20, 147)
+        ));
+        routeColors = new HashMap<>();
+
 
         setTitle("App Delivery Services");
         setSize(600, 300);
@@ -487,9 +498,23 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
         if (evt.getPropertyName().equals("displaySegments")) {
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
+            Random random = new Random();
+            String courierID = (String) evt.getOldValue();
+            //L'id pris est une string somme du nom et prénom du livreur
+
+            // Vérifie si l'itinéraire a déjà une couleur associée
+            Color color;
+            if (routeColors.containsKey(courierID)) {
+                color = routeColors.get(courierID);
+            } else {
+                // Associe une nouvelle couleur unique si l'itinéraire n'en a pas encore
+                color = availableColors.remove(random.nextInt(availableColors.size()));
+                routeColors.put(courierID, color); // Associe la couleur à l'itinéraire
+            }
+
             if (!segmentArrayList.isEmpty()){
                 for(Segment segment : segmentArrayList){
-                    map.displaySegment(segment);
+                    map.displaySegment(segment,color);
                 }
             }
         }

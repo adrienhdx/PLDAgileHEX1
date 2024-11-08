@@ -90,14 +90,12 @@ public class MapDisplay {
         }
     }
 
-    public void displaySegment (Segment segment) {
+    public void displaySegment (Segment segment, Color color) {
         try {
             if (segment != null) {
                 GeoPosition origin = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
                 GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
                 List<GeoPosition> track = Arrays.asList(origin, destination);
-                Random random = new Random();
-                Color color = colors.remove(random.nextInt(colors.size()));
                 RoutePainter routePainter = new RoutePainter(track,color);
                 painters.add(routePainter);
                 mainPainter.addPainter(routePainter);
@@ -112,7 +110,7 @@ public class MapDisplay {
             for(Painter<JXMapViewer> p : mainPainter.getPainters()){
                 mainPainter.removePainter(p);
             }
-            mapViewer.revalidate();
+            mapViewer.repaint();
         }catch (Exception e) {
             System.out.println(e);
         }
