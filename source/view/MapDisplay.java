@@ -21,6 +21,7 @@ public class MapDisplay {
     private final JXMapViewer mapViewer;
     private final List<Painter<JXMapViewer>> painters;
     private final CompoundPainter<JXMapViewer> mainPainter;
+    private final List<Color> colors;
 
     public MapDisplay(){
         mapViewer = new JXMapViewer();
@@ -36,6 +37,10 @@ public class MapDisplay {
         painters = new ArrayList<>();
         mainPainter = new CompoundPainter<>(painters);
         mapViewer.setOverlayPainter(mainPainter);
+        colors = new ArrayList<>(Arrays.asList(
+                Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.PINK,
+                Color.ORANGE, new Color(148, 0, 211), new Color(0, 100, 0)
+        ));
         //Initialisation des écouteurs
         this.initListenersMap();
     }
@@ -85,12 +90,14 @@ public class MapDisplay {
         }
     }
 
-    public void displaySegment (Segment segment, Color color) {
+    public void displaySegment (Segment segment) {
         try {
             if (segment != null) {
                 GeoPosition origin = new GeoPosition(segment.getOrigine().getLatitude(), segment.getOrigine().getLongitude());
                 GeoPosition destination = new GeoPosition(segment.getDestination().getLatitude(), segment.getDestination().getLongitude());
                 List<GeoPosition> track = Arrays.asList(origin, destination);
+                Random random = new Random();
+                Color color = colors.remove(random.nextInt(colors.size()));
                 RoutePainter routePainter = new RoutePainter(track,color);
                 painters.add(routePainter);
                 mainPainter.addPainter(routePainter);

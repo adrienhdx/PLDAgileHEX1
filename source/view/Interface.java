@@ -16,8 +16,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Vector;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
@@ -394,7 +392,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
             if (!segmentArrayList.isEmpty()){
                 for(Segment segment : segmentArrayList){
-                    map.displaySegment(segment,Color.blue);
+                    map.displaySegment(segment);
                 }
             }
         }
