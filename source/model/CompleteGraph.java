@@ -3,8 +3,6 @@ package source.model;
 import java.util.List;
 
 public class CompleteGraph implements Graph {
-	private static final int MAX_COST = 10000;
-	private static final int MIN_COST = 1;
 	public int nbVertices;
 	public double[][] cost;
 	

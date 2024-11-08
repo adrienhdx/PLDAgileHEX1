@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,14 +41,17 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
         }
-        if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierMapComboBox()) {
-            this.getCourierSegmentList();
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportWaitingList()) {
+            this.exportWaitingArrayList();
         }
-        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportDelivery()) {
-            this.exportPendingDelivery();
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportRoutes()) {
+            this.exportRoutes();
         }
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierDeliveryComboBox()){
             this.getCourierDeliveries();
+        }
+        if(e.getSource() == view.getWaitingListButton()){
+            this.addDeliveryInWaitingList();
         }
     }
 
@@ -61,7 +63,9 @@ public class Controller implements ActionListener,ListSelectionListener {
                 System.out.println(view.getCourierList().getSelectedValue());
                 this.getCourierInfo(selectedCourier);
             }
-
+            if (e.getSource() == view.getCourierMapList()) {
+                this.getCourierSegmentList();
+            }
         }
     }
 
@@ -133,22 +137,28 @@ public class Controller implements ActionListener,ListSelectionListener {
     }
 
     public void getCourierSegmentList(){
-        String courierInfo = (String) view.getCourierMapComboBox().getSelectedItem();
-        String firstName = "";
-        String lastName = "";
-        if (courierInfo != null) {
-            String[] splitInfo = courierInfo.split(" ");
-            firstName = splitInfo[0];
-            lastName = splitInfo[1];
+        model.resetMap();
+        if(!view.getCourierMapList().getSelectedValuesList().isEmpty()) {
+            ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+            model.resetMap();
+            for (String courierInfo : couriersInfo) {
+                String firstName = "";
+                String lastName = "";
+                if (courierInfo != null) {
+                    String[] splitInfo = courierInfo.split(" ");
+                    firstName = splitInfo[0];
+                    lastName = splitInfo[1];
+                }
+                Courier courier = model.getCourier(firstName, lastName);
+                model.getCourierSegmentList(courier);
+            }
         }
-        Courier courier = model.getCourier(firstName, lastName);
-        model.getCourierSegmentList(courier);
     }
 
-    public void exportPendingDelivery() {
+    public void exportWaitingArrayList() {
         try {
-            FileWriter fileWriter = new FileWriter(view.getFileExportDelivery().getSelectedFile().getAbsolutePath());
-            fileWriter.write(XmlExtractor.exportPendingDelivery(model.getPendingDeliveryArrayList()));
+            FileWriter fileWriter = new FileWriter(view.getFileExportWaitingList().getSelectedFile().getAbsolutePath());
+            fileWriter.write(XmlExtractor.exportWaitingList(model.getWaitingArrayList()));
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -165,6 +175,39 @@ public class Controller implements ActionListener,ListSelectionListener {
             lastName = splitInfo[1];
             Courier courier = model.getCourier(firstName, lastName);
             model.getCourierDeliveriesDeliveryTab(courier);
+        }
+    }
+
+    public void exportRoutes() {
+        try {
+            ArrayList<String> couriersInfo;
+            FileWriter fileWriter = new FileWriter(view.getFileExportRoutes().getSelectedFile().getAbsolutePath());
+            ArrayList<Vertex> vertices = new ArrayList<>();
+            ArrayList<Segment> segments = new ArrayList<>();
+            if (!view.getCourierMapList().getSelectedValuesList().isEmpty()) {
+                couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+                String firstName = "";
+                String lastName = "";
+                Courier courier = null;
+                for (String courierInfo : couriersInfo) {
+                    if (courierInfo != null) {
+                        String[] splitInfo = courierInfo.split(" ");
+                        firstName = splitInfo[0];
+                        lastName = splitInfo[1];
+                        courier = model.getCourier(firstName, lastName);
+                    }
+                    for (Vertex vertex : model.getCourierVertexArrayList(courier)) {
+                        vertices.add(vertex);
+                    }
+                    for (Segment segment : model.getCourierSegmentArrayList(courier)) {
+                        segments.add(segment);
+                    }
+                }
+            }
+            fileWriter.write(XmlExtractor.exportRoutes(vertices, segments));
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -187,5 +230,16 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.getCourierDeliveriesCourierTab(selectedCourier);
     }
 
+    public void addDeliveryInWaitingList() {
+        String selectedDelirery = (String) view.getPendingDeliveryComboBox().getSelectedItem();
+        Long pickUpPtStr = null;
+        Long deliveryPtStr = null;
+        int index = selectedDelirery.indexOf('-');
+        deliveryPtStr = Long.parseLong(selectedDelirery.substring(index + 1));
+        pickUpPtStr = Long.parseLong(selectedDelirery.substring(0, index));
+        Delivery deliveryWaitingList = model.getPendingDelivery(pickUpPtStr, deliveryPtStr);
+        model.updateWaitingList(deliveryWaitingList);
+    }
 }
+
 

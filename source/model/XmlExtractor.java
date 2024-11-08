@@ -154,13 +154,26 @@ public class XmlExtractor {
         return file.endsWith(".xml");
     }
 
-    public static String exportPendingDelivery(ArrayList<Delivery> pendingDeliveries){
+    public static String exportWaitingList(ArrayList<Delivery> pendingDeliveries){
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
         xml += "<demandeDeLivraisons>\n";
         for (Delivery delivery : pendingDeliveries) {
             xml += "<livraison adresseEnlevement=\"" + delivery.getPickUpPt().getId() + "\" adresseLivraison=\"" + delivery.getDeliveryPt().getId() + "\" dureeEnlevement=\"" + delivery.getPickUpTime() + "\" dureeLivraison=\"" + delivery.getDeliveryTime() + "\"/>\n";
         }
         xml += "</demandeDeLivraisons>";
+        return xml;
+    }
+
+    public static String exportRoutes(ArrayList<Vertex> vertices, ArrayList<Segment> segments) {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
+        xml += "<reseau>\n";
+        for (Vertex vertex : vertices) {
+            xml += "<noeud id=\"" + vertex.getId() + "\" latitude=\"" + vertex.getLatitude() + "\" longitude=\"" + vertex.getLongitude() + "\"/>\n";
+        }
+        for (Segment segment : segments) {
+            xml += "<troncon destination=\"" + segment.getDestination().getId() + "\" longueur=\"" + segment.getLongueur() + "\" nomRue=\"" + segment.getNomRue() + "\" origine=\"" + segment.getOrigine().getId() + "\"/>\n";
+        }
+        xml += "</reseau>";
         return xml;
     }
 
