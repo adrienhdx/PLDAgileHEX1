@@ -214,20 +214,22 @@ public class Controller implements ActionListener,ListSelectionListener {
     public void withdrawDelivery(){}
 
     public void getCourierInfo(String courierSelected){
-        Courier selectedCourier;
-        int rang = -1;
-        String firstNameSelected = "";
-        String lastNameSelected = "";
-        String[] parts = courierSelected.split(" ");
-        if (parts.length == 2) {
-            firstNameSelected = parts[0];
-            lastNameSelected = parts[1];
-        } else {
-            System.out.println("Format de chaîne incorrect");
+        if(courierSelected != null) {
+            Courier selectedCourier;
+            int rang = -1;
+            String firstNameSelected = "";
+            String lastNameSelected = "";
+            String[] parts = courierSelected.split(" ");
+            if (parts.length == 2) {
+                firstNameSelected = parts[0];
+                lastNameSelected = parts[1];
+            } else {
+                System.out.println("Format de chaîne incorrect");
+            }
+            selectedCourier = model.getCourier(firstNameSelected, lastNameSelected);
+            model.getCourierInfo(selectedCourier);
+            model.getCourierDeliveriesCourierTab(selectedCourier);
         }
-        selectedCourier = model.getCourier(firstNameSelected, lastNameSelected);
-        model.getCourierInfo(selectedCourier);
-        model.getCourierDeliveriesCourierTab(selectedCourier);
     }
 
     public void addDeliveryInWaitingList() {

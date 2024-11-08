@@ -408,6 +408,34 @@ public class Interface extends JFrame implements PropertyChangeListener {
             scrollPaneCouriers.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPaneCouriers.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+            courierListMapTab.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                              boolean isSelected, boolean cellHasFocus) {
+                    // Use default renderer setup
+                    JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                    if (value instanceof String) {
+                        Color color = routeColors.get(value);
+                        if (color != null) {
+                            c.setForeground(color); // Set color if found in the map
+                            System.out.println(color);
+                        } else {
+                            c.setForeground(Color.BLACK); // Default color if no entry in map
+                        }
+                    }
+                    // Optionally customize background for selected state
+                    /*
+                    if (isSelected) {
+                        c.setBackground(Color.LIGHT_GRAY);
+                    } else {
+                        c.setBackground(Color.WHITE); // Default unselected background
+                    }*/
+
+                    return c;
+                }
+            });
+
             // Disable automatic selection on single click by using a custom ListSelectionModel.
             courierListMapTab.setSelectionModel(new DefaultListSelectionModel() {
                 @Override
@@ -517,6 +545,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
                     map.displaySegment(segment,color);
                 }
             }
+
+            courierListMapTab.repaint();
         }
         if (evt.getPropertyName().equals("courierArrayList")) {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();

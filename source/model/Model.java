@@ -265,7 +265,7 @@ public class Model {
                     }
                 }
                 propertyChangeSupport.firePropertyChange("displayVertices", null, vertexOrderTypeToDisplay);
-                propertyChangeSupport.firePropertyChange("displaySegments", (courier.getFirstName()+courier.getLastName()), courier.getRoute().getSegments());
+                propertyChangeSupport.firePropertyChange("displaySegments", (courier.getFirstName()+" "+courier.getLastName()), courier.getRoute().getSegments());
                 propertyChangeSupport.firePropertyChange("displayEntrepot", null, solveur.getEntrepot().getAddress());
             } else {
                 propertyChangeSupport.firePropertyChange("errorMessage", null, "No route is associated with this courier : you must assign him at least one delivery");
