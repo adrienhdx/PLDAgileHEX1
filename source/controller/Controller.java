@@ -26,6 +26,9 @@ public class Controller implements ActionListener,ListSelectionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println(e);
+        if (e.getSource() == view.getPendingDeliveryComboBox()) {
+            this.displayPendingDelivery();
+        }
         if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserDelivery()) {
             this.loadDeliveries();
         }
@@ -64,7 +67,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void loadMap(){
+    private void loadMap(){
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
         ArrayList<Object> result = XmlExtractor.extractMap(filePath);
         if (result != null) {
@@ -74,7 +77,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void loadDeliveries(){
+    private void loadDeliveries(){
         String filePath = view.getFileChooserDelivery().getSelectedFile().getAbsolutePath();
         if (model.getVertexArrayList() != null) {
             ArrayList<Object> demandArrayList = XmlExtractor.extractDeliveryDemand(filePath,model.getVertexArrayList());
@@ -86,7 +89,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void createCourier(){
+    private void createCourier(){
         String newCourierFirstName = view.getCourierFieldFirstName().getText().trim();
         String newCourierLastName = view.getCourierFieldLastName().getText().trim();
         String newCourierPhoneNumber = view.getCourierFieldPhoneNumber().getText().trim();
@@ -96,7 +99,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void assignDeliveryCourier(){
+    private void assignDeliveryCourier(){
         String courierStr = (String) view.getCourierDeliveryComboBox().getSelectedItem();
         String firstName = "";
         String lastName = "";
@@ -118,7 +121,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.assignDelivery(selectedCourier, delivery);
     }
 
-    public void deleteCourier(){
+    private void deleteCourier(){
         String courierInfo = view.getCourierList().getSelectedValue();
         String firstName = "";
         String lastName = "";
@@ -131,7 +134,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.deleteCourier(courier);
     }
 
-    public void getCourierSegmentList(){
+    private void getCourierSegmentList(){
         ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
         model.resetMap();
         for (String courierInfo : couriersInfo) {
@@ -147,7 +150,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void exportPendingDelivery() {
+    private void exportPendingDelivery() {
         try {
             FileWriter fileWriter = new FileWriter(view.getFileExportDelivery().getSelectedFile().getAbsolutePath());
             fileWriter.write(XmlExtractor.exportPendingDelivery(model.getPendingDeliveryArrayList()));
@@ -157,7 +160,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void getCourierDeliveries() {
+    private void getCourierDeliveries() {
         String courierInfo = (String) view.getCourierDeliveryComboBox().getSelectedItem();
         String firstName = "";
         String lastName = "";
@@ -170,11 +173,8 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void withdrawDelivery(){}
-
-    public void getCourierInfo(String courierSelected){
+    private void getCourierInfo(String courierSelected){
         Courier selectedCourier;
-        int rang = -1;
         String firstNameSelected = "";
         String lastNameSelected = "";
         String[] parts = courierSelected.split(" ");
@@ -187,6 +187,19 @@ public class Controller implements ActionListener,ListSelectionListener {
         selectedCourier = model.getCourier(firstNameSelected, lastNameSelected);
         model.getCourierInfo(selectedCourier);
         model.getCourierDeliveriesCourierTab(selectedCourier);
+    }
+
+    private void displayPendingDelivery(){
+        String selectedDelivery = (String) view.getPendingDeliveryComboBox() .getSelectedItem();
+        Long pickUpPtStr = null;
+        Long deliveryPtStr = null;
+        if (selectedDelivery != null) {
+            int index = selectedDelivery.indexOf('-');
+            deliveryPtStr = Long.parseLong(selectedDelivery.substring(index + 1));
+            pickUpPtStr = Long.parseLong(selectedDelivery.substring(0, index));
+        }
+        Delivery delivery = model.getPendingDelivery(pickUpPtStr, deliveryPtStr);
+        model.displayDelivery(delivery);
     }
 
 }

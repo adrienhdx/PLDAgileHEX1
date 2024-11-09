@@ -45,12 +45,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
         assignCourierButton.addActionListener(controller);
         waitingListButton.addActionListener(controller); //A IMPLEMENTER !!!!!!!
         exportWaitingListButton.addActionListener(controller); //A IMPLEMENTER !!!!!
-
         removeCourierButton.addActionListener(controller);
         courierList.addListSelectionListener(controller);
         courierListMapTab.addListSelectionListener(controller);
         courierDeliveryDropdown.addActionListener(controller);
         waitingListDropdown.addActionListener(controller);
+        unassignedDeliveryDropdown.addActionListener(controller);
     }
 
     public Interface() {
@@ -72,8 +72,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierDeliveryDropdown = new JComboBox<>(courierDeliveryModel);
         waitingListDropdown = new JComboBox<>(waitingListModel);
         assignCourierButton = new JButton("Assign the delivery to this courier");
-        waitingListButton = new JButton("Put this delivery in the waiting list");
-        exportWaitingListButton = new JButton("Export deliveries in the waiting list");
+        waitingListButton = new JButton("Put the delivery in the waiting list");
+        exportWaitingListButton = new JButton("Export deliveries from the waiting list");
         courierMapDropdown = new JComboBox<>(courierMapModel);
         map = new MapDisplay();
         mapDelivery = new MapDisplay();
@@ -431,7 +431,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         if (evt.getPropertyName().equals("resetMap")) {
             map.hideAll();
         }
-        if (evt.getPropertyName().equals("displayVertices")) {
+        if (evt.getPropertyName().equals("displayVerticesMainMap")) {
             ArrayList<Vector> vertexVectorArrayList = (ArrayList<Vector>) evt.getNewValue();
             for (Vector vector : vertexVectorArrayList) {
                 if (vector.get(1).equals("PICK_UP")) {
@@ -441,7 +441,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
                 }
             }
         }
-        if (evt.getPropertyName().equals("displaySegments")) {
+        if (evt.getPropertyName().equals("displayDelivery")) {
+            ArrayList<Vertex> deliveryVertices = (ArrayList<Vertex>) evt.getNewValue();
+            mapDelivery.hideAll();
+            mapDelivery.displayVertex(deliveryVertices.getFirst(), "PICK UP",Color.cyan,false);
+            mapDelivery.displayVertex(deliveryVertices.getLast(), "DELIVERY",Color.orange,false);
+        }
+        if (evt.getPropertyName().equals("displaySegmentsMainMap")) {
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
             if (!segmentArrayList.isEmpty()){
                 for(Segment segment : segmentArrayList){

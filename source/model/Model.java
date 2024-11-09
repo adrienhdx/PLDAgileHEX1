@@ -170,6 +170,15 @@ public class Model {
         }
     }
 
+    public void displayDelivery(Delivery delivery){
+        if (delivery != null) {
+            ArrayList<Vertex> deliveryVertices = new ArrayList<>();
+            deliveryVertices.add(delivery.getPickUpPt());
+            deliveryVertices.add(delivery.getDeliveryPt());
+            propertyChangeSupport.firePropertyChange("displayDelivery", null, deliveryVertices);
+        }
+    }
+
     public Vertex getPickUpFromDelivery(Courier courier, Vertex deliveryVertex) {
         if (courier != null && deliveryVertex != null) {
             for (Delivery delivery : courier.getRoute().getDeliveries()) {
@@ -213,8 +222,8 @@ public class Model {
                         //}
                     }
                 }
-                propertyChangeSupport.firePropertyChange("displayVertices", null, vertexOrderTypeToDisplay);
-                propertyChangeSupport.firePropertyChange("displaySegments", null, courier.getRoute().getSegments());
+                propertyChangeSupport.firePropertyChange("displayVerticesMainMap", null, vertexOrderTypeToDisplay);
+                propertyChangeSupport.firePropertyChange("displaySegmentsMainMap", null, courier.getRoute().getSegments());
                 propertyChangeSupport.firePropertyChange("displayEntrepot", null, solveur.getEntrepot().getAddress());
             } else {
                 propertyChangeSupport.firePropertyChange("errorMessage", null, "No route is associated with this courier : you must assign him at least one delivery");
