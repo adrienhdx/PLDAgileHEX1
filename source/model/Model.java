@@ -9,6 +9,7 @@ public class Model {
     private ArrayList<Delivery> assignedDeliveryArrayList;
     private ArrayList<Delivery> postponedDeliveryArrayList;
     private ArrayList<Delivery> pendingDeliveryArrayList;
+    private ArrayList<Delivery> waitingDeliveryArrayList;
     private ArrayList<Courier> courierArrayList;
     private PropertyChangeSupport propertyChangeSupport;
     private SolveurTSP solveur;
@@ -22,7 +23,8 @@ public class Model {
         this.pendingDeliveryArrayList = new ArrayList<>();
         this.assignedDeliveryArrayList = new ArrayList<>();
         this.postponedDeliveryArrayList = new ArrayList<>();
-    }
+        this.waitingDeliveryArrayList = new ArrayList<>();
+   }
 
     public void addPropertyChangeListener(PropertyChangeListener ArrayListener){
         propertyChangeSupport.addPropertyChangeListener(ArrayListener);
@@ -191,6 +193,55 @@ public class Model {
         return null;
     }
 
+    public Vertex getEntrepotAddress(Courier courier) {
+        if (courier != null) {
+            return solveur.getEntrepot().getAddress();
+        }
+        return null;
+    }
+
+    public ArrayList<Vertex> getCourierVertexArrayList(Courier courier) {
+        if (courier!= null) {
+            if (!courier.getRoute().getSegments().isEmpty()) {
+                ArrayList<Vertex> courierVertex = new ArrayList<>();
+                courierVertex.add(solveur.getEntrepot().getAddress());
+                for (Segment segment : courier.getRoute().getSegments()) {
+                    Vertex origin = segment.getOrigine();
+                    Vertex destination = segment.getDestination();
+                    String originType = this.isDeliveryPoint(courier, origin);
+                    String destinationType = this.isDeliveryPoint(courier, destination);
+                    if (originType != null && !courierVertex.contains(origin)) {
+                        courierVertex.add(origin);
+                    }
+                    if (destinationType != null && !courierVertex.contains(destination)) {
+                        courierVertex.add(destination);
+                    }
+                }
+                return courierVertex;
+            }
+            return null;
+        }
+        return null;
+    }
+
+    public ArrayList<Segment> getCourierSegmentArrayList(Courier courier) {
+        if (courier != null) {
+            if (!courier.getRoute().getSegments().isEmpty()) {
+                ArrayList<Segment> courierSegments = new ArrayList<>();
+                for (Segment segment : courier.getRoute().getSegments()) {
+                    for (Segment solveurSegment : solveur.getSegmentList()) {
+                        if (solveurSegment.getOrigine() == segment.getOrigine() && solveurSegment.getDestination() == segment.getDestination()) {
+                            courierSegments.add(solveurSegment);
+                        }
+                    }
+                }
+                return courierSegments;
+            }
+            return null;
+        }
+        return null;
+    }
+
     public void getCourierSegmentList(Courier courier){
         if (courier != null) {
             if (!courier.getRoute().getSegments().isEmpty()) {
@@ -241,5 +292,15 @@ public class Model {
         propertyChangeSupport.firePropertyChange("courierInfo", null, courier);
     }
 
-    public ArrayList<Delivery> getPendingDeliveryArrayList() { return pendingDeliveryArrayList; }
+    public ArrayList<Delivery> getWaitingArrayList() { return waitingDeliveryArrayList; }
+
+    public void updateWaitingList(Delivery delivery){
+        if (delivery != null) {
+            waitingDeliveryArrayList.add(delivery);
+            propertyChangeSupport.firePropertyChange("updateWaitingList", null,waitingDeliveryArrayList);
+        }
+    }
 }
+
+
+

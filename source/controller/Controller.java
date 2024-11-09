@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,11 +44,17 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getSource() == view.getRemoveCourierButton()) {
             this.deleteCourier();
         }
-        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportDelivery()) {
-            this.exportPendingDelivery();
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportWaitingList()) {
+            this.exportWaitingArrayList();
+        }
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileExportRoutes()) {
+            this.exportRoutes();
         }
         if (e.getActionCommand().equals("comboBoxChanged") && e.getSource() == view.getCourierDeliveryComboBox()){
             this.getCourierDeliveries();
+        }
+        if(e.getSource() == view.getWaitingListButton()){
+            this.addDeliveryInWaitingList();
         }
     }
 
@@ -134,26 +139,28 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.deleteCourier(courier);
     }
 
-    private void getCourierSegmentList(){
-        ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+    public void getCourierSegmentList(){
         model.resetMap();
-        for (String courierInfo : couriersInfo) {
-            String firstName = "";
-            String lastName = "";
-            if (courierInfo != null) {
-                String[] splitInfo = courierInfo.split(" ");
-                firstName = splitInfo[0];
-                lastName = splitInfo[1];
+        if(!view.getCourierMapList().getSelectedValuesList().isEmpty()) {
+            ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+            for (String courierInfo : couriersInfo) {
+                String firstName = "";
+                String lastName = "";
+                if (courierInfo != null) {
+                    String[] splitInfo = courierInfo.split(" ");
+                    firstName = splitInfo[0];
+                    lastName = splitInfo[1];
+                }
+                Courier courier = model.getCourier(firstName, lastName);
+                model.getCourierSegmentList(courier);
             }
-            Courier courier = model.getCourier(firstName, lastName);
-            model.getCourierSegmentList(courier);
         }
     }
 
-    private void exportPendingDelivery() {
+    public void exportWaitingArrayList() {
         try {
-            FileWriter fileWriter = new FileWriter(view.getFileExportDelivery().getSelectedFile().getAbsolutePath());
-            fileWriter.write(XmlExtractor.exportPendingDelivery(model.getPendingDeliveryArrayList()));
+            FileWriter fileWriter = new FileWriter(view.getFileExportWaitingList().getSelectedFile().getAbsolutePath());
+            fileWriter.write(XmlExtractor.exportWaitingList(model.getWaitingArrayList()));
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -173,20 +180,58 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    private void getCourierInfo(String courierSelected){
-        Courier selectedCourier;
-        String firstNameSelected = "";
-        String lastNameSelected = "";
-        String[] parts = courierSelected.split(" ");
-        if (parts.length == 2) {
-            firstNameSelected = parts[0];
-            lastNameSelected = parts[1];
-        } else {
-            System.out.println("Format de chaîne incorrect");
+    public void exportRoutes() {
+        try {
+            ArrayList<String> couriersInfo;
+            FileWriter fileWriter = new FileWriter(view.getFileExportRoutes().getSelectedFile().getAbsolutePath());
+            ArrayList<Vertex> vertices = new ArrayList<>();
+            ArrayList<Segment> segments = new ArrayList<>();
+            if (!view.getCourierMapList().getSelectedValuesList().isEmpty()) {
+                couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
+                String firstName = "";
+                String lastName = "";
+                Courier courier = null;
+                for (String courierInfo : couriersInfo) {
+                    if (courierInfo != null) {
+                        String[] splitInfo = courierInfo.split(" ");
+                        firstName = splitInfo[0];
+                        lastName = splitInfo[1];
+                        courier = model.getCourier(firstName, lastName);
+                    }
+                    for (Vertex vertex : model.getCourierVertexArrayList(courier)) {
+                        vertices.add(vertex);
+                    }
+                    for (Segment segment : model.getCourierSegmentArrayList(courier)) {
+                        segments.add(segment);
+                    }
+                }
+            }
+            fileWriter.write(XmlExtractor.exportRoutes(vertices, segments));
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        selectedCourier = model.getCourier(firstNameSelected, lastNameSelected);
-        model.getCourierInfo(selectedCourier);
-        model.getCourierDeliveriesCourierTab(selectedCourier);
+    }
+
+    public void withdrawDelivery(){}
+
+    public void getCourierInfo(String courierSelected){
+        if(courierSelected != null) {
+            Courier selectedCourier;
+            int rang = -1;
+            String firstNameSelected = "";
+            String lastNameSelected = "";
+            String[] parts = courierSelected.split(" ");
+            if (parts.length == 2) {
+                firstNameSelected = parts[0];
+                lastNameSelected = parts[1];
+            } else {
+                System.out.println("Format de chaîne incorrect");
+            }
+            selectedCourier = model.getCourier(firstNameSelected, lastNameSelected);
+            model.getCourierInfo(selectedCourier);
+            model.getCourierDeliveriesCourierTab(selectedCourier);
+        }
     }
 
     private void displayPendingDelivery(){
@@ -202,5 +247,15 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.displayDelivery(delivery);
     }
 
+    public void addDeliveryInWaitingList() {
+        String selectedDelirery = (String) view.getPendingDeliveryComboBox().getSelectedItem();
+        Long pickUpPtStr = null;
+        Long deliveryPtStr = null;
+        int index = selectedDelirery.indexOf('-');
+        deliveryPtStr = Long.parseLong(selectedDelirery.substring(index + 1));
+        pickUpPtStr = Long.parseLong(selectedDelirery.substring(0, index));
+        Delivery deliveryWaitingList = model.getPendingDelivery(pickUpPtStr, deliveryPtStr);
+        model.updateWaitingList(deliveryWaitingList);
+    }
 }
 

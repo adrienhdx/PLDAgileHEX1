@@ -21,6 +21,7 @@ public class MapDisplay {
     private final JXMapViewer mapViewer;
     private final List<Painter<JXMapViewer>> painters;
     private final CompoundPainter<JXMapViewer> mainPainter;
+    private final List<Color> colors;
 
     public MapDisplay(){
         mapViewer = new JXMapViewer();
@@ -36,6 +37,10 @@ public class MapDisplay {
         painters = new ArrayList<>();
         mainPainter = new CompoundPainter<>(painters);
         mapViewer.setOverlayPainter(mainPainter);
+        colors = new ArrayList<>(Arrays.asList(
+                Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.PINK,
+                Color.ORANGE, new Color(148, 0, 211), new Color(0, 100, 0)
+        ));
         //Initialisation des écouteurs
         this.initListenersMap();
     }
@@ -105,7 +110,7 @@ public class MapDisplay {
             for(Painter<JXMapViewer> p : mainPainter.getPainters()){
                 mainPainter.removePainter(p);
             }
-            mapViewer.revalidate();
+            mapViewer.repaint();
         }catch (Exception e) {
             System.out.println(e);
         }

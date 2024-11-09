@@ -9,45 +9,51 @@ import source.model.Vertex;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Vector;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.*;
+import java.util.List;
 
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
+    private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap, mainPanelDeliveries, controlDeliveriesPanel;
     private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap, mainPanelDeliveries, controlDeliveriesPanel, courierInfoPanel;
     private JScrollPane scrollPanelMap, scrollPanelDeliveriesMap;
     private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes, waitingListButton, exportWaitingListButton;
     private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown, waitingListDropdown;
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel, waitingListModel;
-    private Vector<String> couriers, selectedCourierVectorCourierTab, selectedCourierVectorDeliveryTab;
-    private JList<String> courierList,courierListMapTab, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
+    private Vector<String> couriers,selectedCourierVectorCourierTab,  selectedCourierVectorDeliveryTab;
+    private JList<String> courierList, courierListMapTab, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
     private MapDisplay map, mapDelivery;
     private JFileChooser fileChooserDelivery;
     private JFileChooser fileChooserMap;
-    private JFileChooser fileExportDelivery;
+    private JFileChooser fileExportWaitingList;
+    private JFileChooser fileExportRoutes;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
     private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier, mapLoadingBeforeDelivery;
     private JSplitPane splitPaneCourier;
     private Vertex mapDefault ;
+    private List<Color> availableColors;
+    private Map<String, Color> routeColors;
 
     public void addController(Controller controller) {
         fileChooserDelivery.addActionListener(controller);
         fileChooserMap.addActionListener(controller);
-        fileExportDelivery.addActionListener(controller);
+        fileExportWaitingList.addActionListener(controller);
+        fileExportRoutes.addActionListener(controller);
         addCourierButton.addActionListener(controller);
         assignCourierButton.addActionListener(controller);
-        waitingListButton.addActionListener(controller); //A IMPLEMENTER !!!!!!!
-        exportWaitingListButton.addActionListener(controller); //A IMPLEMENTER !!!!!
+        waitingListButton.addActionListener(controller);
+        exportWaitingListButton.addActionListener(controller);
         removeCourierButton.addActionListener(controller);
         courierList.addListSelectionListener(controller);
         courierListMapTab.addListSelectionListener(controller);
+        courierMapDropdown.addActionListener(controller);
         courierDeliveryDropdown.addActionListener(controller);
         waitingListDropdown.addActionListener(controller);
         unassignedDeliveryDropdown.addActionListener(controller);
@@ -58,11 +64,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
         selectedCourierVectorDeliveryTab = new Vector<>();
         selectedCourierVectorCourierTab = new Vector<>();
         fileChooserDelivery = new JFileChooser();
-        fileChooserDelivery.setCurrentDirectory(new File("."));
+        fileChooserDelivery.setCurrentDirectory(new File("./resources"));
         fileChooserMap = new JFileChooser();
-        fileChooserMap.setCurrentDirectory(new File("."));
-        fileExportDelivery = new JFileChooser();
-        fileExportDelivery.setCurrentDirectory(new File("."));
+        fileChooserMap.setCurrentDirectory(new File("./resources"));
+        fileExportWaitingList = new JFileChooser();
+        fileExportWaitingList.setCurrentDirectory(new File("."));
+        fileExportRoutes = new JFileChooser();
+        fileExportRoutes.setCurrentDirectory(new File("."));
         unassignedModel = new DefaultComboBoxModel<>();
         courierModel = new DefaultComboBoxModel<>(couriers);
         courierMapModel = new DefaultComboBoxModel<>(couriers);
@@ -87,6 +95,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
         selectedCourierListCourierTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         courierListMapTab = new JList<>(couriers);
         courierListMapTab.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        availableColors = new ArrayList<>(Arrays.asList(
+                Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA,
+                Color.ORANGE, new Color(150, 131, 236), new Color(20, 148, 20),
+                new Color(255, 20, 147)
+        ));
+        routeColors = new HashMap<>();
+
 
         setTitle("App Delivery Services");
         setSize(600, 300);
@@ -208,6 +223,17 @@ public class Interface extends JFrame implements PropertyChangeListener {
         controlDeliveriesPanel.add(exportWaitingListButton, gbc);
 
         controlDeliveriesPanel.setBorder(BorderFactory.createTitledBorder("Management Deliveries Panel"));
+
+        exportWaitingListButton.addActionListener(e -> {
+            LocalDate actualDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            fileExportWaitingList.setSelectedFile(new File("waitingList-" + actualDate.format(formatter) + ".xml"));
+            if (fileExportWaitingList.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportWaitingList.getSelectedFile().getAbsolutePath());
+            } else {
+                JOptionPane.showMessageDialog(null, "File has not been saved.");
+            };
+        });
 
         // Ajout de controlMapPanel et scrollPanelDeliveries dans mainPanelMap
         mainPanelDeliveries.add(controlDeliveriesPanel, BorderLayout.EAST);
@@ -379,19 +405,84 @@ public class Interface extends JFrame implements PropertyChangeListener {
         scrollPaneCouriers.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPaneCouriers.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        exportRoutes = new JButton("Export Routes");
-        exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
+            courierListMapTab.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                              boolean isSelected, boolean cellHasFocus) {
+                    // Use default renderer setup
+                    JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-        exportRoutes.addActionListener(e -> {
-            LocalDate actualDate = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            fileExportDelivery.setSelectedFile(new File("pendingDelivery-" + actualDate.format(formatter) + ".xml"));
-            if (fileExportDelivery.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportDelivery.getSelectedFile().getAbsolutePath());
-            } else {
-                JOptionPane.showMessageDialog(null, "File has not been saved.");
-            };
-        });
+                    if (value instanceof String) {
+                        Color color = routeColors.get(value);
+                        if (color != null) {
+                            c.setForeground(color); // Set color if found in the map
+                            System.out.println(color);
+                        } else {
+                            c.setForeground(Color.BLACK); // Default color if no entry in map
+                        }
+                    }
+                    // Optionally customize background for selected state
+                    /*
+                    if (isSelected) {
+                        c.setBackground(Color.LIGHT_GRAY);
+                    } else {
+                        c.setBackground(Color.WHITE); // Default unselected background
+                    }*/
+
+                    return c;
+                }
+            });
+
+            // Disable automatic selection on single click by using a custom ListSelectionModel.
+            courierListMapTab.setSelectionModel(new DefaultListSelectionModel() {
+                @Override
+                public void setSelectionInterval(int index0, int index1) {
+                    // Override to do nothing on single-click, selection is handled in the MouseListener
+                }
+            });
+
+            courierListMapTab.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    int index = courierListMapTab.locationToIndex(e.getPoint());
+                    if (index != -1) {  // Check if click is within an item
+                        if (courierListMapTab.isSelectedIndex(index)) {
+                            courierListMapTab.removeSelectionInterval(index, index);  // Deselect item if selected
+                        } else {
+                            courierListMapTab.addSelectionInterval(index, index);    // Select item if not selected
+                        }
+                    }
+                }
+            });
+
+            /*exportPendingDeliveries = new JButton("Export Pending Deliveries");
+            exportPendingDeliveries.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            exportPendingDeliveries.addActionListener(e -> {
+                LocalDate actualDate = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                fileExportDelivery.setSelectedFile(new File("pendingDelivery-" + actualDate.format(formatter) + ".xml"));
+                if (fileExportDelivery.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportDelivery.getSelectedFile().getAbsolutePath());
+                } else {
+                    JOptionPane.showMessageDialog(null, "File has not been saved.");
+                };
+            });*/
+
+            exportRoutes = new JButton("Export Routes");
+            exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            exportRoutes.addActionListener(e -> {
+                LocalDate actualDate = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                fileExportRoutes.setSelectedFile(new File("exportedRoute-" + actualDate.format(formatter) + ".xml"));
+                if (fileExportRoutes.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportRoutes.getSelectedFile().getAbsolutePath());
+                } else {
+                    JOptionPane.showMessageDialog(null, "File has not been saved.");
+                };
+
+            });
 
         importRoutes = new JButton("Import Routes");
         importRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -449,11 +540,27 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
         if (evt.getPropertyName().equals("displaySegmentsMainMap")) {
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
+            Random random = new Random();
+            String courierID = (String) evt.getOldValue();
+            //L'id pris est une string somme du nom et prénom du livreur
+
+            // Vérifie si l'itinéraire a déjà une couleur associée
+            Color color;
+            if (routeColors.containsKey(courierID)) {
+                color = routeColors.get(courierID);
+            } else {
+                // Associe une nouvelle couleur unique si l'itinéraire n'en a pas encore
+                color = availableColors.remove(random.nextInt(availableColors.size()));
+                routeColors.put(courierID, color); // Associe la couleur à l'itinéraire
+            }
+
             if (!segmentArrayList.isEmpty()){
                 for(Segment segment : segmentArrayList){
-                    map.displaySegment(segment,Color.blue);
+                    map.displaySegment(segment,color);
                 }
             }
+
+            courierListMapTab.repaint();
         }
         if (evt.getPropertyName().equals("courierArrayList")) {
             ArrayList<Courier> courierList  = (ArrayList<Courier>) evt.getNewValue();
@@ -494,10 +601,20 @@ public class Interface extends JFrame implements PropertyChangeListener {
             lastNameOfSelectedCourier.setText("Last Name : " + courier.getLastName());
             phoneNumberOfSelectedCourier.setText("Phone Number : " + courier.getPhoneNum());
         }
+        if(evt.getPropertyName().equals("updateWaitingList")){
+            ArrayList<Delivery>  deliveryWaitingList = (ArrayList<Delivery>) evt.getNewValue();
+            waitingListModel.removeAllElements();
+            for (Delivery delivery : deliveryWaitingList) {
+                String deliveryWaitingString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
+                waitingListModel.addElement(deliveryWaitingString);
+                unassignedModel.removeElement(deliveryWaitingString);
+            }
+        }
     }
 
     private void updateCourierList(ArrayList<Courier> newCourierList) {
         couriers.clear();
+        courierMapDropdown.removeAllItems();
         courierDeliveryDropdown.removeAllItems();
         for (Courier courier : newCourierList) {
             couriers.add(courier.getFirstName()+ " " + courier.getLastName());
@@ -522,6 +639,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         selectedCourierListCourierTab.setListData(selectedCourierVectorCourierTab);
     }
 
+
     // Getters
     public JFileChooser getFileChooserDelivery() {
         return fileChooserDelivery;
@@ -531,7 +649,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return fileChooserMap;
     }
 
-    public JFileChooser getFileExportDelivery() { return fileExportDelivery; }
+    public JFileChooser getFileExportWaitingList() { return fileExportWaitingList; }
+
+    public JFileChooser getFileExportRoutes() { return fileExportRoutes; }
 
     public JTextField getCourierFieldFirstName() {
         return courierFieldFirstName;
@@ -575,6 +695,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JList<String> getCourierMapList() {
         return courierListMapTab;
+    }
+
+    public JButton getWaitingListButton() {return waitingListButton;}
+
+    public JComboBox<String> getCourierMapComboBox(){
+        return courierMapDropdown;
     }
 
 }
