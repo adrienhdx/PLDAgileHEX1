@@ -7,7 +7,6 @@ import java.util.*;
 
 public class Model {
     private ArrayList<Delivery> assignedDeliveryArrayList;
-    private ArrayList<Delivery> postponedDeliveryArrayList;
     private ArrayList<Delivery> pendingDeliveryArrayList;
     private ArrayList<Delivery> waitingDeliveryArrayList;
     private ArrayList<Courier> courierArrayList;
@@ -22,7 +21,6 @@ public class Model {
         this.courierArrayList = new ArrayList<>();
         this.pendingDeliveryArrayList = new ArrayList<>();
         this.assignedDeliveryArrayList = new ArrayList<>();
-        this.postponedDeliveryArrayList = new ArrayList<>();
         this.waitingDeliveryArrayList = new ArrayList<>();
    }
 
@@ -296,6 +294,7 @@ public class Model {
 
     public void updateWaitingList(Delivery delivery){
         if (delivery != null) {
+            delivery.setState(DeliveryState.POSTPONED);
             waitingDeliveryArrayList.add(delivery);
             propertyChangeSupport.firePropertyChange("updateWaitingList", null,waitingDeliveryArrayList);
         }

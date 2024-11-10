@@ -213,20 +213,15 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void withdrawDelivery(){}
-
     public void getCourierInfo(String courierSelected){
         if(courierSelected != null) {
             Courier selectedCourier;
-            int rang = -1;
             String firstNameSelected = "";
             String lastNameSelected = "";
             String[] parts = courierSelected.split(" ");
             if (parts.length == 2) {
                 firstNameSelected = parts[0];
                 lastNameSelected = parts[1];
-            } else {
-                System.out.println("Format de chaîne incorrect");
             }
             selectedCourier = model.getCourier(firstNameSelected, lastNameSelected);
             model.getCourierInfo(selectedCourier);
@@ -248,12 +243,14 @@ public class Controller implements ActionListener,ListSelectionListener {
     }
 
     public void addDeliveryInWaitingList() {
-        String selectedDelirery = (String) view.getPendingDeliveryComboBox().getSelectedItem();
+        String selectedDelivery = (String) view.getPendingDeliveryComboBox().getSelectedItem();
         Long pickUpPtStr = null;
         Long deliveryPtStr = null;
-        int index = selectedDelirery.indexOf('-');
-        deliveryPtStr = Long.parseLong(selectedDelirery.substring(index + 1));
-        pickUpPtStr = Long.parseLong(selectedDelirery.substring(0, index));
+        if (selectedDelivery != null) {
+            int index = selectedDelivery.indexOf('-');
+            deliveryPtStr = Long.parseLong(selectedDelivery.substring(index + 1));
+            pickUpPtStr = Long.parseLong(selectedDelivery.substring(0, index));
+        }
         Delivery deliveryWaitingList = model.getPendingDelivery(pickUpPtStr, deliveryPtStr);
         model.updateWaitingList(deliveryWaitingList);
     }
