@@ -161,12 +161,18 @@ public class Interface extends JFrame implements PropertyChangeListener {
         // Config panneau de controle
         controlDeliveriesPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 1, 10, 1 );
+        gbc.insets = new Insets(10, 10, 10, 10 );
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        controlDeliveriesPanel.add(deliveryButton, gbc);
 
         // Livraisons non attribuées
         gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
         controlDeliveriesPanel.add(new JLabel("Pending Deliveries:"), gbc);
 
         gbc.gridx = 1;
@@ -177,7 +183,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridy = 2;
         controlDeliveriesPanel.add(new JLabel("Choose Courier:"), gbc);
 
-        gbc.gridy = 2 ;
         gbc.gridx = 1;
         controlDeliveriesPanel.add(courierDeliveryDropdown, gbc);
 
@@ -193,32 +198,34 @@ public class Interface extends JFrame implements PropertyChangeListener {
         scrollPaneDelivery.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         gbc.gridx = 1;
-        gbc.gridy = 3;
         controlDeliveriesPanel.add(scrollPaneDelivery, gbc);
-
-        //Bouton pour passer la livraison en attente
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        controlDeliveriesPanel.add(waitingListButton, gbc);
-
-        //JLabel pour la liste des livraisons deja assignée au livreur choisi
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        controlDeliveriesPanel.add(new JLabel("Deliveries in the waiting list : "), gbc);
-
-        //Liste des livraison en attente
-        gbc.gridy = 5 ;
-        gbc.gridx = 1;
-        controlDeliveriesPanel.add(waitingListDropdown, gbc);
 
         // Bouton pour affecter le livreur
         gbc.gridx = 0;
         gbc.gridy = 4;
+        gbc.gridwidth = 2;
         controlDeliveriesPanel.add(assignCourierButton, gbc);
 
-        //Bouton exporter les livraisons en attente
-        gbc.gridx = 1;
+        //Bouton pour passer la livraison en attente
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        controlDeliveriesPanel.add(waitingListButton, gbc);
+
+        //JLabel pour la liste des livraisons deja assignée au livreur choisi
+        gbc.gridx = 0;
         gbc.gridy = 6;
+        gbc.gridwidth = 1;
+        controlDeliveriesPanel.add(new JLabel("Deliveries in the waiting list : "), gbc);
+
+        //Liste des livraison en attente
+        gbc.gridx = 1;
+        controlDeliveriesPanel.add(waitingListDropdown, gbc);
+
+
+        //Bouton exporter les livraisons en attente
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 2;
         controlDeliveriesPanel.add(exportWaitingListButton, gbc);
 
         controlDeliveriesPanel.setBorder(BorderFactory.createTitledBorder("Management Deliveries Panel"));
@@ -545,7 +552,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
             JOptionPane.showMessageDialog(this, "Courier list updated");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
-            deliveryPanel.remove(deliveryButton);
             showSettingsDelivery();
             unassignedModel.removeAllElements();
             ArrayList<Delivery> deliveryArrayList = (ArrayList<Delivery>) evt.getNewValue();
@@ -663,10 +669,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     public JButton getAssignCourierButton(){
         return assignCourierButton;
-    }
-
-    public JButton getExportRoutesButton(){
-        return exportRoutes;
     }
 
     public JComboBox<String> getCourierDeliveryComboBox() {
