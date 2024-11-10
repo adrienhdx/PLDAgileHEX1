@@ -582,6 +582,22 @@ public class Interface extends JFrame implements PropertyChangeListener {
                 unassignedModel.removeElement(deliveryWaitingString);
             }
         }
+        if(evt.getPropertyName().equals("courierDeleted")) {
+            String courierID = (String) evt.getNewValue();
+            Color associatedColor = routeColors.get(courierID);
+            if (associatedColor != null) {
+                routeColors.remove(courierID);
+                availableColors.add(associatedColor);
+            }
+            map.hideAll();
+            courierListMapTab.clearSelection();
+            firstNameOfSelectedCourier.setText("First Name :");
+            lastNameOfSelectedCourier.setText("Last Name :");
+            phoneNumberOfSelectedCourier.setText("Phone Number :");
+            ArrayList<Delivery> emptyList = new ArrayList<>();
+            updateDeliveryListCourierTab(emptyList);
+            updateDeliveryListDeliveryTab(emptyList);
+        }
     }
 
     private void updateCourierList(ArrayList<Courier> newCourierList) {

@@ -71,7 +71,9 @@ public class Model {
     public void deleteCourier(Courier courier){
         if (courier != null) {
             courierArrayList.remove(courier);
+            String courierID = courier.getFirstName().concat(" ").concat(courier.getLastName());
             propertyChangeSupport.firePropertyChange("courierArrayList", null, courierArrayList);
+            propertyChangeSupport.firePropertyChange("courierDeleted", null, courierID);
         } else {
             propertyChangeSupport.firePropertyChange("errorMessage", null, "No courier selected");
         }
