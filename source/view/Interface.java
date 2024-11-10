@@ -404,84 +404,61 @@ public class Interface extends JFrame implements PropertyChangeListener {
         scrollPaneCouriers.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPaneCouriers.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            courierListMapTab.setCellRenderer(new DefaultListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                              boolean isSelected, boolean cellHasFocus) {
-                    // Use default renderer setup
-                    JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+        courierListMapTab.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                // Use default renderer setup
+                JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                    if (value instanceof String) {
-                        Color color = routeColors.get(value);
-                        if (color != null) {
-                            c.setForeground(color); // Set color if found in the map
-                            System.out.println(color);
-                        } else {
-                            c.setForeground(Color.BLACK); // Default color if no entry in map
-                        }
-                    }
-                    // Optionally customize background for selected state
-                    /*
-                    if (isSelected) {
-                        c.setBackground(Color.LIGHT_GRAY);
+                if (value instanceof String) {
+                    Color color = routeColors.get(value);
+                    if (color != null) {
+                        c.setForeground(color); // Set color if found in the map
+                        System.out.println(color);
                     } else {
-                        c.setBackground(Color.WHITE); // Default unselected background
-                    }*/
-
-                    return c;
-                }
-            });
-
-            // Disable automatic selection on single click by using a custom ListSelectionModel.
-            courierListMapTab.setSelectionModel(new DefaultListSelectionModel() {
-                @Override
-                public void setSelectionInterval(int index0, int index1) {
-                    // Override to do nothing on single-click, selection is handled in the MouseListener
-                }
-            });
-
-            courierListMapTab.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    int index = courierListMapTab.locationToIndex(e.getPoint());
-                    if (index != -1) {  // Check if click is within an item
-                        if (courierListMapTab.isSelectedIndex(index)) {
-                            courierListMapTab.removeSelectionInterval(index, index);  // Deselect item if selected
-                        } else {
-                            courierListMapTab.addSelectionInterval(index, index);    // Select item if not selected
-                        }
+                        c.setForeground(Color.BLACK); // Default color if no entry in map
                     }
                 }
-            });
+                return c;
+            }
+        });
 
-            /*exportPendingDeliveries = new JButton("Export Pending Deliveries");
-            exportPendingDeliveries.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // Disable automatic selection on single click by using a custom ListSelectionModel.
+        courierListMapTab.setSelectionModel(new DefaultListSelectionModel() {
+            @Override
+            public void setSelectionInterval(int index0, int index1) {
+                // Override to do nothing on single-click, selection is handled in the MouseListener
+            }
+        });
 
-            exportPendingDeliveries.addActionListener(e -> {
-                LocalDate actualDate = LocalDate.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-                fileExportDelivery.setSelectedFile(new File("pendingDelivery-" + actualDate.format(formatter) + ".xml"));
-                if (fileExportDelivery.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportDelivery.getSelectedFile().getAbsolutePath());
-                } else {
-                    JOptionPane.showMessageDialog(null, "File has not been saved.");
-                };
-            });*/
+        courierListMapTab.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int index = courierListMapTab.locationToIndex(e.getPoint());
+                if (index != -1) {  // Check if click is within an item
+                    if (courierListMapTab.isSelectedIndex(index)) {
+                        courierListMapTab.removeSelectionInterval(index, index);  // Deselect item if selected
+                    } else {
+                        courierListMapTab.addSelectionInterval(index, index);    // Select item if not selected
+                    }
+                }
+            }
+        });
 
-            exportRoutes = new JButton("Export Routes");
-            exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
+        exportRoutes = new JButton("Export Routes");
+        exportRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            exportRoutes.addActionListener(e -> {
-                LocalDate actualDate = LocalDate.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-                fileExportRoutes.setSelectedFile(new File("exportedRoute-" + actualDate.format(formatter) + ".xml"));
-                if (fileExportRoutes.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportRoutes.getSelectedFile().getAbsolutePath());
-                } else {
-                    JOptionPane.showMessageDialog(null, "File has not been saved.");
-                };
+        exportRoutes.addActionListener(e -> {
+            LocalDate actualDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            fileExportRoutes.setSelectedFile(new File("exportedRoute-" + actualDate.format(formatter) + ".xml"));
+            if (fileExportRoutes.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportRoutes.getSelectedFile().getAbsolutePath());
+            } else {
+                JOptionPane.showMessageDialog(null, "File has not been saved.");
+            };
 
-            });
+        });
 
         importRoutes = new JButton("Import Routes");
         importRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -540,17 +517,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
         if (evt.getPropertyName().equals("displaySegmentsMainMap")) {
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
             Random random = new Random();
-            String courierID = (String) evt.getOldValue();
-            //L'id pris est une string somme du nom et prénom du livreur
-
-            // Vérifie si l'itinéraire a déjà une couleur associée
+            String courierID = (String) evt.getOldValue(); // ID = FirstName + " " + LastName
             Color color;
             if (routeColors.containsKey(courierID)) {
                 color = routeColors.get(courierID);
             } else {
-                // Associe une nouvelle couleur unique si l'itinéraire n'en a pas encore
                 color = availableColors.remove(random.nextInt(availableColors.size()));
-                routeColors.put(courierID, color); // Associe la couleur à l'itinéraire
+                routeColors.put(courierID, color);
             }
 
             if (!segmentArrayList.isEmpty()){
@@ -697,10 +670,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
     }
 
     public JButton getWaitingListButton() {return waitingListButton;}
-
-    public JComboBox<String> getCourierMapComboBox(){
-        return courierMapDropdown;
-    }
 
 }
 

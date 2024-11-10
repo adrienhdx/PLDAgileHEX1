@@ -271,8 +271,9 @@ public class Model {
                         //}
                     }
                 }
+                String courierID = courier.getFirstName().concat(" ").concat(courier.getLastName());
                 propertyChangeSupport.firePropertyChange("displayVerticesMainMap", null, vertexOrderTypeToDisplay);
-                propertyChangeSupport.firePropertyChange("displaySegmentsMainMap", null, courier.getRoute().getSegments());
+                propertyChangeSupport.firePropertyChange("displaySegmentsMainMap", courierID, courier.getRoute().getSegments());
                 propertyChangeSupport.firePropertyChange("displayEntrepot", null, solveur.getEntrepot().getAddress());
             } else {
                 propertyChangeSupport.firePropertyChange("errorMessage", null, "No route is associated with this courier : you must assign him at least one delivery");
