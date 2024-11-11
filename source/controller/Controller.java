@@ -6,7 +6,6 @@ import source.view.Interface;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.io.FileWriter;
@@ -31,8 +30,11 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserDelivery()) {
             this.loadDeliveries();
         }
-        if(e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserMap()){
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserMap()){
             this.loadMap();
+        }
+        if (e.getActionCommand().equals("ApproveSelection") && e.getSource() == view.getFileChooserImport()){
+            this.loadRoute();
         }
         if (e.getSource() == view.getAddCourierButton()) {
             this.createCourier();
@@ -79,6 +81,16 @@ public class Controller implements ActionListener,ListSelectionListener {
             model.updateMap((ArrayList<Vertex>) result.getFirst(), (ArrayList<Segment>) result.getLast());
         } else {
             model.updateMap(null, null);
+        }
+    }
+
+    private void loadRoute(){
+        String filePath = view.getFileChooserImport().getSelectedFile().getAbsolutePath();
+        ArrayList<Object> result = XmlExtractor.extractRoute(filePath, model.getSolveur().getVertexList());
+        if (result != null) {
+            model.createRouteMap((ArrayList<Vertex>) result.getFirst(), (ArrayList<Segment>) result.getLast());
+        } else {
+            model.createRouteMap(null, null);
         }
     }
 

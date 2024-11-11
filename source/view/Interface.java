@@ -28,11 +28,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel, waitingListModel;
     private Vector<String> couriers,selectedCourierVectorCourierTab,  selectedCourierVectorDeliveryTab;
     private JList<String> courierList, courierListMapTab, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
-    private MapDisplay map, mapDelivery;
-    private JFileChooser fileChooserDelivery;
-    private JFileChooser fileChooserMap;
-    private JFileChooser fileExportWaitingList;
-    private JFileChooser fileExportRoutes;
+    private MapDisplay map, mapDelivery, routeMap;
+    private JFileChooser fileChooserDelivery, fileChooserMap, fileExportWaitingList, fileExportRoutes, fileImportRoutes;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
     private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier, mapLoadingBeforeDelivery;
     private JSplitPane splitPaneCourier;
@@ -45,6 +42,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         fileChooserMap.addActionListener(controller);
         fileExportWaitingList.addActionListener(controller);
         fileExportRoutes.addActionListener(controller);
+        fileImportRoutes.addActionListener(controller);
         addCourierButton.addActionListener(controller);
         assignCourierButton.addActionListener(controller);
         waitingListButton.addActionListener(controller);
@@ -70,6 +68,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
         fileExportWaitingList.setCurrentDirectory(new File("."));
         fileExportRoutes = new JFileChooser();
         fileExportRoutes.setCurrentDirectory(new File("."));
+        fileImportRoutes = new JFileChooser();
+        fileImportRoutes.setCurrentDirectory(new File("."));
         unassignedModel = new DefaultComboBoxModel<>();
         courierModel = new DefaultComboBoxModel<>(couriers);
         courierMapModel = new DefaultComboBoxModel<>(couriers);
@@ -84,6 +84,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierMapDropdown = new JComboBox<>(courierMapModel);
         map = new MapDisplay();
         mapDelivery = new MapDisplay();
+        routeMap = new MapDisplay();
         scrollPanelMap = new JScrollPane(map.getMapViewer());
         scrollPanelDeliveriesMap = new JScrollPane(mapDelivery.getMapViewer());
         courierList = new JList<>(courierModel);
@@ -462,21 +463,28 @@ public class Interface extends JFrame implements PropertyChangeListener {
         exportRoutes.addActionListener(e -> {
             LocalDate actualDate = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            fileExportRoutes.setSelectedFile(new File("exportedRoute-" + actualDate.format(formatter) + ".xml"));
-            if (fileExportRoutes.showSaveDialog(null) == JFileChooser.APPROVE_OPTION && !getCourierMapList().isSelectionEmpty()) {
-                JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportRoutes.getSelectedFile().getAbsolutePath());
-            } else {
-                if (getCourierMapList().isSelectionEmpty()) {
-                    JOptionPane.showMessageDialog(null, "File has not been saved, please select a courier");
+            if (courierListMapTab.getSelectedValuesList().size() == 1) {
+                fileExportRoutes.setSelectedFile(new File("exportedRoute-" + actualDate.format(formatter) + ".xml"));
+                if (fileExportRoutes.showSaveDialog(null) == JFileChooser.APPROVE_OPTION && !getCourierMapList().isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportRoutes.getSelectedFile().getAbsolutePath());
                 } else {
-                    JOptionPane.showMessageDialog(null, "File has not been saved.");
+                    if (getCourierMapList().isSelectionEmpty()) {
+                        JOptionPane.showMessageDialog(null, "File has not been saved, please select a courier.");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "File has not been saved.");
+                    }
                 }
-            };
-
+            } else {
+                JOptionPane.showMessageDialog(null, "You must select only one courier to export its route.");
+            }
         });
 
         importRoutes = new JButton("Import Routes");
         importRoutes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        importRoutes.addActionListener(e -> {
+            fileImportRoutes.showOpenDialog(null);
+        });
 
         // Ajout des composants avec des espaces entre eux
         controlMapPanel.add(select);
@@ -528,6 +536,28 @@ public class Interface extends JFrame implements PropertyChangeListener {
             mapDelivery.hideAll();
             mapDelivery.displayVertex(deliveryVertices.getFirst(), "PICK UP",Color.cyan,false);
             mapDelivery.displayVertex(deliveryVertices.getLast(), "DELIVERY",Color.orange,false);
+        }
+        if (evt.getPropertyName().equals("createNewMap")) {
+            ArrayList<Vertex> routeVertices = (ArrayList<Vertex>) evt.getNewValue();
+            routeMap.setCentre(routeVertices.getFirst());
+            routeMap.hideAll();
+            this.setupMapManagementPanel();
+            for(Vertex vertex : routeVertices){
+                routeMap.displayVertex(vertex);
+            }
+            JFrame routeFrame = new JFrame();
+            routeFrame.setSize(300, 300);
+            routeFrame.setLocationRelativeTo(this);
+            routeFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+            routeFrame.setContentPane(new JScrollPane(routeMap.getMapViewer()));
+            routeFrame.setTitle("Route Display");
+            routeFrame.setVisible(true);
+        }
+        if (evt.getPropertyName().equals("displaySegmentsRouteMap")) {
+            ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
+            for (Segment segment : segmentArrayList) {
+                routeMap.displaySegment(segment, Color.BLUE);
+            }
         }
         if (evt.getPropertyName().equals("displaySegmentsMainMap")) {
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
@@ -651,6 +681,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return fileChooserMap;
     }
 
+    public JFileChooser getFileChooserImport() {
+        return fileImportRoutes;
+    }
+
     public JFileChooser getFileExportWaitingList() { return fileExportWaitingList; }
 
     public JFileChooser getFileExportRoutes() { return fileExportRoutes; }
@@ -674,7 +708,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public JButton getRemoveCourierButton() {
         return removeCourierButton;
     }
-
     public JButton getAssignCourierButton(){
         return assignCourierButton;
     }

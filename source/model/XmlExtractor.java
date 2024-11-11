@@ -144,6 +144,76 @@ public class XmlExtractor {
         }
     }
 
+    public static ArrayList<Object> extractRoute(String file, ArrayList<Vertex> vertices) {
+        if (!isXMLFile(file)) {
+            return null;
+        }
+        try {
+            // file
+            DocumentBuilderFactory factoryMap = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builderMap = factoryMap.newDocumentBuilder();
+            Document documentMap = builderMap.parse(new FileInputStream(file));
+
+            HashMap<Long, Vertex> verticesMap = new HashMap<>();
+            for (Vertex vertex : vertices) {
+                Long id = Long.valueOf(vertex.getId());
+                verticesMap.put(id,vertex);
+            }
+
+
+
+            ArrayList<Vertex> vertexArrayList = new ArrayList<>();
+            ArrayList<Object> map = new ArrayList<>();
+
+            NodeList vertexNodeList = documentMap.getElementsByTagName("noeud");
+
+            for (int i = 0; i < vertexNodeList.getLength(); i++) {
+                Node vertexNode = vertexNodeList.item(i);
+                if (vertexNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) vertexNode;
+                    // On recupere les attributs pour creer chaque objet noeud
+                    Long id = Long.valueOf(element.getAttribute("id"));
+                    double latitude = Double.parseDouble(element.getAttribute("latitude"));
+                    double longitude = Double.parseDouble(element.getAttribute("longitude"));
+
+                    Vertex vertex = new Vertex(id, latitude, longitude);
+                    vertexArrayList.add(vertex);
+                    verticesMap.put(id,vertex);
+                }
+            }
+
+            map.add(vertexArrayList);
+
+            // On récupère tous les tronçons "troncon" correspondant aux segments de la carte
+            NodeList segmentNodeList = documentMap.getElementsByTagName("troncon");
+            ArrayList<Segment> segmentArrayList = new ArrayList<>();
+
+            for (int i = 0; i < segmentNodeList.getLength(); i++) {
+                Node node = segmentNodeList.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+
+                    // On recupere les attributs pour creer chaque objet segment: destination (noeud), longueur, nomRue et origine (noeud)
+                    Long destination = Long.valueOf(element.getAttribute("destination"));
+                    double length = Double.parseDouble(element.getAttribute("longueur"));
+                    String nomRue = element.getAttribute("nomRue");
+                    Long origin = Long.valueOf(element.getAttribute("origine"));
+
+                    Vertex originNode = verticesMap.get(origin);
+                    Vertex destinationNode = verticesMap.get(destination);
+
+                    Segment segment = new Segment(nomRue, originNode, destinationNode, length);
+                    segmentArrayList.add(segment);
+                }
+            }
+            map.add(segmentArrayList);
+            return map;
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private static HashMap<Long, Vertex> vertexListToMap(ArrayList<Vertex> vertexArrayList) {
         HashMap<Long, Vertex> vertexIdMap = new HashMap<>();
         for (Vertex vertex : vertexArrayList) {

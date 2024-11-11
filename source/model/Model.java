@@ -132,6 +132,19 @@ public class Model {
         }
     }
 
+    public void createRouteMap(ArrayList<Vertex> vertexList, ArrayList<Segment> segmentList){
+        if (segmentList != null && vertexList != null) {
+            if (!vertexList.isEmpty()) {
+                propertyChangeSupport.firePropertyChange("createNewMap", null, vertexList);
+                propertyChangeSupport.firePropertyChange("displaySegmentsRouteMap", null, segmentList);
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "The file doesn't contain any vertex, please select an other file");
+            }
+        } else {
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
+        }
+    }
+
     public void updateDeliveryList(ArrayList<Delivery> deliveryList, Entrepot entrepot){
         if (deliveryList != null) {
             if (deliveryList.isEmpty() && entrepot == null) {
@@ -293,6 +306,10 @@ public class Model {
 
     public void getCourierInfo(Courier courier){
         propertyChangeSupport.firePropertyChange("courierInfo", null, courier);
+    }
+
+    public SolveurTSP getSolveur() {
+        return solveur;
     }
 
     public ArrayList<Delivery> getWaitingArrayList() { return waitingDeliveryArrayList; }
