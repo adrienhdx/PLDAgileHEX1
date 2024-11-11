@@ -134,7 +134,9 @@ public class Model {
 
     public void updateDeliveryList(ArrayList<Delivery> deliveryList, Entrepot entrepot){
         if (deliveryList != null) {
-            if (entrepot != null){
+            if (deliveryList.isEmpty() && entrepot == null) {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
+            } else if (entrepot != null){
                 pendingDeliveryArrayList = deliveryList;
                 propertyChangeSupport.firePropertyChange("pendingDeliveryArrayList", null, pendingDeliveryArrayList);
                 solveur.setEntrepot(entrepot);
@@ -142,7 +144,7 @@ public class Model {
                 propertyChangeSupport.firePropertyChange("errorMessage", null, "Entrepot location missing");
             }
         } else {
-            propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
+            propertyChangeSupport.firePropertyChange("errorMessage", null, "The delivery demand doesn't match the uploaded map");
         }
     }
 

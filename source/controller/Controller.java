@@ -87,8 +87,11 @@ public class Controller implements ActionListener,ListSelectionListener {
         if (model.getVertexArrayList() != null) {
             ArrayList<Object> demandArrayList = XmlExtractor.extractDeliveryDemand(filePath,model.getVertexArrayList());
             if (demandArrayList != null) {
-                model.updateDeliveryList((ArrayList<Delivery>) demandArrayList.getLast(), (Entrepot) demandArrayList.getFirst());
-            } else {
+                model.updateDeliveryList(
+                        (demandArrayList.size() > 0) ? (ArrayList<Delivery>) demandArrayList.getLast() : new ArrayList<Delivery>(),
+                        (demandArrayList.size() > 0) ? (Entrepot) demandArrayList.getFirst() : null
+                );
+            }else {
                 model.updateDeliveryList(null, null);
             }
         }

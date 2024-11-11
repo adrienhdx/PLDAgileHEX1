@@ -20,13 +20,13 @@ import java.io.FileInputStream;
 public class XmlExtractor {
 
     public static ArrayList<Object> extractDeliveryDemand(String file, ArrayList<Vertex> vertexArrayList) {
+        ArrayList<Object> deliveryDemand = new ArrayList<>();
+        ArrayList<Delivery> deliveryArrayList = new ArrayList<>();
         if (!isXMLFile(file)) {
             System.out.println("The file " + file + " is not an XML file");
-            return null;
+            return deliveryDemand;
         }
         try {
-            ArrayList<Object> deliveryDemand = new ArrayList<>();
-            ArrayList<Delivery> deliveryArrayList = new ArrayList<>();
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -40,9 +40,11 @@ public class XmlExtractor {
 
                 Long idPickUp = Long.valueOf(delivery.getAttribute("adresseEnlevement"));
                 Vertex pickUpAddress = vertexIdMap.get(idPickUp);
+                if (pickUpAddress == null) return null;
 
                 Long idDelivery = Long.valueOf(delivery.getAttribute("adresseLivraison"));
                 Vertex deliveryAddress = vertexIdMap.get(idDelivery);
+                if (deliveryAddress == null) return null;
 
                 int pickUpTime = Integer.parseInt(delivery.getAttribute("dureeEnlevement"));
                 int deliveryTime = Integer.parseInt(delivery.getAttribute("dureeLivraison"));
@@ -75,7 +77,7 @@ public class XmlExtractor {
             return deliveryDemand;
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
-            return null;
+            return new ArrayList<Object>();
         }
     }
 
