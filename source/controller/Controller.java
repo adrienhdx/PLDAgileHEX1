@@ -159,9 +159,11 @@ public class Controller implements ActionListener,ListSelectionListener {
 
     public void exportWaitingArrayList() {
         try {
-            FileWriter fileWriter = new FileWriter(view.getFileExportWaitingList().getSelectedFile().getAbsolutePath());
-            fileWriter.write(XmlExtractor.exportWaitingList(model.getWaitingArrayList()));
-            fileWriter.close();
+            if (view.getWaitingList().getSelectedItem() != null) {
+                FileWriter fileWriter = new FileWriter(view.getFileExportWaitingList().getSelectedFile().getAbsolutePath());
+                fileWriter.write(XmlExtractor.exportWaitingList(model.getWaitingArrayList()));
+                fileWriter.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -183,10 +185,10 @@ public class Controller implements ActionListener,ListSelectionListener {
     public void exportRoutes() {
         try {
             ArrayList<String> couriersInfo;
-            FileWriter fileWriter = new FileWriter(view.getFileExportRoutes().getSelectedFile().getAbsolutePath());
             ArrayList<Vertex> vertices = new ArrayList<>();
             ArrayList<Segment> segments = new ArrayList<>();
             if (!view.getCourierMapList().getSelectedValuesList().isEmpty()) {
+                FileWriter fileWriter = new FileWriter(view.getFileExportRoutes().getSelectedFile().getAbsolutePath());
                 couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
                 String firstName = "";
                 String lastName = "";
@@ -205,9 +207,9 @@ public class Controller implements ActionListener,ListSelectionListener {
                         segments.add(segment);
                     }
                 }
+                fileWriter.write(XmlExtractor.exportRoutes(vertices, segments));
+                fileWriter.close();
             }
-            fileWriter.write(XmlExtractor.exportRoutes(vertices, segments));
-            fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

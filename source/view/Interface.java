@@ -234,10 +234,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
             LocalDate actualDate = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
             fileExportWaitingList.setSelectedFile(new File("waitingList-" + actualDate.format(formatter) + ".xml"));
-            if (fileExportWaitingList.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (fileExportWaitingList.showSaveDialog(null) == JFileChooser.APPROVE_OPTION && waitingListDropdown.getSelectedItem() != null) {
                 JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportWaitingList.getSelectedFile().getAbsolutePath());
             } else {
-                JOptionPane.showMessageDialog(null, "File has not been saved.");
+                if (waitingListDropdown.getSelectedItem() == null) {
+                    JOptionPane.showMessageDialog(null, "File has not been saved: waiting list is empty");
+                } else {
+                    JOptionPane.showMessageDialog(null, "File has not been saved.");
+                }
             };
         });
 
@@ -459,10 +463,14 @@ public class Interface extends JFrame implements PropertyChangeListener {
             LocalDate actualDate = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
             fileExportRoutes.setSelectedFile(new File("exportedRoute-" + actualDate.format(formatter) + ".xml"));
-            if (fileExportRoutes.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (fileExportRoutes.showSaveDialog(null) == JFileChooser.APPROVE_OPTION && !getCourierMapList().isSelectionEmpty()) {
                 JOptionPane.showMessageDialog(null, "File has been saved at " + fileExportRoutes.getSelectedFile().getAbsolutePath());
             } else {
-                JOptionPane.showMessageDialog(null, "File has not been saved.");
+                if (getCourierMapList().isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(null, "File has not been saved, please select a courier");
+                } else {
+                    JOptionPane.showMessageDialog(null, "File has not been saved.");
+                }
             };
 
         });
@@ -686,6 +694,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public JList<String> getCourierMapList() {
         return courierListMapTab;
     }
+
+    public JComboBox<String> getWaitingList() { return waitingListDropdown; }
 
     public JButton getWaitingListButton() {return waitingListButton;}
 
