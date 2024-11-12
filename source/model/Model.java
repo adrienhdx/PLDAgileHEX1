@@ -164,7 +164,9 @@ public class Model {
 
     private void resetModel(){
         for (Courier courier :  courierArrayList) {
-            deleteCourier(courier);
+            courier.getRoute().setDeliveries(new ArrayList<>());
+            courier.getRoute().setSegments(new ArrayList<>());
+            propertyChangeSupport.firePropertyChange("courierRouteDeliveries", null, courier.getRoute().getDeliveries());
         }
     }
 
