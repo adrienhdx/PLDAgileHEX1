@@ -689,6 +689,9 @@ public class Interface extends JFrame implements PropertyChangeListener {
             selectedCourierVectorDeliveryTab.clear();
             selectedCourierVectorCourierTab.clear();
         }
+        if(evt.getPropertyName().equals("routeTime")){
+            JOptionPane.showMessageDialog(this, "Total time for this courier's route : " + evt.getNewValue() + " minutes.");
+        }
     }
 
     /**

@@ -133,6 +133,7 @@ public class Model {
                     delivery.setState(DeliveryState.ASSIGNED);
                     propertyChangeSupport.firePropertyChange("courierRouteDeliveries", null, courier.getRoute().getDeliveries());
                     propertyChangeSupport.firePropertyChange("pendingDeliveryRemoved", null, delivery);
+                    propertyChangeSupport.firePropertyChange("routeTime", null, String.valueOf((int)tempsRoute));
                 } else {
                     courier.getRoute().getDeliveries().remove(delivery);
                     if (routeComputed == null) propertyChangeSupport.firePropertyChange("errorMessage", null, "No route found : the delivery can't be assigned to this courier");
