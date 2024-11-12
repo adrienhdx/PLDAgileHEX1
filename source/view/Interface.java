@@ -327,7 +327,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JLabel listActualCourier = new JLabel("Actual Courier List :");
-        listActualCourier.setFont(new Font("Georgia", Font.BOLD, 16));  // Mettre le texte en gras et plus grand
+        listActualCourier.setFont(new Font("Times New Roman", Font.BOLD, 16));  // Mettre le texte en gras et plus grand
         managementPanel.add(listActualCourier, gbc);
 
         //Courier list
@@ -350,7 +350,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
         //"New Courier Info" label
         JLabel newCourierInfoLabel = new JLabel("New Courier Info :");
-        newCourierInfoLabel.setFont(new Font("Georgia", Font.BOLD, 16));
+        newCourierInfoLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
