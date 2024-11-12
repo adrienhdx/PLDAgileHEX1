@@ -65,16 +65,19 @@ class XmlExtractorTest {
     @Test
     void exportWaitingList() {
         ArrayList<Delivery> deliveries = new ArrayList<>();
+        LocalTime departureHour = LocalTime.parse("08:00:00", DateTimeFormatter.ofPattern("H:m:s"));
+        Entrepot entrepot = new Entrepot(new Vertex(4150019167L, 45.752956, 4.8982544), departureHour);
         Delivery delivery1 = new Delivery(new Vertex(1679901320L, 45.762653, 4.875565), new Vertex(208769457L, 45.760174, 4.877455), 420, 600, DeliveryState.PENDING);
         Delivery delivery2 = new Delivery(new Vertex(208769120L, 45.759434, 4.869736), new Vertex(25336179L, 45.754128, 4.863194), 420, 480, DeliveryState.PENDING);
         deliveries.add(delivery1);
         deliveries.add(delivery2);
         String waitingListExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                 "<demandeDeLivraisons>\n" +
+                "<entrepot adresse=\"4150019167\" heureDepart=\"8:0:0\"/>\n" +
                 "<livraison adresseEnlevement=\"1679901320\" adresseLivraison=\"208769457\" dureeEnlevement=\"420\" dureeLivraison=\"600\"/>\n" +
                 "<livraison adresseEnlevement=\"208769120\" adresseLivraison=\"25336179\" dureeEnlevement=\"420\" dureeLivraison=\"480\"/>\n" +
                 "</demandeDeLivraisons>";
-        String waitingList = XmlExtractor.exportWaitingList(deliveries);
+        String waitingList = XmlExtractor.exportWaitingList(deliveries, entrepot);
         assertEquals(waitingListExpected, waitingList);
     }
 

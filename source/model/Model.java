@@ -298,7 +298,7 @@ public class Model {
      * @return The list of vertices
      */
     public ArrayList<Vertex> getCourierVertexListToExport(Courier courier) {
-        if (courier!= null) {
+        if (courier != null) {
             if (!courier.getRoute().getSegments().isEmpty()) {
                 ArrayList<Vertex> courierVertex = new ArrayList<>();
                 courierVertex.add(solveur.getEntrepot().getAddress());

@@ -253,11 +253,15 @@ public class XmlExtractor {
     /**
      * Create a .xml file with the list of deliveries
      * @param pendingDeliveries The list of deliveries
+     * @param entrepot The warehouse
      * @return The content of the .xml file
      */
-    public static String exportWaitingList(ArrayList<Delivery> pendingDeliveries){
+    public static String exportWaitingList(ArrayList<Delivery> pendingDeliveries, Entrepot entrepot){
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
         xml += "<demandeDeLivraisons>\n";
+        LocalTime departureHour = entrepot.getDepartureHour();
+        departureHour = departureHour.withSecond(0);
+        xml += "<entrepot adresse=\"" + entrepot.getAddress().getId() + "\" heureDepart=\"" + departureHour.format(DateTimeFormatter.ofPattern("H:m:s")) +"\"/>\n";
         for (Delivery delivery : pendingDeliveries) {
             xml += "<livraison adresseEnlevement=\"" + delivery.getPickUpPt().getId() + "\" adresseLivraison=\"" + delivery.getDeliveryPt().getId() + "\" dureeEnlevement=\"" + delivery.getPickUpTime() + "\" dureeLivraison=\"" + delivery.getDeliveryTime() + "\"/>\n";
         }

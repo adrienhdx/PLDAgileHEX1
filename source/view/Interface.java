@@ -81,11 +81,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
         fileChooserMap = new JFileChooser();
         fileChooserMap.setCurrentDirectory(new File("./resources"));
         fileExportWaitingList = new JFileChooser();
-        fileExportWaitingList.setCurrentDirectory(new File("."));
+        fileExportWaitingList.setCurrentDirectory(new File("./resources"));
         fileExportRoutes = new JFileChooser();
-        fileExportRoutes.setCurrentDirectory(new File("."));
+        fileExportRoutes.setCurrentDirectory(new File("./resources"));
         fileImportRoutes = new JFileChooser();
-        fileImportRoutes.setCurrentDirectory(new File("."));
+        fileImportRoutes.setCurrentDirectory(new File("./resources"));
         unassignedModel = new DefaultComboBoxModel<>();
         courierModel = new DefaultComboBoxModel<>(couriers);
         courierMapModel = new DefaultComboBoxModel<>(couriers);

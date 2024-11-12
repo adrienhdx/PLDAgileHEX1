@@ -214,7 +214,7 @@ public class Controller implements ActionListener,ListSelectionListener {
         try {
             if (view.getWaitingList().getSelectedItem() != null) {
                 FileWriter fileWriter = new FileWriter(view.getFileExportWaitingList().getSelectedFile().getAbsolutePath());
-                fileWriter.write(XmlExtractor.exportWaitingList(model.getWaitingArrayList()));
+                fileWriter.write(XmlExtractor.exportWaitingList(model.getWaitingArrayList(), model.getSolveur().getEntrepot()));
                 fileWriter.close();
             }
         } catch (IOException e) {

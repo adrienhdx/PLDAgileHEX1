@@ -16,6 +16,9 @@ public class Entrepot {
     public Vertex getAddress() {
         return address;
     }
+    public LocalTime getDepartureHour() {
+        return departureHour;
+    }
 
     @Override
     public String toString() {
