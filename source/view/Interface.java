@@ -19,6 +19,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 
+/**
+ * User Interface of the App
+ *
+ **/
 public class Interface extends JFrame implements PropertyChangeListener {
     private JTabbedPane tabPan = new JTabbedPane();
     private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap, mainPanelDeliveries, controlDeliveriesPanel,courierInfoPanel;
@@ -37,25 +41,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
     private List<Color> availableColors;
     private Map<String, Color> routeColors;
 
-    public void addController(Controller controller) {
-        fileChooserDelivery.addActionListener(controller);
-        fileChooserMap.addActionListener(controller);
-        fileExportWaitingList.addActionListener(controller);
-        fileExportRoutes.addActionListener(controller);
-        fileImportRoutes.addActionListener(controller);
-        addCourierButton.addActionListener(controller);
-        assignCourierButton.addActionListener(controller);
-        waitingListButton.addActionListener(controller);
-        exportWaitingListButton.addActionListener(controller);
-        removeCourierButton.addActionListener(controller);
-        courierList.addListSelectionListener(controller);
-        courierListMapTab.addListSelectionListener(controller);
-        courierMapDropdown.addActionListener(controller);
-        courierDeliveryDropdown.addActionListener(controller);
-        waitingListDropdown.addActionListener(controller);
-        unassignedDeliveryDropdown.addActionListener(controller);
-    }
-
+    /**
+     * Constructor of the Interface Class
+     *
+     **/
     public Interface() {
         couriers = new Vector<>();
         selectedCourierVectorDeliveryTab = new Vector<>();
@@ -107,32 +96,61 @@ public class Interface extends JFrame implements PropertyChangeListener {
         setSize(600, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Onglet "Map"
+        //Tab "Map"
         setupMapPanel();
 
-        // Onglet "Delivery"
+        //Tab "Delivery"
         setupDeliveryPanel();
 
-        // Onglet "Gestion des Courriers"
+        //Tab "Courier"
         setupCourierManagementPanel();
 
-        // Organisation de la fenêtre
+        //Window's organization
         getContentPane().add(tabPan, BorderLayout.CENTER);
         setVisible(true);
         pack();
     }
 
+    /**
+     * Set the controller as ActionListener for the needed component
+     *
+     * @param controller The controller
+     **/
+    public void addController(Controller controller) {
+        fileChooserDelivery.addActionListener(controller);
+        fileChooserMap.addActionListener(controller);
+        fileExportWaitingList.addActionListener(controller);
+        fileExportRoutes.addActionListener(controller);
+        fileImportRoutes.addActionListener(controller);
+        addCourierButton.addActionListener(controller);
+        assignCourierButton.addActionListener(controller);
+        waitingListButton.addActionListener(controller);
+        exportWaitingListButton.addActionListener(controller);
+        removeCourierButton.addActionListener(controller);
+        courierList.addListSelectionListener(controller);
+        courierListMapTab.addListSelectionListener(controller);
+        courierMapDropdown.addActionListener(controller);
+        courierDeliveryDropdown.addActionListener(controller);
+        waitingListDropdown.addActionListener(controller);
+        unassignedDeliveryDropdown.addActionListener(controller);
+    }
+
+    /**
+     * Set up the map panel
+     */
     private void setupMapPanel() {
         mapPanel = new JPanel();
         mapButton = new JButton("Upload Map");
         mapPanel.add(mapButton);
         tabPan.addTab("Map", mapPanel);
-
         mapButton.addActionListener(e -> {
             fileChooserMap.showOpenDialog(null);
         });
     }
 
+    /**
+     * Set up the delivery panel
+     */
     private void setupDeliveryPanel() {
         deliveryPanel = new JPanel();
         deliveryPanel.setLayout(new BoxLayout(deliveryPanel, BoxLayout.Y_AXIS));
@@ -145,33 +163,33 @@ public class Interface extends JFrame implements PropertyChangeListener {
         deliveryPanel.add(deliveryButton);
         deliveryPanel.add(mapLoadingBeforeDelivery);
         tabPan.addTab("Delivery", deliveryPanel);
-
         deliveryButton.addActionListener(e -> {
             fileChooserDelivery.showOpenDialog(null);
         });
     }
 
+    /**
+     * Update the delivery panel
+     */
     private void showSettingsDelivery(){
         deliveryPanel.removeAll();
         deliveryButton.setText("Reset and load a new delivery file");
-
+        mainPanelDeliveries = new JPanel(new BorderLayout());
         mapDelivery.setCentre(mapDefault);
 
-        // Initialisation du panneau principal
-        mainPanelDeliveries = new JPanel(new BorderLayout());
-
-        // Config panneau de controle
+        //Configuration of the control panel
         controlDeliveriesPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10 );
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        //Load delivery button
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         controlDeliveriesPanel.add(deliveryButton, gbc);
 
-        // Livraisons non attribuées
+        //Unassigned deliveries
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
@@ -180,7 +198,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridx = 1;
         controlDeliveriesPanel.add(unassignedDeliveryDropdown, gbc);
 
-        // Choisir un livreur
+        //Choice of the delivery
         gbc.gridx = 0;
         gbc.gridy = 2;
         controlDeliveriesPanel.add(new JLabel("Choose Courier :"), gbc);
@@ -188,12 +206,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridx = 1;
         controlDeliveriesPanel.add(courierDeliveryDropdown, gbc);
 
-        //JLabel pour la liste des livraisons deja assignée au livreur choisi
+        //Delivery list of the selected courier
         gbc.gridx = 0;
         gbc.gridy = 3;
         controlDeliveriesPanel.add(new JLabel("Delivery list of the selected courier :"), gbc);
 
-        // Liste des livraisons du courier
         JScrollPane scrollPaneDelivery = new JScrollPane(selectedCourierListDeliveryTab);
         scrollPaneDelivery.setPreferredSize(new Dimension(200, 100));
         scrollPaneDelivery.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -202,29 +219,28 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridx = 1;
         controlDeliveriesPanel.add(scrollPaneDelivery, gbc);
 
-        // Bouton pour affecter le livreur
+        //Assign delivery button
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         controlDeliveriesPanel.add(assignCourierButton, gbc);
 
-        //Bouton pour passer la livraison en attente
+        //Waiting list button
         gbc.gridx = 0;
         gbc.gridy = 5;
         controlDeliveriesPanel.add(waitingListButton, gbc);
 
-        //JLabel pour la liste des livraisons deja assignée au livreur choisi
+        //Waiting list
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 1;
         controlDeliveriesPanel.add(new JLabel("Deliveries in the waiting list : "), gbc);
 
-        //Liste des livraison en attente
         gbc.gridx = 1;
         controlDeliveriesPanel.add(waitingListDropdown, gbc);
 
 
-        //Bouton exporter les livraisons en attente
+        //Export waiting list button
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.gridwidth = 2;
@@ -247,12 +263,15 @@ public class Interface extends JFrame implements PropertyChangeListener {
             };
         });
 
-        // Ajout de controlMapPanel et scrollPanelDeliveries dans mainPanelMap
+        // Adding of controlMapPanel and scrollPanelDeliveries to mainPanelMap
         mainPanelDeliveries.add(controlDeliveriesPanel, BorderLayout.EAST);
         mainPanelDeliveries.add(scrollPanelDeliveriesMap, BorderLayout.CENTER);
         tabPan.setComponentAt(1,mainPanelDeliveries);
     }
 
+    /**
+     * Set up the courier management panel
+     */
     private void setupCourierManagementPanel() {
         JPanel mainManagementPanel = new JPanel(new BorderLayout());
 
@@ -261,26 +280,25 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierInfoPanel.setVisible(false);
         courierInfoPanel.setBorder(BorderFactory.createTitledBorder("Selected Courier Informations"));
 
-        // Labels et ComboBox
+        //Labels
         firstNameOfSelectedCourier = new JLabel("First Name: ");
         lastNameOfSelectedCourier = new JLabel("Last Name: ");
         phoneNumberOfSelectedCourier = new JLabel("Phone Number: ");
         JLabel listOfDeliveries = new JLabel("List of Deliveries: ");
 
-        // Liste des livraisons du courier
+        //Courier delivery list
         JScrollPane scrollPaneDelivery = new JScrollPane(selectedCourierListCourierTab);
         scrollPaneDelivery.setPreferredSize(new Dimension(200, 100));
         scrollPaneDelivery.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPaneDelivery.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        // Configuration des contraintes de GridBagLayout pour un alignement vertical centré
         GridBagConstraints gbc1 = new GridBagConstraints();
-        gbc1.anchor = GridBagConstraints.CENTER;  // Centrer horizontalement
-        gbc1.insets = new Insets(10, 0, 10, 0);   // Espacement entre les éléments
+        gbc1.anchor = GridBagConstraints.CENTER;
+        gbc1.insets = new Insets(10, 0, 10, 0);
         gbc1.gridx = 0;
         gbc1.fill = GridBagConstraints.HORIZONTAL;
 
-        // Ajouter les composants avec un espacement vertical uniforme
+        //Adding of components
         gbc1.gridy = 0;
         courierInfoPanel.add(firstNameOfSelectedCourier, gbc1);
 
@@ -296,16 +314,15 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc1.gridy = 4;
         courierInfoPanel.add(scrollPaneDelivery, gbc1);
 
-        // Configuration de managementPanel
+        //Configuration of managementPanel
         JPanel managementPanel = new JPanel(new GridBagLayout());
         managementPanel.setBorder(BorderFactory.createTitledBorder("Management Panel"));
 
-        // Organisation de la managementPanel
+        //Organization of managementPanel
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);  // Réduction de l'espacement entre les composants pour rapprocher les zones de texte
-        gbc.anchor = GridBagConstraints.WEST;  // Alignement des composants à gauche
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        // Utilisation d'un modèle dynamique pour faciliter les modifications
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -313,34 +330,34 @@ public class Interface extends JFrame implements PropertyChangeListener {
         listActualCourier.setFont(new Font("Georgia", Font.BOLD, 16));  // Mettre le texte en gras et plus grand
         managementPanel.add(listActualCourier, gbc);
 
-        // JScrollPane pour afficher la liste des livreurs
+        //Courier list
         JScrollPane scrollPane = new JScrollPane(courierList);
         scrollPane.setPreferredSize(new Dimension(200, 100));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 1; // Le JScrollPane occupe une colonne
+        gbc.gridwidth = 1;
         managementPanel.add(scrollPane, gbc);
 
-        // Bouton "Remove Courier" à droite de la liste
+        //Remove courier button
         removeCourierButton = new JButton("Remove courier");
         gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.gridwidth = 1;  // Le bouton occupe une seule colonne
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Le bouton remplit la hauteur disponible
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(removeCourierButton, gbc);
 
-        // Ajouter le "New Courier Info" avant les champs de saisie
+        //"New Courier Info" label
         JLabel newCourierInfoLabel = new JLabel("New Courier Info :");
-        newCourierInfoLabel.setFont(new Font("Georgia", Font.BOLD, 16));  // Mettre le texte en gras et plus grand
+        newCourierInfoLabel.setFont(new Font("Georgia", Font.BOLD, 16));
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.gridwidth = 2;  // Il occupe toute la largeur disponible
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         managementPanel.add(newCourierInfoLabel, gbc);
 
-        // Champ de texte pour "First Name"
+        //"First Name" text field
         courierFieldFirstName = new JTextField(15);
         gbc.gridy = 4;
         gbc.gridwidth = 1;
@@ -350,7 +367,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldFirstName, gbc);
 
-        // Champ de texte pour "Last Name"
+        //"Last Name" text field
         courierFieldLastName = new JTextField(15);
         gbc.gridy = 5;
         gbc.gridx = 0;
@@ -360,7 +377,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldLastName, gbc);
 
-        // Champ de texte pour "Phone number"
+        //"Phone number" text field
         courierFieldPhoneNumber = new JTextField(15);
         gbc.gridy = 6;
         gbc.gridx = 0;
@@ -370,43 +387,38 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         managementPanel.add(courierFieldPhoneNumber, gbc);
 
-        // Section des boutons
-        // Bouton pour ajouter un nouveau livreur
+        //Buttons
         addCourierButton = new JButton("Add Courier");
         gbc.gridx = 0;
         gbc.gridy = 7;
-        //gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE;
         managementPanel.add(addCourierButton, gbc);
 
-        // Division de mainManagementPanel en deux avec un JSplitPane
+        //Division of mainManagementPanel
         splitPaneCourier = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, managementPanel, courierInfoPanel);
-        splitPaneCourier.setResizeWeight(0.5); // Division égale
-        splitPaneCourier.setDividerSize(5); // Largeur du séparateur
+        splitPaneCourier.setResizeWeight(0.5);
+        splitPaneCourier.setDividerSize(5);
 
-        // Ajout de splitPane dans mainManagementPanel
         mainManagementPanel.add(splitPaneCourier, BorderLayout.CENTER);
 
         tabPan.addTab("Courier Management", mainManagementPanel);
-
     }
 
+    /**
+     * Set up the map management panel
+     */
     private void setupMapManagementPanel(){
         deliveryButton.setEnabled(true);
         deliveryPanel.remove(mapLoadingBeforeDelivery);
         mapPanel.removeAll();
-        // Initialisation du panneau principal
         mainPanelMap = new JPanel(new BorderLayout());
 
-        // Panneau de contrôle amélioré
         controlMapPanel = new JPanel();
         controlMapPanel.setLayout(new BoxLayout(controlMapPanel, BoxLayout.Y_AXIS));
         controlMapPanel.setBorder(new EmptyBorder(15, 15, 15, 15)); // Ajouter des marges internes
 
-        // Espacement entre les composants
         int componentSpacing = 15;
 
-        // Création des composants
         JLabel select = new JLabel("Select a Courier:");
         select.setFont(new Font("Arial", Font.BOLD, 14)); // Font plus visible
         select.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -417,30 +429,30 @@ public class Interface extends JFrame implements PropertyChangeListener {
         scrollPaneCouriers.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPaneCouriers.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        //Legend the color associated to each courier
         courierListMapTab.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                // Use default renderer setup
                 JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
                 if (value instanceof String) {
                     Color color = routeColors.get(value);
                     if (color != null) {
-                        c.setForeground(color); // Set color if found in the map
+                        c.setForeground(color); //Set color if found in the map
                         System.out.println(color);
                     } else {
-                        c.setForeground(Color.BLACK); // Default color if no entry in map
+                        c.setForeground(Color.BLACK); //Default color if no entry in map
                     }
                 }
                 return c;
             }
         });
 
-        // Disable automatic selection on single click by using a custom ListSelectionModel.
+        //Disable automatic selection on single click by using a custom ListSelectionModel.
         courierListMapTab.setSelectionModel(new DefaultListSelectionModel() {
             @Override
             public void setSelectionInterval(int index0, int index1) {
-                // Override to do nothing on single-click, selection is handled in the MouseListener
+                //Override to do nothing on single-click, selection is handled in the MouseListener
             }
         });
 
@@ -448,11 +460,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
             @Override
             public void mousePressed(MouseEvent e) {
                 int index = courierListMapTab.locationToIndex(e.getPoint());
-                if (index != -1) {  // Check if click is within an item
+                if (index != -1) {  //Check if click is within an item
                     if (courierListMapTab.isSelectedIndex(index)) {
-                        courierListMapTab.removeSelectionInterval(index, index);  // Deselect item if selected
+                        courierListMapTab.removeSelectionInterval(index, index);  //Deselect item if selected
                     } else {
-                        courierListMapTab.addSelectionInterval(index, index);    // Select item if not selected
+                        courierListMapTab.addSelectionInterval(index, index);    //Select item if not selected
                     }
                 }
             }
@@ -487,32 +499,35 @@ public class Interface extends JFrame implements PropertyChangeListener {
             fileImportRoutes.showOpenDialog(null);
         });
 
-        // Ajout des composants avec des espaces entre eux
+        //Adding of the components
         controlMapPanel.add(select);
-        controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+        controlMapPanel.add(Box.createVerticalStrut(componentSpacing));
         controlMapPanel.add(scrollPaneCouriers);
-        controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+        controlMapPanel.add(Box.createVerticalStrut(componentSpacing));
         controlMapPanel.add(exportRoutes);
-        controlMapPanel.add(Box.createVerticalStrut(componentSpacing)); // Espacement
+        controlMapPanel.add(Box.createVerticalStrut(componentSpacing));
         controlMapPanel.add(importRoutes);
 
-        // Ajouter une bordure pour encadrer visuellement le panneau
         controlMapPanel.setBorder(BorderFactory.createTitledBorder("Control Panel"));
 
-        // Ajout de controlMapPanel et scrollPanelMap dans mainPanelMap
         mainPanelMap.add(controlMapPanel, BorderLayout.EAST);
         mainPanelMap.add(scrollPanelMap, BorderLayout.CENTER);
         tabPan.setComponentAt(0,mainPanelMap);
     }
 
+    /**
+     * @param evt A PropertyChangeEvent object describing the event source
+     *            and the property that has changed.
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("errorMessage")) {
             JOptionPane.showMessageDialog(this, evt.getNewValue());
         }
         if (evt.getPropertyName().equals("map")) {
-            mapDefault = (Vertex) evt.getNewValue();
-            map.setCentre((Vertex) evt.getNewValue());
+            Vertex centreVertex = (Vertex) evt.getNewValue();
+            mapDefault = centreVertex;
+            map.setCentre(centreVertex);
             this.setupMapManagementPanel();
         }
         if (evt.getPropertyName().equals("displayEntrepot")) {
@@ -563,7 +578,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         if (evt.getPropertyName().equals("displaySegmentsMainMap")) {
             ArrayList<Segment> segmentArrayList = (ArrayList<Segment>) evt.getNewValue();
             Random random = new Random();
-            String courierID = (String) evt.getOldValue(); // ID = FirstName + " " + LastName
+            String courierID = (String) evt.getOldValue(); //ID = FirstName + " " + LastName
             Color color;
             if (routeColors.containsKey(courierID)) {
                 color = routeColors.get(courierID);
@@ -603,21 +618,21 @@ public class Interface extends JFrame implements PropertyChangeListener {
             String deliveryString = delivery.getPickUpPt().getId() + "-" + delivery.getDeliveryPt().getId();
             unassignedModel.removeElement(deliveryString);
         }
-        if (evt.getPropertyName().equals("deliveryListDeliveryTab")){
+        if (evt.getPropertyName().equals("deliveryListDeliveryTab")) {
             ArrayList<Delivery>  deliveryList = (ArrayList<Delivery>) evt.getNewValue();
             updateDeliveryListDeliveryTab(deliveryList);
         }
-        if (evt.getPropertyName().equals("deliveryListCourierTab")){
+        if (evt.getPropertyName().equals("deliveryListCourierTab")) {
             ArrayList<Delivery>  deliveryList = (ArrayList<Delivery>) evt.getNewValue();
             updateDeliveryListCourierTab(deliveryList);
         }
-        if(evt.getPropertyName().equals("courierInfo")){
+        if (evt.getPropertyName().equals("courierInfo")) {
             Courier courier = (Courier) evt.getNewValue();
             firstNameOfSelectedCourier.setText("First Name : " + courier.getFirstName());
             lastNameOfSelectedCourier.setText("Last Name : " + courier.getLastName());
             phoneNumberOfSelectedCourier.setText("Phone Number : " + courier.getPhoneNum());
         }
-        if(evt.getPropertyName().equals("updateWaitingList")){
+        if (evt.getPropertyName().equals("updateWaitingList")) {
             ArrayList<Delivery>  deliveryWaitingList = (ArrayList<Delivery>) evt.getNewValue();
             waitingListModel.removeAllElements();
             for (Delivery delivery : deliveryWaitingList) {
@@ -626,7 +641,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
                 unassignedModel.removeElement(deliveryWaitingString);
             }
         }
-        if(evt.getPropertyName().equals("courierDeleted")) {
+        if (evt.getPropertyName().equals("courierDeleted")) {
             String courierID = (String) evt.getNewValue();
             Color associatedColor = routeColors.get(courierID);
             if (associatedColor != null) {
@@ -643,6 +658,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Update the several lists of courier
+     * @param newCourierList The updated list of couriers
+     */
     private void updateCourierList(ArrayList<Courier> newCourierList) {
         couriers.clear();
         courierMapDropdown.removeAllItems();
@@ -654,6 +673,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
         courierListMapTab.setListData(couriers);
     }
 
+    /**
+     * Update the list of deliveries in the delivery panel
+     * @param newDeliveryList The updated list of deliveries
+     */
     private void updateDeliveryListDeliveryTab(ArrayList<Delivery> newDeliveryList) {
         selectedCourierVectorDeliveryTab.clear();
         for (Delivery delivery : newDeliveryList) {
@@ -662,6 +685,10 @@ public class Interface extends JFrame implements PropertyChangeListener {
         selectedCourierListDeliveryTab.setListData(selectedCourierVectorDeliveryTab);
     }
 
+    /**
+     * Update the list of deliveries if the courier management panel
+     * @param newDeliveryList The updated list of deliveries
+     */
     private void updateDeliveryListCourierTab(ArrayList<Delivery> newDeliveryList) {
         selectedCourierVectorCourierTab.clear();
         for (Delivery delivery : newDeliveryList) {
@@ -670,8 +697,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         selectedCourierListCourierTab.setListData(selectedCourierVectorCourierTab);
     }
 
-
-    // Getters
+    //Getters
     public JFileChooser getFileChooserDelivery() {
         return fileChooserDelivery;
     }
@@ -684,9 +710,13 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return fileImportRoutes;
     }
 
-    public JFileChooser getFileExportWaitingList() { return fileExportWaitingList; }
+    public JFileChooser getFileExportWaitingList() {
+        return fileExportWaitingList;
+    }
 
-    public JFileChooser getFileExportRoutes() { return fileExportRoutes; }
+    public JFileChooser getFileExportRoutes() {
+        return fileExportRoutes;
+    }
 
     public JTextField getCourierFieldFirstName() {
         return courierFieldFirstName;
@@ -707,6 +737,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
     public JButton getRemoveCourierButton() {
         return removeCourierButton;
     }
+
     public JButton getAssignCourierButton(){
         return assignCourierButton;
     }
@@ -727,9 +758,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
         return courierListMapTab;
     }
 
-    public JComboBox<String> getWaitingList() { return waitingListDropdown; }
+    public JComboBox<String> getWaitingList() {
+        return waitingListDropdown;
+    }
 
-    public JButton getWaitingListButton() {return waitingListButton;}
-
+    public JButton getWaitingListButton() {
+        return waitingListButton;
+    }
 }
 

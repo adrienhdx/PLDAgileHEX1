@@ -12,15 +12,26 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * The Controller class of the App
+ */
 public class Controller implements ActionListener,ListSelectionListener {
     private final Model model;
     private final Interface view;
 
+    /**
+     * Constructor of the Controller class
+     * @param model Model of the App
+     * @param view Interface of the App
+     */
     public Controller(Model model, Interface view) {
         this.model = model;
         this.view = view;
     }
 
+    /**
+     * @param e The event to be processed
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println(e);
@@ -60,6 +71,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
+    /**
+     * @param e The event that characterizes the change
+     */
     @Override
     public void valueChanged(ListSelectionEvent e){
         if (!e.getValueIsAdjusting()) {
@@ -74,6 +88,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
+    /**
+     * Load the map
+     */
     private void loadMap(){
         String filePath = view.getFileChooserMap().getSelectedFile().getAbsolutePath();
         ArrayList<Object> result = XmlExtractor.extractMap(filePath);
@@ -84,6 +101,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
+    /**
+     * Load a route
+     */
     private void loadRoute(){
         String filePath = view.getFileChooserImport().getSelectedFile().getAbsolutePath();
         ArrayList<Object> result = XmlExtractor.extractRoute(filePath, model.getSolveur().getVertexList());
@@ -94,6 +114,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
+    /**
+     * Load the deliveries
+     */
     private void loadDeliveries(){
         String filePath = view.getFileChooserDelivery().getSelectedFile().getAbsolutePath();
         if (model.getVertexArrayList() != null) {
@@ -109,6 +132,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
+    /**
+     * Create a new courier
+     */
     private void createCourier(){
         String newCourierFirstName = view.getCourierFieldFirstName().getText().trim();
         String newCourierLastName = view.getCourierFieldLastName().getText().trim();
@@ -119,6 +145,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
+    /**
+     * Assign a delivery to a courier
+     */
     private void assignDeliveryCourier(){
         String courierStr = (String) view.getCourierDeliveryComboBox().getSelectedItem();
         String firstName = "";
@@ -141,6 +170,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.assignDelivery(selectedCourier, delivery);
     }
 
+    /**
+     * Delete a courier
+     */
     private void deleteCourier(){
         String courierInfo = view.getCourierList().getSelectedValue();
         String firstName = "";
@@ -154,7 +186,10 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.deleteCourier(courier);
     }
 
-    public void getCourierSegmentList(){
+    /**
+     * Transmit to the view the segment list of a courier
+     */
+    private void getCourierSegmentList(){
         model.resetMap();
         if(!view.getCourierMapList().getSelectedValuesList().isEmpty()) {
             ArrayList<String> couriersInfo = (ArrayList<String>) view.getCourierMapList().getSelectedValuesList();
@@ -172,7 +207,10 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void exportWaitingArrayList() {
+    /**
+     * Create a .xml file with the list of deliveries from the waiting list
+     */
+    private void exportWaitingArrayList() {
         try {
             if (view.getWaitingList().getSelectedItem() != null) {
                 FileWriter fileWriter = new FileWriter(view.getFileExportWaitingList().getSelectedFile().getAbsolutePath());
@@ -184,6 +222,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
+    /**
+     * Transmit to the view the segment list of a courier
+     */
     private void getCourierDeliveries() {
         String courierInfo = (String) view.getCourierDeliveryComboBox().getSelectedItem();
         String firstName = "";
@@ -197,7 +238,10 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void exportRoutes() {
+    /**
+     * Create a .xml file with the list of nodes and segments corresponding to a route
+     */
+    private void exportRoutes() {
         try {
             ArrayList<String> couriersInfo;
             ArrayList<Vertex> vertices = new ArrayList<>();
@@ -230,7 +274,10 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
-    public void getCourierInfo(String courierSelected){
+    /**
+     * Transmit to the view the infos of a courier
+     */
+    private void getCourierInfo(String courierSelected){
         if(courierSelected != null) {
             Courier selectedCourier;
             String firstNameSelected = "";
@@ -246,6 +293,9 @@ public class Controller implements ActionListener,ListSelectionListener {
         }
     }
 
+    /**
+     * Transmit to the view the infos of a delivery in order to display it
+     */
     private void displayPendingDelivery(){
         String selectedDelivery = (String) view.getPendingDeliveryComboBox() .getSelectedItem();
         Long pickUpPtStr = null;
@@ -259,7 +309,10 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.displayDelivery(delivery);
     }
 
-    public void addDeliveryInWaitingList() {
+    /**
+     * Put an unassigned delivery in the waiting list
+     */
+    private void addDeliveryInWaitingList() {
         String selectedDelivery = (String) view.getPendingDeliveryComboBox().getSelectedItem();
         Long pickUpPtStr = null;
         Long deliveryPtStr = null;
@@ -272,4 +325,3 @@ public class Controller implements ActionListener,ListSelectionListener {
         model.updateWaitingList(deliveryWaitingList);
     }
 }
-
