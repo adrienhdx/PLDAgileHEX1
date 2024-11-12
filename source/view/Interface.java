@@ -656,6 +656,12 @@ public class Interface extends JFrame implements PropertyChangeListener {
             updateDeliveryListCourierTab(new ArrayList<>());
             updateDeliveryListDeliveryTab(new ArrayList<>());
         }
+        if(evt.getPropertyName().equals("resetClear")){
+            map.hideAll();
+            courierListMapTab.clearSelection();
+            selectedCourierVectorDeliveryTab.clear();
+            selectedCourierVectorCourierTab.clear();
+        }
     }
 
     /**
