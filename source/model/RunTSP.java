@@ -8,7 +8,7 @@ public class RunTSP {
 		// CLASSE TEST POUR TSP
 
 		int[] sommets = {0, 17210, 17385, 19273, 21520, 66666};
-		// Posons les contraintes 1->2, 3->4, 3->5
+		// Posons les contraintes 2->1, 3->4, 3->5
 
 		// Contraintes de précédence : clé = sommet, valeur = liste des suivants
 		// Passé en paramètre
@@ -18,8 +18,8 @@ public class RunTSP {
 		precedence.put(19273, Arrays.asList(17385)); // 3->2*/
 
 		Map<Integer, List<Integer>> precedence = new HashMap<>();
-		precedence.put(17385, Arrays.asList(-1)); // vide
-		precedence.put(17210, Arrays.asList(17385)); // 1->2
+		precedence.put(17385, Arrays.asList(17210)); // 2->1
+		precedence.put(17210, Arrays.asList(-1)); // vide
 		precedence.put(19273, Arrays.asList(21520, 66666)); // 3->4, 3->5
 		precedence.put(21520, Arrays.asList(-1)); // vide
 		precedence.put(66666, Arrays.asList(-1)); // vide
@@ -85,11 +85,20 @@ public class RunTSP {
 		TSP tsp = new TSP1();
 		long startTime = System.currentTimeMillis();
 		tsp.searchSolution(20000, g);
-		System.out.print("Solution of cost " + tsp.getSolutionCost() + " found in "
+		System.out.println("Solution of cost " + tsp.getSolutionCost() + " found in "
 				+ (System.currentTimeMillis() - startTime) + "ms : ");
+
 		for (int i = 0; i < sommets.length; i++)
+			// afficher les numéros des sommets visités dans l'ordre
 			System.out.print(tsp.getSolution(i) + " ");
 		System.out.println("0");
+
+		for (int i = 0; i < sommets.length; i++)
+			// afficher les numéros des sommets visités dans l'ordre
+			System.out.print(sommets[tsp.getSolution(i)] + " ");
+		System.out.println("0");
+
+
 
 	}
 

@@ -59,6 +59,10 @@ public class Model {
         return null;
     }
 
+    public ArrayList<Courier> getCourierArrayList() {
+        return courierArrayList;
+    }
+
     public Delivery getPendingDelivery(Long pickUpPtStr, Long deliveryPtStr) {
         for (Delivery delivery : pendingDeliveryArrayList){
             if (delivery.getPickUpPt().getId().equals(pickUpPtStr) && delivery.getDeliveryPt().getId().equals(deliveryPtStr)) {
