@@ -174,13 +174,7 @@ public class XmlExtractor {
             DocumentBuilder builderMap = factoryMap.newDocumentBuilder();
             Document documentMap = builderMap.parse(new FileInputStream(file));
 
-            HashMap<Long, Vertex> verticesMap = new HashMap<>();
-            for (Vertex vertex : vertices) {
-                Long id = vertex.getId();
-                verticesMap.put(id,vertex);
-            }
-
-
+            HashMap<Long, Vertex> verticesMap = vertexListToMap(vertices);
 
             ArrayList<Vertex> vertexArrayList = new ArrayList<>();
             ArrayList<Object> map = new ArrayList<>();
