@@ -15,7 +15,7 @@ public class SolveurTSP {
     private double longueurSolutionCourante;
 
     private Map<Long, List<Long>> contraintesPrecedence;
-    private Map<Long, Integer> vertexToGlobalNum;
+    private final Map<Long, Integer> vertexToGlobalNum;
 
     public SolveurTSP() {
         this.vertexArrayList = new ArrayList<>();
@@ -120,9 +120,7 @@ public class SolveurTSP {
 
         double [][] matrix = new double[taille+2][taille+2];
         for (int i = 0; i < taille; i++) {
-            for (int j = 0; j < taille; j++) {
-                matrix[i][j] = completeGraph.cost[i][j];
-            }
+            System.arraycopy(completeGraph.cost[i], 0, matrix[i], 0, taille);
         }
 
         for (Vertex vertex : Vertex_to_visit) {
@@ -168,17 +166,17 @@ public class SolveurTSP {
         }
 
         // ajouter -1 pour le point de delivery si nouveau
-        if (newptB) contraintesPrecedence.put(delivery_pt.getId(), new ArrayList<>(Arrays.asList((long)-1)));
+        if (newptB) contraintesPrecedence.put(delivery_pt.getId(), new ArrayList<>(List.of((long) -1)));
 
         if (contraintesPrecedence.containsKey(pickup_pt.getId())) {
             // vérifier si l'entrée est -1 : si oui supprimer la liste et la recréer avec delivery_pt.getId()
             if (contraintesPrecedence.get(pickup_pt.getId()).contains((long)-1)) {
-                contraintesPrecedence.put(pickup_pt.getId(), new ArrayList<>(Arrays.asList(delivery_pt.getId())));
+                contraintesPrecedence.put(pickup_pt.getId(), new ArrayList<>(Collections.singletonList(delivery_pt.getId())));
             } else {
                 contraintesPrecedence.get(pickup_pt.getId()).add(delivery_pt.getId());
             }
         } else {
-            contraintesPrecedence.put(pickup_pt.getId(), new ArrayList<>(Arrays.asList(delivery_pt.getId())));
+            contraintesPrecedence.put(pickup_pt.getId(), new ArrayList<>(Collections.singletonList(delivery_pt.getId())));
         }
     }
 

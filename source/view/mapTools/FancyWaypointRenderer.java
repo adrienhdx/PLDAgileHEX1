@@ -22,7 +22,7 @@ import org.jxmapviewer.viewer.WaypointRenderer;
  */
 public class FancyWaypointRenderer implements WaypointRenderer<CustomWaypoint>
 {
-    private boolean entrepot;
+    private final boolean entrepot;
     private static final Log log = LogFactory.getLog(FancyWaypointRenderer.class);
 
     private final Map<Color, BufferedImage> map = new HashMap<Color, BufferedImage>();

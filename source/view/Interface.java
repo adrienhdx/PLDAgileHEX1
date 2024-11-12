@@ -24,22 +24,49 @@ import java.util.List;
  *
  **/
 public class Interface extends JFrame implements PropertyChangeListener {
-    private JTabbedPane tabPan = new JTabbedPane();
+    private final JTabbedPane tabPan = new JTabbedPane();
     private JPanel mapPanel, deliveryPanel, controlMapPanel, mainPanelMap, mainPanelDeliveries, controlDeliveriesPanel,courierInfoPanel;
-    private JScrollPane scrollPanelMap, scrollPanelDeliveriesMap;
-    private JButton mapButton, deliveryButton, assignCourierButton, addCourierButton, removeCourierButton, exportRoutes, importRoutes, waitingListButton, exportWaitingListButton;
-    private JComboBox<String> unassignedDeliveryDropdown, courierDeliveryDropdown, courierMapDropdown, waitingListDropdown;
-    private DefaultComboBoxModel<String> unassignedModel, courierModel, courierMapModel, courierDeliveryModel, waitingListModel;
-    private Vector<String> couriers,selectedCourierVectorCourierTab,  selectedCourierVectorDeliveryTab;
-    private JList<String> courierList, courierListMapTab, selectedCourierListCourierTab, selectedCourierListDeliveryTab;
-    private MapDisplay map, mapDelivery, routeMap;
-    private JFileChooser fileChooserDelivery, fileChooserMap, fileExportWaitingList, fileExportRoutes, fileImportRoutes;
+    private final JScrollPane scrollPanelMap;
+    private final JScrollPane scrollPanelDeliveriesMap;
+    private JButton mapButton;
+    private JButton deliveryButton;
+    private final JButton assignCourierButton;
+    private JButton addCourierButton;
+    private JButton removeCourierButton;
+    private JButton exportRoutes;
+    private JButton importRoutes;
+    private final JButton waitingListButton;
+    private final JButton exportWaitingListButton;
+    private final JComboBox<String> unassignedDeliveryDropdown;
+    private final JComboBox<String> courierDeliveryDropdown;
+    private final JComboBox<String> courierMapDropdown;
+    private final JComboBox<String> waitingListDropdown;
+    private final DefaultComboBoxModel<String> unassignedModel;
+    private final DefaultComboBoxModel<String> courierModel;
+    private final DefaultComboBoxModel<String> courierMapModel;
+    private final DefaultComboBoxModel<String> courierDeliveryModel;
+    private final DefaultComboBoxModel<String> waitingListModel;
+    private final Vector<String> couriers;
+    private final Vector<String> selectedCourierVectorCourierTab;
+    private final Vector<String> selectedCourierVectorDeliveryTab;
+    private final JList<String> courierList;
+    private final JList<String> courierListMapTab;
+    private final JList<String> selectedCourierListCourierTab;
+    private final JList<String> selectedCourierListDeliveryTab;
+    private final MapDisplay map;
+    private final MapDisplay mapDelivery;
+    private final MapDisplay routeMap;
+    private final JFileChooser fileChooserDelivery;
+    private final JFileChooser fileChooserMap;
+    private final JFileChooser fileExportWaitingList;
+    private final JFileChooser fileExportRoutes;
+    private final JFileChooser fileImportRoutes;
     private JTextField courierFieldFirstName, courierFieldLastName, courierFieldPhoneNumber;
     private JLabel firstNameOfSelectedCourier, lastNameOfSelectedCourier, phoneNumberOfSelectedCourier, mapLoadingBeforeDelivery;
     private JSplitPane splitPaneCourier;
     private Vertex mapDefault ;
-    private List<Color> availableColors;
-    private Map<String, Color> routeColors;
+    private final List<Color> availableColors;
+    private final Map<String, Color> routeColors;
 
     /**
      * Constructor of the Interface Class
@@ -260,7 +287,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
                 } else {
                     JOptionPane.showMessageDialog(null, "File has not been saved.");
                 }
-            };
+            }
         });
 
         // Adding of controlMapPanel and scrollPanelDeliveries to mainPanelMap

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class SeqIter implements Iterator<Integer> {
-	private Integer[] candidates;
+	private final Integer[] candidates;
 	private int nbCandidates;
 
 	/**

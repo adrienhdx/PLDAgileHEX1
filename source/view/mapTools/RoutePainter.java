@@ -24,9 +24,9 @@ import org.jxmapviewer.painter.Painter;
 public class RoutePainter implements Painter<JXMapViewer>
 {
     private Color color;
-    private boolean antiAlias = true;
+    private final boolean antiAlias = true;
 
-    private List<GeoPosition> track;
+    private final List<GeoPosition> track;
 
     /**
      * @param track the track

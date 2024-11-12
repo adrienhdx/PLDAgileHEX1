@@ -7,9 +7,9 @@ import java.util.*;
 
 public class Model {
     private ArrayList<Delivery> pendingDeliveryArrayList;
-    private ArrayList<Delivery> waitingDeliveryArrayList;
-    private ArrayList<Courier> courierArrayList;
-    private PropertyChangeSupport propertyChangeSupport;
+    private final ArrayList<Delivery> waitingDeliveryArrayList;
+    private final ArrayList<Courier> courierArrayList;
+    private final PropertyChangeSupport propertyChangeSupport;
     private SolveurTSP solveur;
 
     private final double VITESSE_COURIER_KMH = 15.0;

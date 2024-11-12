@@ -18,11 +18,11 @@ public class RunTSP {
 		precedence.put(19273, Arrays.asList(17385)); // 3->2*/
 
 		Map<Integer, List<Integer>> precedence = new HashMap<>();
-		precedence.put(17385, Arrays.asList(17210)); // 2->1
-		precedence.put(17210, Arrays.asList(-1)); // vide
+		precedence.put(17385, List.of(17210)); // 2->1
+		precedence.put(17210, List.of(-1)); // vide
 		precedence.put(19273, Arrays.asList(21520, 66666)); // 3->4, 3->5
-		precedence.put(21520, Arrays.asList(-1)); // vide
-		precedence.put(66666, Arrays.asList(-1)); // vide
+		precedence.put(21520, List.of(-1)); // vide
+		precedence.put(66666, List.of(-1)); // vide
 
 		// Matrice des distances
 		double[][] matrix = {

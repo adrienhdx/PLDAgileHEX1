@@ -176,7 +176,7 @@ public class XmlExtractor {
 
             HashMap<Long, Vertex> verticesMap = new HashMap<>();
             for (Vertex vertex : vertices) {
-                Long id = Long.valueOf(vertex.getId());
+                Long id = vertex.getId();
                 verticesMap.put(id,vertex);
             }
 
