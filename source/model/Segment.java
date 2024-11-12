@@ -2,57 +2,44 @@ package source.model;
 
 public class Segment {
 
-    private Vertex origine;
+    private final Vertex origin;
     private Vertex destination;
-    private double longueur;
-    private String nomRue;
+    private double length;
+    private String streetName;
 
-    public Segment(String nomRue, Vertex origine, Vertex destination, double longueur) {
-        this.nomRue = nomRue;
-        this.origine = origine;
+    public Segment(String streetName, Vertex origin, Vertex destination, double length) {
+        this.streetName = streetName;
+        this.origin = origin;
         this.destination = destination;
-        this.longueur = longueur;
+        this.length = length;
     }
 
-    public Segment(Vertex origine, Vertex destination) {
-        this.origine = origine;
+    public Segment(Vertex origin, Vertex destination) {
+        this.origin = origin;
         this.destination = destination;
     }
 
-    public Vertex getOrigine() {
-        return origine;
-    }
-
-    public void setOrigine(Vertex origine) {
-        this.origine = origine;
+    public Vertex getOrigin() {
+        return origin;
     }
 
     public Vertex getDestination() {
         return destination;
     }
-
     public void setDestination(Vertex destination) {
         this.destination = destination;
     }
 
-    public double getLongueur() {
-        return longueur;
+    public double getLength() {
+        return length;
     }
 
-    public void setLongueur(double longueur) {
-        this.longueur = longueur;
-    }
-
-    public String getNomRue() {
-        return nomRue;
-    }
-
-    public void setNomRue(String nomRue) {
-        this.nomRue = nomRue;
+    public String getStreetName() {
+        return streetName;
     }
 
     @Override
     public String toString() {
-        return "Segment{origine=" + origine + ", destination=" + destination + ", longueur=" + longueur + ", nomRue='" + nomRue + "'}";
+        return "Segment{origine=" + origin + ", destination=" + destination + ", longueur=" + length + ", nomRue='" + streetName + "'}";
     }
 }

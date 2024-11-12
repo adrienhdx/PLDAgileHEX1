@@ -68,10 +68,10 @@ public class SolveurTSP {
         }
         // On remplit les longueurs entre deux sommets en récupérant leur numéro
         for (Segment segment : segmentArrayList){
-            Integer num_ligne = vertexToGlobalNum.get(segment.getOrigine().getId());
+            Integer num_ligne = vertexToGlobalNum.get(segment.getOrigin().getId());
             Integer num_colonne = vertexToGlobalNum.get(segment.getDestination().getId());
             if (num_colonne != 0 && num_ligne != 0){
-                matrice[num_ligne-1][num_colonne-1] = segment.getLongueur();
+                matrice[num_ligne-1][num_colonne-1] = segment.getLength();
                 // NOTE pour test erreur décommenter la ligne suivante et commenter celle au-dessus
                 //matrice[num_ligne-1][num_colonne-1] = Integer.MAX_VALUE;
             }
@@ -269,7 +269,7 @@ public class SolveurTSP {
         // Reconstruit la route réelle en ajoutant tous les sommets intermédiaires au chemin
         ArrayList<Vertex> sommetsAVisiter = new ArrayList<>();
         for (Segment segment : routeBirdFly) {
-            Vertex ptA = segment.getOrigine();
+            Vertex ptA = segment.getOrigin();
             Vertex ptB = segment.getDestination();
             ArrayList<Vertex> chemin = aStar(ptA, ptB).path;
             for (Vertex v : chemin) {

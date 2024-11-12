@@ -1,14 +1,12 @@
 package source.model;
 
-import java.util.List;
-
 public class CompleteGraph implements Graph {
 	public int nbVertices;
 	public double[][] cost;
 	
 	/**
 	 * Create a complete directed graph such that each edge has a weight within [MIN_COST,MAX_COST]
-	 * @param nbVertices
+	 *
 	 */
 	public CompleteGraph() {
 	}
@@ -36,7 +34,4 @@ public class CompleteGraph implements Graph {
 			return false;
 		return i != j;
 	}
-
-
-
 }

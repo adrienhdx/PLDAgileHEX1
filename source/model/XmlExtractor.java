@@ -17,8 +17,17 @@ import java.util.*;
 
 import java.io.FileInputStream;
 
+/**
+ * The XmlExtractor class is used to extract data from .xml files and to export data into new .xml files
+ */
 public class XmlExtractor {
 
+    /**
+     * Extract the deliveries and the warehouse from the .xml file
+     * @param file The xml filepath
+     * @param vertexArrayList The list of vertices
+     * @return The list of deliveries and the warehouse
+     */
     public static ArrayList<Object> extractDeliveryDemand(String file, ArrayList<Vertex> vertexArrayList) {
         ArrayList<Object> deliveryDemand = new ArrayList<>();
         ArrayList<Delivery> deliveryArrayList = new ArrayList<>();
@@ -81,6 +90,11 @@ public class XmlExtractor {
         }
     }
 
+    /**
+     * Extract the segments and the vertices of the map from the.xml file
+     * @param file The xml filepath
+     * @return Both lists of segments and vertices from the file
+     */
     public static ArrayList<Object> extractMap(String file) {
         if (!isXMLFile(file)) {
             return null;
@@ -144,6 +158,12 @@ public class XmlExtractor {
         }
     }
 
+    /**
+     * Extract the segments and the vertices of the route from the.xml file
+     * @param file The xml filepath
+     * @param vertices The list of the vertices of the map
+     * @return Both lists of segments and vertices from the file
+     */
     public static ArrayList<Object> extractRoute(String file, ArrayList<Vertex> vertices) {
         if (!isXMLFile(file)) {
             return null;
@@ -214,6 +234,11 @@ public class XmlExtractor {
         }
     }
 
+    /**
+     * Create a hash map [vertexID] -> Vertex
+     * @param vertexArrayList The list of vertices
+     * @return The hash map linking each vertex to its ID
+     */
     private static HashMap<Long, Vertex> vertexListToMap(ArrayList<Vertex> vertexArrayList) {
         HashMap<Long, Vertex> vertexIdMap = new HashMap<>();
         for (Vertex vertex : vertexArrayList) {
@@ -222,10 +247,20 @@ public class XmlExtractor {
         return vertexIdMap;
     }
 
+    /**
+     * Test is the file is a .xml file
+     * @param file The filepath
+     * @return True is the file is a .xml file
+     */
     private static boolean isXMLFile(String file) {
         return file.endsWith(".xml");
     }
 
+    /**
+     * Create a .xml file with the list of deliveries
+     * @param pendingDeliveries The list of deliveries
+     * @return The content of the .xml file
+     */
     public static String exportWaitingList(ArrayList<Delivery> pendingDeliveries){
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
         xml += "<demandeDeLivraisons>\n";
@@ -236,6 +271,12 @@ public class XmlExtractor {
         return xml;
     }
 
+    /**
+     * Create a .xml file with the list of segments and vertices of a route
+     * @param vertices The list of vertices
+     * @param segments The list of segments
+     * @return The content of the .xml file
+     */
     public static String exportRoutes(ArrayList<Vertex> vertices, ArrayList<Segment> segments) {
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
         xml += "<reseau>\n";
@@ -243,7 +284,7 @@ public class XmlExtractor {
             xml += "<noeud id=\"" + vertex.getId() + "\" latitude=\"" + vertex.getLatitude() + "\" longitude=\"" + vertex.getLongitude() + "\"/>\n";
         }
         for (Segment segment : segments) {
-            xml += "<troncon destination=\"" + segment.getDestination().getId() + "\" longueur=\"" + segment.getLongueur() + "\" nomRue=\"" + segment.getNomRue() + "\" origine=\"" + segment.getOrigine().getId() + "\"/>\n";
+            xml += "<troncon destination=\"" + segment.getDestination().getId() + "\" longueur=\"" + segment.getLength() + "\" nomRue=\"" + segment.getStreetName() + "\" origine=\"" + segment.getOrigin().getId() + "\"/>\n";
         }
         xml += "</reseau>";
         return xml;

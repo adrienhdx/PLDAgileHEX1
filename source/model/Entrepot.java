@@ -16,16 +16,6 @@ public class Entrepot {
     public Vertex getAddress() {
         return address;
     }
-    public void setAddress(Vertex address) {
-        this.address = address;
-    }
-
-    public LocalTime getDepartureHour() {
-        return departureHour;
-    }
-    public void setDepartureHour(LocalTime departureHour) {
-        this.departureHour = departureHour;
-    }
 
     @Override
     public String toString() {

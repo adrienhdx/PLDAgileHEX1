@@ -259,10 +259,10 @@ public class Controller implements ActionListener,ListSelectionListener {
                         lastName = splitInfo[1];
                         courier = model.getCourier(firstName, lastName);
                     }
-                    for (Vertex vertex : model.getCourierVertexArrayList(courier)) {
+                    for (Vertex vertex : model.getCourierVertexListToExport(courier)) {
                         vertices.add(vertex);
                     }
-                    for (Segment segment : model.getCourierSegmentArrayList(courier)) {
+                    for (Segment segment : model.getCourierSegmentListToExport(courier)) {
                         segments.add(segment);
                     }
                 }
