@@ -215,6 +215,7 @@ public class Model {
             courier.getRoute().setDeliveries(new ArrayList<>());
             courier.getRoute().setSegments(new ArrayList<>());
             propertyChangeSupport.firePropertyChange("courierRouteDeliveries", null, courier.getRoute().getDeliveries());
+            propertyChangeSupport.firePropertyChange("resetClear", null, "reset");
         }
     }
 
@@ -396,6 +397,7 @@ public class Model {
         return solveur;
     }
     public ArrayList<Vertex> getVertexArrayList() { return solveur.getVertexList(); }
+    public ArrayList<Courier> getCourierArrayList() { return courierArrayList; }
 }
 
 
