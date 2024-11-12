@@ -150,6 +150,7 @@ public class Model {
             if (deliveryList.isEmpty() && entrepot == null) {
                 propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
             } else if (entrepot != null){
+                this.resetModel();
                 pendingDeliveryArrayList = deliveryList;
                 propertyChangeSupport.firePropertyChange("pendingDeliveryArrayList", null, pendingDeliveryArrayList);
                 solveur.setEntrepot(entrepot);
@@ -158,6 +159,12 @@ public class Model {
             }
         } else {
             propertyChangeSupport.firePropertyChange("errorMessage", null, "The delivery demand doesn't match the uploaded map");
+        }
+    }
+
+    private void resetModel(){
+        for (Courier courier :  courierArrayList) {
+            deleteCourier(courier);
         }
     }
 
@@ -194,25 +201,6 @@ public class Model {
             deliveryVertices.add(delivery.getDeliveryPt());
             propertyChangeSupport.firePropertyChange("displayDelivery", null, deliveryVertices);
         }
-    }
-
-    public Vertex getPickUpFromDelivery(Courier courier, Vertex deliveryVertex) {
-        if (courier != null && deliveryVertex != null) {
-            for (Delivery delivery : courier.getRoute().getDeliveries()) {
-                if (delivery.getDeliveryPt() == deliveryVertex) {
-                    return delivery.getPickUpPt();
-                }
-            }
-            return null;
-        }
-        return null;
-    }
-
-    public Vertex getEntrepotAddress(Courier courier) {
-        if (courier != null) {
-            return solveur.getEntrepot().getAddress();
-        }
-        return null;
     }
 
     public ArrayList<Vertex> getCourierVertexArrayList(Courier courier) {

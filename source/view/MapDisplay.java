@@ -32,7 +32,7 @@ public class MapDisplay {
         mapViewer.setTileFactory(tileFactory);
 
         // Initialisation des paramètres de la carte
-        mapViewer.setZoom(3);
+        mapViewer.setZoom(6);
 
         painters = new ArrayList<>();
         mainPainter = new CompoundPainter<>(painters);

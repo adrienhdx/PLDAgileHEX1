@@ -153,6 +153,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
 
     private void showSettingsDelivery(){
         deliveryPanel.removeAll();
+        deliveryButton.setText("Reset and load a new delivery file");
 
         mapDelivery.setCentre(mapDefault);
 
@@ -174,7 +175,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        controlDeliveriesPanel.add(new JLabel("Pending Deliveries:"), gbc);
+        controlDeliveriesPanel.add(new JLabel("Pending Deliveries :"), gbc);
 
         gbc.gridx = 1;
         controlDeliveriesPanel.add(unassignedDeliveryDropdown, gbc);
@@ -182,7 +183,7 @@ public class Interface extends JFrame implements PropertyChangeListener {
         // Choisir un livreur
         gbc.gridx = 0;
         gbc.gridy = 2;
-        controlDeliveriesPanel.add(new JLabel("Choose Courier:"), gbc);
+        controlDeliveriesPanel.add(new JLabel("Choose Courier :"), gbc);
 
         gbc.gridx = 1;
         controlDeliveriesPanel.add(courierDeliveryDropdown, gbc);
@@ -587,7 +588,6 @@ public class Interface extends JFrame implements PropertyChangeListener {
             courierFieldFirstName.setText("");
             courierFieldLastName.setText("");
             courierFieldPhoneNumber.setText("");
-            JOptionPane.showMessageDialog(this, "Courier list updated");
         }
         if (evt.getPropertyName().equals("pendingDeliveryArrayList")) {
             showSettingsDelivery();
@@ -638,9 +638,8 @@ public class Interface extends JFrame implements PropertyChangeListener {
             firstNameOfSelectedCourier.setText("First Name :");
             lastNameOfSelectedCourier.setText("Last Name :");
             phoneNumberOfSelectedCourier.setText("Phone Number :");
-            ArrayList<Delivery> emptyList = new ArrayList<>();
-            updateDeliveryListCourierTab(emptyList);
-            updateDeliveryListDeliveryTab(emptyList);
+            updateDeliveryListCourierTab(new ArrayList<>());
+            updateDeliveryListDeliveryTab(new ArrayList<>());
         }
     }
 
