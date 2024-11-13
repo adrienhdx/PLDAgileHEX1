@@ -38,13 +38,18 @@ public class Model {
      */
     public Courier createCourier (String firstName, String lastName, String phoneNumber){
         if(!firstName.isEmpty() & !lastName.isEmpty() & !phoneNumber.isEmpty()) {
-            for (Courier courier : courierArrayList) {
-                if (courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
-                    propertyChangeSupport.firePropertyChange("errorMessage", null, "This courier already exists");
-                    return null;
+            if (!firstName.contains(" ") && !lastName.contains(" ")) {
+                for (Courier courier : courierArrayList) {
+                    if (courier.getFirstName().equals(firstName) && courier.getLastName().equals(lastName)) {
+                        propertyChangeSupport.firePropertyChange("errorMessage", null, "This courier already exists");
+                        return null;
+                    }
                 }
+                return new Courier(firstName, lastName, phoneNumber);
+            } else {
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "Please don't insert spaces in the courier's first or last name");
+                return null;
             }
-            return new Courier(firstName, lastName, phoneNumber);
         } else {
             propertyChangeSupport.firePropertyChange("errorMessage", null, "Please fill in all fields");
             return null;
