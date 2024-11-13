@@ -189,14 +189,12 @@ public class Model {
     public void updateDeliveryList(ArrayList<Delivery> deliveryList, Entrepot entrepot){
         if (deliveryList != null) {
             if (deliveryList.isEmpty() && entrepot == null) {
-                propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file is not an XML file");
+                propertyChangeSupport.firePropertyChange("errorMessage", null, "The selected file doesn't contain any delivery");
             } else if (entrepot != null){
                 this.resetRoutes();
                 pendingDeliveryArrayList = deliveryList;
                 propertyChangeSupport.firePropertyChange("pendingDeliveryArrayList", null, pendingDeliveryArrayList);
                 solveur.setEntrepot(entrepot);
-            } else {
-                propertyChangeSupport.firePropertyChange("errorMessage", null, "Entrepot location missing");
             }
         } else {
             propertyChangeSupport.firePropertyChange("errorMessage", null, "The delivery demand doesn't match the uploaded map");
