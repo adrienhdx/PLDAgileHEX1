@@ -5,9 +5,9 @@ import source.model.Model;
 import source.view.Interface;
 import javax.swing.*;
 
-public class AppName {
+public class DeliveRide {
 
-    public AppName() {
+    public DeliveRide() {
         Model model = new Model();
         Interface view = new Interface();
         Controller controller = new Controller(model, view);
@@ -23,7 +23,7 @@ public class AppName {
                 System.out.println(info.getName() + " - " + info.getClassName());
             }
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-            new AppName();
+            new DeliveRide();
         } catch (Exception e) {
             e.printStackTrace();
         }

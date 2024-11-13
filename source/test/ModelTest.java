@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ModelTest {
 
-
     @Test
     void createCourier() {
         Model model = new Model();

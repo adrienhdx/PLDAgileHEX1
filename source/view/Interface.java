@@ -119,9 +119,11 @@ public class Interface extends JFrame implements PropertyChangeListener {
         routeColors = new HashMap<>();
 
 
-        setTitle("App Delivery Services");
+        setTitle("DELIVE'RIDE");
         setSize(600, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ImageIcon icon = new ImageIcon("C:\\Stockage\\4IF\\AGILE\\PLDAgileHEX1\\source\\image\\Logo-agile.png");
+        setIconImage(icon.getImage());
 
         //Tab "Map"
         setupMapPanel();

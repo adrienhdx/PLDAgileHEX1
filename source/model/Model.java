@@ -115,18 +115,13 @@ public class Model {
             if (delivery != null) {
                 courier.getRoute().getDeliveries().add(delivery);
                 ArrayList<Segment> routeComputed = solveur.ObtenirArrayListeSegmentsTSP(courier.getRoute().getDeliveries());
-                // CALCUL TEMPS
                 double distanceRoute = solveur.getLongueurSolutionCourante();
                 double tempsRoute = 0;
-                for (int i=0; i<courier.getRoute().getDeliveries().size(); i++) {
+                for (int i = 0 ; i < courier.getRoute().getDeliveries().size() ; i++) {
                     // il y a 5 minutes de temps de pickup/delivery
-                    tempsRoute += 5;
+                    tempsRoute += 10;
                 }
-
-                tempsRoute += ( ( distanceRoute / 1000 ) / VITESSE_COURIER_KMH )*60; // 15 km/h
-                System.out.println("Distance de la solution trouvée : " + distanceRoute + " m");
-                System.out.println("Temps de la solution trouvée : " + tempsRoute + " min");
-
+                tempsRoute += ((distanceRoute / 1000) / VITESSE_COURIER_KMH) * 60;
                 if (routeComputed != null && tempsRoute <= DUREE_JOURNEE_MIN) {
                     courier.getRoute().setSegments(routeComputed);
                     pendingDeliveryArrayList.remove(delivery);
